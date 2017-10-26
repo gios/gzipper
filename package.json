@@ -1,0 +1,24 @@
+{
+  "name": "gzipper",
+  "version": "1.0.0",
+  "description": "Simple gzip script for your files.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gios/gzipper.git"
+  },
+  "keywords": [
+    "gzip",
+    "script",
+    "gzipper"
+  ],
+  "author": "Gios",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/gios/gzipper/issues"
+  },
+  "homepage": "https://github.com/gios/gzipper#readme"
+}
