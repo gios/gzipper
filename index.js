@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const zlib = require('zlib');
 const fs = require('fs');
 const path = require('path');
