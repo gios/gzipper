@@ -24,5 +24,8 @@
   "devDependencies": {
     "eslint": "^4.10.0",
     "eslint-config-google": "^0.9.1"
+  },
+  "engines": {
+    "node": ">=6 <8"
   }
 }

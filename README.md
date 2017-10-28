@@ -43,3 +43,6 @@ Locally usage.
 
 ### Contribution
 I appreciate every contribution, just fork the repository and send the pull request with your changes.
+
+### Requirments
+* Node.js 6 or 8
