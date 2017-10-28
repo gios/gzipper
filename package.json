@@ -1,6 +1,6 @@
 {
   "name": "gzipper",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Simple gzip script for your files.",
   "main": "index.js",
   "scripts": {
@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/gios/gzipper/issues"
   },
-  "homepage": "https://github.com/gios/gzipper#readme"
+  "homepage": "https://github.com/gios/gzipper#readme",
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "eslint-config-google": "^0.9.1"
+  }
 }
