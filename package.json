@@ -1,6 +1,6 @@
 {
   "name": "gzipper",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Simple gzip script for your files.",
   "main": "index.js",
   "scripts": {
