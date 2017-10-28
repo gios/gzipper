@@ -25,7 +25,7 @@ Locally usage.
   }
 ```
 
-* use gzipper with your build commands (ex. Angular CLI)
+* use gzipper with your build commands (e.g. Angular CLI)
 ```
   "scripts": {
     "build": "ng build && gzipper './dist'"
