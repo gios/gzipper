@@ -12,7 +12,7 @@ if (!distFolder) {
 
 let globalFilesCount = 0;
 let successGlobalFilesCount = 0;
-const outputDir = path.resolve(__dirname, distFolder);
+const outputDir = path.resolve(__dirname, '../../', distFolder);
 compileFolderRecursively(outputDir);
 
 /**

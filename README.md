@@ -1,6 +1,8 @@
 # gzipper
 Simple CLI for gzipping your js files.
 
+## **PLEASE UPDATE TO v1.3.0**
+
 ## How to use:
 ### Install globally the package.
 
@@ -28,7 +30,7 @@ Locally usage.
 * use gzipper with your build commands (e.g. Angular CLI)
 ```
   "scripts": {
-    "build": "ng build && gzipper './dist'"
+    "build": "ng build && gzipper ./dist"
   }
 ```
 
