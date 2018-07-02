@@ -8,7 +8,7 @@ Simple CLI for gzipping your js and css files.
 
 or locally to devDependencies
 
-``` npm i gzipper -D ```
+``` npm i gzipper ```
 
 ### Run script from global scope or from your package.json as a script;
 Globally usage.
