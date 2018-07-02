@@ -12,11 +12,12 @@ if (!distFolder) {
 
 let globalFilesCount = 0;
 let successGlobalFilesCount = 0;
-const outputDir = path.resolve(__dirname, '../../', distFolder);
+const outputDir = path.resolve(process.cwd(), distFolder);
 compileFolderRecursively(outputDir);
 
 /**
- * Compile files in folders recursively
+ * Compile files in folders recursively.
+ *
  * @param {string} outputDir
  * @param {number} fileCounter
  */
@@ -28,7 +29,8 @@ function compileFolderRecursively(outputDir) {
       const fullFilePath = path.resolve(outputDir, file);
 
       if (fs.lstatSync(fullFilePath).isFile()
-        && path.extname(fullFilePath) === '.js') {
+        && (path.extname(fullFilePath) === '.js'
+          || path.extname(fullFilePath) === '.css')) {
         ++globalFilesCount;
 
         compressFile(file, outputDir, () => {
@@ -49,7 +51,7 @@ function compileFolderRecursively(outputDir) {
 }
 
 /**
- * File compression func
+ * File compression.
  *
  * @param {string} filename
  * @param {string} outputDir
@@ -70,7 +72,8 @@ function compressFile(filename, outputDir, callback) {
 
 
 /**
- * Custom logger
+ * Custom logger.
+ *
  * @param {boolean} enable
  * @return {Function} logger function
  */

@@ -1,7 +1,5 @@
 # gzipper
-Simple CLI for gzipping your js files.
-
-## **PLEASE UPDATE TO v1.3.0**
+Simple CLI for gzipping your js and css files.
 
 ## How to use:
 ### Install globally the package.
@@ -35,12 +33,12 @@ Locally usage.
 ```
 
 ### Args
-* ```--log``` - enable logging
+* ```--log``` - enable logging for each file
 
 ### Roadmap
 - [x] First work version
 - [ ] Unit tests
-- [ ] Additional arguments for CLI
+- [x] Additional arguments for CLI
 - [ ] Your porposal for improvement
 
 ### Contribution
