@@ -35,12 +35,6 @@ Locally usage.
 ### Args
 * ```--log``` - enable logging for each file
 
-### Roadmap
-- [x] First work version
-- [ ] Unit tests
-- [x] Additional arguments for CLI
-- [ ] Your porposal for improvement
-
 ### Contribution
 I appreciate every contribution, just fork the repository and send the pull request with your changes.
 
