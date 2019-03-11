@@ -47,6 +47,6 @@ Locally usage.
 
 I appreciate every contribution, just fork the repository and send the pull request with your changes.
 
-### Requirments
+### Requirements
 
 - Node.js >= 8
