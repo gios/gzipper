@@ -1,6 +1,20 @@
 module.exports = {
-    "extends": "google",
-    "parserOptions": {
-        "ecmaVersion": 2017
-    }
-};
+  env: {
+    commonjs: true,
+    es6: true,
+    node: true,
+  },
+  extends: ['prettier', 'eslint:recommended'],
+  plugins: ['prettier'],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly',
+  },
+  parserOptions: {
+    ecmaVersion: 2018,
+  },
+  rules: {
+    'prettier/prettier': 'error',
+    'no-console': false,
+  },
+}

@@ -1,10 +1,13 @@
 {
   "name": "gzipper",
-  "version": "1.4.2",
-  "description": "Simple gzip script for your files.",
+  "version": "1.4.3",
+  "description": "CLI for gzipping js/css files, also perfectly works with Angular CLI.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "prettier --write \"**/*.js\"",
+    "eslint": "eslint \"**/*.js\"",
+    "check": "npm run prettier && npm run eslint"
   },
   "repository": {
     "type": "git",
@@ -12,9 +15,14 @@
   },
   "bin": "./index.js",
   "keywords": [
+    "tool",
+    "cli",
+    "zlib",
+    "zip",
     "gzip",
     "script",
-    "gzipper"
+    "gzipper",
+    "angular"
   ],
   "author": "Gios",
   "license": "GPL-3.0",
@@ -23,8 +31,10 @@
   },
   "homepage": "https://github.com/gios/gzipper#readme",
   "devDependencies": {
-    "eslint": "^5.7.0",
-    "eslint-config-google": "^0.10.0"
+    "eslint": "^5.15.1",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.16.4"
   },
   "engines": {
     "node": ">=8"
