@@ -40,7 +40,7 @@ Locally usage.
 ### Options:
 
 - `-V, --version` output the version number
-- `-v, --verbose` enable logging for every file
+- `-v, --verbose` detailed level of logs
 - `-h, --help` output usage information
 
 ### Contribution

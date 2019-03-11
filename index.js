@@ -16,7 +16,7 @@ program
     }
     outputDir = path.resolve(process.cwd(), folderPath)
   })
-  .option('-v, --verbose', 'enable logging for every file')
+  .option('-v, --verbose', 'detailed level of logs')
   .parse(process.argv)
 
 let logger = program.verbose ? loggerInit(true) : loggerInit(false)
