@@ -1,6 +1,6 @@
 # gzipper
 
-CLI for gzipping js/css files.
+CLI for gzipping files.
 
 ## How to use:
 
