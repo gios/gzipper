@@ -2,16 +2,24 @@
 const zlib = require('zlib')
 const fs = require('fs')
 const path = require('path')
+const program = require('commander')
+const version = require('./package.json').version
 
-const distFolder = process.argv[2]
-const logLevel = process.argv[3]
-let logger = logLevel === '--log' ? loggerInit(true) : loggerInit(false)
+let outputDir
 
-if (!distFolder) {
-  throw new Error('Path should be present.')
-}
+program
+  .version(version)
+  .usage('[options] <path>')
+  .action(folderPath => {
+    if (!folderPath) {
+      throw new Error(`Can't find a path.`)
+    }
+    outputDir = path.resolve(process.cwd(), folderPath)
+  })
+  .option('-v, --verbose', 'enable logging for every file')
+  .parse(process.argv)
 
-const outputDir = path.resolve(process.cwd(), distFolder)
+let logger = program.verbose ? loggerInit(true) : loggerInit(false)
 compileFolderRecursively(outputDir)
 
 /**

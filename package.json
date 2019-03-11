@@ -1,7 +1,7 @@
 {
   "name": "gzipper",
   "version": "1.4.3",
-  "description": "CLI for gzipping js/css files, also perfectly works with Angular CLI.",
+  "description": "CLI for gzipping js/css files.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -38,5 +38,8 @@
   },
   "engines": {
     "node": ">=8"
+  },
+  "dependencies": {
+    "commander": "^2.19.0"
   }
 }
