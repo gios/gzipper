@@ -11,8 +11,6 @@ if (!distFolder) {
   throw new Error('Path should be present.')
 }
 
-let globalFilesCount = 0
-let successGlobalFilesCount = 0
 const outputDir = path.resolve(process.cwd(), distFolder)
 compileFolderRecursively(outputDir)
 
@@ -22,34 +20,38 @@ compileFolderRecursively(outputDir)
  * @param {string} outputDir
  * @param {number} fileCounter
  */
-function compileFolderRecursively(outputDir) {
+function compileFolderRecursively(
+  outputDir,
+  globalCount = 0,
+  successGlobalCount = 0
+) {
   const filesList = fs.readdirSync(outputDir)
 
   try {
     filesList.forEach(file => {
-      const fullFilePath = path.resolve(outputDir, file)
+      const filePath = path.resolve(outputDir, file)
 
       if (
-        fs.lstatSync(fullFilePath).isFile() &&
-        (path.extname(fullFilePath) === '.js' ||
-          path.extname(fullFilePath) === '.css')
+        fs.lstatSync(filePath).isFile() &&
+        (path.extname(filePath) === '.js' || path.extname(filePath) === '.css')
       ) {
-        ++globalFilesCount
+        ++globalCount
 
         compressFile(file, outputDir, () => {
-          ++successGlobalFilesCount
+          ++successGlobalCount
           logger(`File ${file} has been compiled.`)
 
-          if (globalFilesCount === successGlobalFilesCount) {
-            logger(`${globalFilesCount} files have been compiled.`, true)
+          if (globalCount === successGlobalCount) {
+            logger(`${globalCount} files have been compiled.`, true)
           }
         })
-      } else if (fs.lstatSync(fullFilePath).isDirectory()) {
-        compileFolderRecursively(fullFilePath)
+      } else if (fs.lstatSync(filePath).isDirectory()) {
+        compileFolderRecursively(filePath, globalCount, successGlobalCount)
       }
     })
   } catch (err) {
     console.error(err)
+    logger(`${globalCount} files have been compiled.`, true)
   }
 }
 
@@ -63,7 +65,7 @@ function compileFolderRecursively(outputDir) {
 function compressFile(filename, outputDir, callback) {
   let compress = zlib.createGzip()
   let input = fs.createReadStream(path.join(outputDir, filename))
-  let output = fs.createWriteStream(path.join(outputDir, filename) + '.gz')
+  let output = fs.createWriteStream(`${path.join(outputDir, filename)}.gz`)
 
   input.pipe(compress).pipe(output)
 
