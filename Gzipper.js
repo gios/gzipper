@@ -86,8 +86,8 @@ class Gzipper {
     } catch (err) {
       this.logger.error(err, true)
       this.logger.warn(
-        `${globalCount} ${
-          globalCount.length > 1 ? 'files have' : 'file has'
+        `${successGlobalCount} ${
+          successGlobalCount.length > 1 ? 'files have' : 'file has'
         } been compiled.`,
         true
       )
