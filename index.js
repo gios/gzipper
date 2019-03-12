@@ -4,17 +4,9 @@ const program = require('commander')
 const version = require('./package.json').version
 const Gzipper = require('./Gzipper')
 
-let target
-
 program
   .version(version)
-  .usage('[options] <path>')
-  .action(folderPath => {
-    if (!folderPath) {
-      throw new Error(`Can't find a path.`)
-    }
-    target = folderPath
-  })
+  .usage('[options] <path> [outputPath]')
   .option('-v, --verbose', 'detailed level of logs')
   .option(
     '-gl, --gzip-level',
@@ -30,4 +22,5 @@ program
   )
   .parse(process.argv)
 
+const [target, outputPath] = program.args
 new Gzipper(target, program).compress()

@@ -25,10 +25,13 @@ class Gzipper {
    * @memberof Gzipper
    */
   constructor(target, options = {}) {
-    this.nativeTarget = target
-    this.target = path.resolve(process.cwd(), target)
+    if (!target) {
+      throw new Error(`Can't find a path.`)
+    }
     this.options = options
     this.logger = new Logger(this.options.verbose)
+    this.nativeTarget = target
+    this.target = path.resolve(process.cwd(), target)
 
     this.compressionMechanism = zlib.createGzip({
       level: this.options.gzipLevel || DEFAULT_GZIP_LEVEL,
