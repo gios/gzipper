@@ -3,9 +3,11 @@ const zlib = require('zlib')
 const fs = require('fs')
 const path = require('path')
 const program = require('commander')
-const version = require('./package.json').version
 
-let outputDir
+const version = require('./package.json').version
+const Logger = require('./Logger')
+
+let target
 
 program
   .version(version)
@@ -14,13 +16,25 @@ program
     if (!folderPath) {
       throw new Error(`Can't find a path.`)
     }
-    outputDir = path.resolve(process.cwd(), folderPath)
+    target = path.resolve(process.cwd(), folderPath)
   })
   .option('-v, --verbose', 'detailed level of logs')
+  .option(
+    '-gl, --gzip-level',
+    'gzip compression level 0 (no compression) - 9 (best compression)'
+  )
+  .option(
+    '-gm, --gzip-memory-level',
+    'amount of memory which will be allocated for compression 1 (minimum memory) - 9 (maximum memory)'
+  )
+  .option(
+    '-gs, --gzip-strategy',
+    'compression strategy 1 (filtered) - 2 (huffman only) - 3 (RLE) - 4 (fixed)'
+  )
   .parse(process.argv)
 
-let logger = program.verbose ? loggerInit(true) : loggerInit(false)
-compileFolderRecursively(outputDir)
+let logger = new Logger(program.verbose)
+compileFolderRecursively(target)
 
 /**
  * Compile files in folder recursively.
@@ -51,7 +65,12 @@ function compileFolderRecursively(
           logger.info(`File ${file} has been compiled.`)
 
           if (globalCount === successGlobalCount) {
-            logger.success(`${globalCount} files have been compiled.`, true)
+            logger.success(
+              `${globalCount} ${
+                globalCount.length > 1 ? 'files have' : 'file has'
+              } been compiled.`,
+              true
+            )
           }
         })
       } else if (fs.lstatSync(filePath).isDirectory()) {
@@ -59,8 +78,13 @@ function compileFolderRecursively(
       }
     })
   } catch (err) {
-    console.error(err)
-    logger.warn(`${globalCount} files have been compiled.`, true)
+    logger.error(err, true)
+    logger.warn(
+      `${globalCount} ${
+        globalCount.length > 1 ? 'files have' : 'file has'
+      } been compiled.`,
+      true
+    )
   }
 }
 
@@ -72,7 +96,11 @@ function compileFolderRecursively(
  * @param {() => void} callback finish callback
  */
 function compressFile(filename, outputDir, callback) {
-  let compress = zlib.createGzip()
+  let compress = zlib.createGzip({
+    level: program.gzipLevel || -1,
+    memLevel: program.gzipMemoryLevel || 8,
+    strategy: program.gzipStrategy || 0,
+  })
   let input = fs.createReadStream(path.join(outputDir, filename))
   let output = fs.createWriteStream(`${path.join(outputDir, filename)}.gz`)
 
@@ -80,50 +108,6 @@ function compressFile(filename, outputDir, callback) {
 
   if (callback) {
     output.on('finish', callback)
-    output.on('error', error => console.error(error))
-  }
-}
-
-/**
- * Custom logger.
- *
- * @typedef {Object} Logger
- * @property {(message: any, force: boolean) => void} info info message
- * @property {(message: any, force: boolean) => void} error error message
- * @property {(message: any, force: boolean) => void} success success message
- * @property {(message: any, force: boolean) => void} warn warning message
- *
- * @param {boolean} enable verbose logging
- * @return {Logger}
- */
-function loggerInit(enable) {
-  const logFn = level => {
-    let colorfulMessage
-    switch (level) {
-      case 'info':
-        colorfulMessage = `\x1b[36m%s\x1b[0m`
-        break
-
-      case 'error':
-        colorfulMessage = `\x1b[31m%s\x1b[0m`
-        break
-
-      case 'warning':
-        colorfulMessage = `\x1b[33m%s\x1b[0m`
-        break
-
-      case 'success':
-        colorfulMessage = `\x1b[32m%s\x1b[0m`
-        break
-    }
-    return (message, force) =>
-      (enable || force) && console.log(colorfulMessage.replace('%s', message))
-  }
-
-  return {
-    info: logFn('info'),
-    error: logFn('error'),
-    success: logFn('success'),
-    warn: logFn('warning'),
+    output.on('error', error => logger.error(error, true))
   }
 }
