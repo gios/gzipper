@@ -1,11 +1,9 @@
 #!/usr/bin/env node
-const zlib = require('zlib')
-const fs = require('fs')
 const path = require('path')
 const program = require('commander')
 
 const version = require('./package.json').version
-const Logger = require('./Logger')
+const Gzipper = require('./Gzipper')
 
 let target
 
@@ -33,81 +31,4 @@ program
   )
   .parse(process.argv)
 
-let logger = new Logger(program.verbose)
-compileFolderRecursively(target)
-
-/**
- * Compile files in folder recursively.
- *
- * @param {string} outputDir path to output directory
- * @param {number} [globalCount=0] global files count
- * @param {number} [successGlobalCount=0] success files count
- */
-function compileFolderRecursively(
-  outputDir,
-  globalCount = 0,
-  successGlobalCount = 0
-) {
-  const filesList = fs.readdirSync(outputDir)
-
-  try {
-    filesList.forEach(file => {
-      const filePath = path.resolve(outputDir, file)
-
-      if (
-        fs.lstatSync(filePath).isFile() &&
-        (path.extname(filePath) === '.js' || path.extname(filePath) === '.css')
-      ) {
-        ++globalCount
-
-        compressFile(file, outputDir, () => {
-          ++successGlobalCount
-          logger.info(`File ${file} has been compiled.`)
-
-          if (globalCount === successGlobalCount) {
-            logger.success(
-              `${globalCount} ${
-                globalCount.length > 1 ? 'files have' : 'file has'
-              } been compiled.`,
-              true
-            )
-          }
-        })
-      } else if (fs.lstatSync(filePath).isDirectory()) {
-        compileFolderRecursively(filePath, globalCount, successGlobalCount)
-      }
-    })
-  } catch (err) {
-    logger.error(err, true)
-    logger.warn(
-      `${globalCount} ${
-        globalCount.length > 1 ? 'files have' : 'file has'
-      } been compiled.`,
-      true
-    )
-  }
-}
-
-/**
- * File compression.
- *
- * @param {string} filename path to file
- * @param {string} outputDir path to output directory
- * @param {() => void} callback finish callback
- */
-function compressFile(filename, outputDir, callback) {
-  let compress = zlib.createGzip({
-    level: program.gzipLevel || -1,
-    memLevel: program.gzipMemoryLevel || 8,
-    strategy: program.gzipStrategy || 0,
-  })
-  let input = fs.createReadStream(path.join(outputDir, filename))
-  let output = fs.createWriteStream(`${path.join(outputDir, filename)}.gz`)
-
-  input.pipe(compress).pipe(output)
-
-  if (callback) {
-    output.on('finish', callback)
-    output.on('error', error => logger.error(error, true))
-  }
-}
+new Gzipper(target, program).compress()
