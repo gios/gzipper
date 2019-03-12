@@ -25,7 +25,8 @@ class Gzipper {
    * @memberof Gzipper
    */
   constructor(target, options = {}) {
-    this.target = target
+    this.nativeTarget = target
+    this.target = path.resolve(process.cwd(), target)
     this.options = options
     this.logger = new Logger(this.options.verbose)
 
@@ -39,21 +40,17 @@ class Gzipper {
   /**
    * Compile files in folder recursively.
    *
-   * @param {string} outputDir path to output directory
+   * @param {string} target path to target directory
    * @param {number} [globalCount=0] global files count
    * @param {number} [successGlobalCount=0] success files count
    * @memberof Gzipper
    */
-  [compileFolderRecursively](
-    outputDir,
-    globalCount = 0,
-    successGlobalCount = 0
-  ) {
-    const filesList = fs.readdirSync(outputDir)
+  [compileFolderRecursively](target, globalCount = 0, successGlobalCount = 0) {
+    const filesList = fs.readdirSync(target)
 
     try {
       filesList.forEach(file => {
-        const filePath = path.resolve(outputDir, file)
+        const filePath = path.resolve(target, file)
 
         if (
           fs.lstatSync(filePath).isFile() &&
@@ -62,7 +59,7 @@ class Gzipper {
         ) {
           ++globalCount
 
-          this[compressFile](file, outputDir, () => {
+          this[compressFile](file, target, null, () => {
             ++successGlobalCount
             this.logger.info(`File ${file} has been compiled.`)
 
@@ -70,7 +67,10 @@ class Gzipper {
               this.logger.success(
                 `${globalCount} ${
                   globalCount.length > 1 ? 'files have' : 'file has'
-                } been compiled.`,
+                } been compiled from folder ${path.relative(
+                  this.nativeTarget,
+                  path.dirname(filePath)
+                )}.`,
                 true
               )
             }
@@ -85,12 +85,6 @@ class Gzipper {
       })
     } catch (err) {
       this.logger.error(err, true)
-      this.logger.warn(
-        `${successGlobalCount} ${
-          successGlobalCount.length > 1 ? 'files have' : 'file has'
-        } been compiled.`,
-        true
-      )
     }
   }
 
@@ -98,13 +92,16 @@ class Gzipper {
    * File compression.
    *
    * @param {string} filename path to file
-   * @param {string} outputDir path to output directory
+   * @param {string} target path to target directory
+   * @param {string} outputDir path to output directory (default {target})
    * @param {() => void} callback finish callback
    * @memberof Gzipper
    */
-  [compressFile](filename, outputDir, callback) {
-    let input = fs.createReadStream(path.join(outputDir, filename))
-    let output = fs.createWriteStream(`${path.join(outputDir, filename)}.gz`)
+  [compressFile](filename, target, outputDir, callback) {
+    let input = fs.createReadStream(path.join(target, filename))
+    let output = fs.createWriteStream(
+      `${path.join(outputDir || target, filename)}.gz`
+    )
 
     input.pipe(this.compressionMechanism).pipe(output)
 

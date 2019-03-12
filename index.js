@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-const path = require('path')
 const program = require('commander')
 
 const version = require('./package.json').version
@@ -14,7 +13,7 @@ program
     if (!folderPath) {
       throw new Error(`Can't find a path.`)
     }
-    target = path.resolve(process.cwd(), folderPath)
+    target = folderPath
   })
   .option('-v, --verbose', 'detailed level of logs')
   .option(

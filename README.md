@@ -41,6 +41,9 @@ Locally usage.
 
 - `-V, --version` output the version number
 - `-v, --verbose` detailed level of logs
+- `gl, --gzip-level` gzip compression level 0 (no compression) - 9 (best compression)
+- `gm, --gzip-memory-level` amount of memory which will be allocated for compression 1 (minimum memory) - 9 (maximum memory)
+- `gs, --gzip-strategy` compression strategy 1 (filtered) - 2 (huffman only) - 3 (RLE) - 4 (fixed)
 - `-h, --help` output usage information
 
 ### Contribution
