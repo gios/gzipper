@@ -75,7 +75,7 @@ class Gzipper {
             if (globalCount === successGlobalCount) {
               this.logger.success(
                 `${globalCount} ${
-                  globalCount.length > 1 ? 'files have' : 'file has'
+                  globalCount > 1 ? 'files have' : 'file has'
                 } been compiled from folder ${path.relative(
                   this.nativeTarget,
                   path.dirname(filePath)
