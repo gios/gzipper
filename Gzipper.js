@@ -24,12 +24,18 @@ class Gzipper {
    * @param {Object} [options={}]
    * @memberof Gzipper
    */
-  constructor(target, options = {}) {
+  constructor(target, outputPath, options = {}) {
     if (!target) {
       throw new Error(`Can't find a path.`)
     }
     this.options = options
     this.logger = new Logger(this.options.verbose)
+    if (outputPath) {
+      this.outputPath = path.resolve(process.cwd(), outputPath)
+      if (!fs.existsSync(this.outputPath)) {
+        fs.mkdirSync(this.outputPath, { recursive: true })
+      }
+    }
     this.nativeTarget = target
     this.target = path.resolve(process.cwd(), target)
 
@@ -62,7 +68,7 @@ class Gzipper {
         ) {
           ++globalCount
 
-          this[compressFile](file, target, null, () => {
+          this[compressFile](file, target, this.outputPath, () => {
             ++successGlobalCount
             this.logger.info(`File ${file} has been compiled.`)
 

@@ -16,7 +16,7 @@ or locally to devDependencies
 
 Globally usage.
 
-`gzipper <path> args`
+`gzipper [options] <path> [outputPath]`
 
 Locally usage.
 
@@ -33,7 +33,7 @@ Locally usage.
 
 ```
   "scripts": {
-    "build": "ng build && gzipper ./dist"
+    "build": "ng build && gzipper --verbose ./dist"
   }
 ```
 

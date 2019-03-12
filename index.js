@@ -23,4 +23,4 @@ program
   .parse(process.argv)
 
 const [target, outputPath] = program.args
-new Gzipper(target, program).compress()
+new Gzipper(target, outputPath, program).compress()
