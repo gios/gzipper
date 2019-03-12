@@ -68,22 +68,29 @@ class Gzipper {
         ) {
           ++globalCount
 
-          this[compressFile](file, target, this.outputPath, () => {
-            ++successGlobalCount
-            this.logger.info(`File ${file} has been compiled.`)
-
-            if (globalCount === successGlobalCount) {
-              this.logger.success(
-                `${globalCount} ${
-                  globalCount > 1 ? 'files have' : 'file has'
-                } been compiled from folder ${path.relative(
-                  this.nativeTarget,
-                  path.dirname(filePath)
-                )}.`,
-                true
+          this[compressFile](
+            file,
+            target,
+            this.outputPath,
+            (beforeSize, afterSize) => {
+              ++successGlobalCount
+              this.logger.info(
+                `File ${file} has been compressed ${beforeSize}Kb -> ${afterSize}Kb.`
               )
+
+              if (globalCount === successGlobalCount) {
+                this.logger.success(
+                  `${globalCount} ${
+                    globalCount > 1 ? 'files have' : 'file has'
+                  } been compressed from folder ${path.relative(
+                    this.nativeTarget,
+                    path.dirname(filePath)
+                  )}.`,
+                  true
+                )
+              }
             }
-          })
+          )
         } else if (fs.lstatSync(filePath).isDirectory()) {
           this[compileFolderRecursively](
             filePath,
@@ -107,15 +114,22 @@ class Gzipper {
    * @memberof Gzipper
    */
   [compressFile](filename, target, outputDir, callback) {
-    let input = fs.createReadStream(path.join(target, filename))
-    let output = fs.createWriteStream(
-      `${path.join(outputDir || target, filename)}.gz`
-    )
+    const inputPath = path.join(target, filename)
+    const outputPath = path.join(outputDir || target, filename)
+    const input = fs.createReadStream(inputPath)
+    const output = fs.createWriteStream(`${outputPath}.gz`)
 
     input.pipe(this.compressionMechanism).pipe(output)
 
     if (callback) {
-      output.on('finish', callback)
+      output.on(
+        'finish',
+        callback.bind(
+          this,
+          fs.statSync(inputPath).size / 1024,
+          fs.statSync(outputPath).size / 1024
+        )
+      )
       output.on('error', error => this.logger.error(error, true))
     }
   }
