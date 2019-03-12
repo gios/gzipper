@@ -115,9 +115,9 @@ class Gzipper {
    */
   [compressFile](filename, target, outputDir, callback) {
     const inputPath = path.join(target, filename)
-    const outputPath = path.join(outputDir || target, filename)
+    const outputPath = `${path.join(outputDir || target, filename)}.gz`
     const input = fs.createReadStream(inputPath)
-    const output = fs.createWriteStream(`${outputPath}.gz`)
+    const output = fs.createWriteStream(outputPath)
 
     input.pipe(this.compressionMechanism).pipe(output)
 
