@@ -23,10 +23,11 @@ let logger = program.verbose ? loggerInit(true) : loggerInit(false)
 compileFolderRecursively(outputDir)
 
 /**
- * Compile files in folders recursively.
+ * Compile files in folder recursively.
  *
- * @param {string} outputDir
- * @param {number} fileCounter
+ * @param {string} outputDir path to output directory
+ * @param {number} [globalCount=0] global files count
+ * @param {number} [successGlobalCount=0] success files count
  */
 function compileFolderRecursively(
   outputDir,
@@ -47,10 +48,10 @@ function compileFolderRecursively(
 
         compressFile(file, outputDir, () => {
           ++successGlobalCount
-          logger(`File ${file} has been compiled.`)
+          logger.info(`File ${file} has been compiled.`)
 
           if (globalCount === successGlobalCount) {
-            logger(`${globalCount} files have been compiled.`, true)
+            logger.success(`${globalCount} files have been compiled.`, true)
           }
         })
       } else if (fs.lstatSync(filePath).isDirectory()) {
@@ -59,16 +60,16 @@ function compileFolderRecursively(
     })
   } catch (err) {
     console.error(err)
-    logger(`${globalCount} files have been compiled.`, true)
+    logger.warn(`${globalCount} files have been compiled.`, true)
   }
 }
 
 /**
  * File compression.
  *
- * @param {string} filename
- * @param {string} outputDir
- * @param {any} callback
+ * @param {string} filename path to file
+ * @param {string} outputDir path to output directory
+ * @param {() => void} callback finish callback
  */
 function compressFile(filename, outputDir, callback) {
   let compress = zlib.createGzip()
@@ -86,9 +87,43 @@ function compressFile(filename, outputDir, callback) {
 /**
  * Custom logger.
  *
- * @param {boolean} enable
- * @return {Function} logger function
+ * @typedef {Object} Logger
+ * @property {(message: any, force: boolean) => void} info info message
+ * @property {(message: any, force: boolean) => void} error error message
+ * @property {(message: any, force: boolean) => void} success success message
+ * @property {(message: any, force: boolean) => void} warn warning message
+ *
+ * @param {boolean} enable verbose logging
+ * @return {Logger}
  */
 function loggerInit(enable) {
-  return (message, force) => (enable || force) && console.log(message)
+  const logFn = level => {
+    let colorfulMessage
+    switch (level) {
+      case 'info':
+        colorfulMessage = `\x1b[36m%s\x1b[0m`
+        break
+
+      case 'error':
+        colorfulMessage = `\x1b[31m%s\x1b[0m`
+        break
+
+      case 'warning':
+        colorfulMessage = `\x1b[33m%s\x1b[0m`
+        break
+
+      case 'success':
+        colorfulMessage = `\x1b[32m%s\x1b[0m`
+        break
+    }
+    return (message, force) =>
+      (enable || force) && console.log(colorfulMessage.replace('%s', message))
+  }
+
+  return {
+    info: logFn('info'),
+    error: logFn('error'),
+    success: logFn('success'),
+    warn: logFn('warning'),
+  }
 }
