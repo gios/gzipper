@@ -4,7 +4,7 @@ CLI for compressing files.
 
 ## How to use:
 
-### Install globally the package.
+### Install globally the package
 
 `npm i gzipper -g`
 
@@ -12,7 +12,7 @@ or locally to devDependencies
 
 `npm i gzipper -D`
 
-### Run script from global scope or from your package.json as a script;
+### Run script from global scope or from your package.json as a script
 
 Globally usage.
 
@@ -20,7 +20,7 @@ Globally usage.
 
 Locally usage.
 
-- add to scripts property in your package.json
+- add to scripts in your package.json
 
 ```
   "scripts": {
@@ -34,6 +34,14 @@ Locally usage.
 ```
   "scripts": {
     "build": "ng build && gzipper --verbose ./dist"
+  }
+```
+
+- compress files to a certain directory `./gzipped`
+
+```
+  "scripts": {
+    "build": "ng build && gzipper --verbose ./dist ./gzipped"
   }
 ```
 
