@@ -36,7 +36,6 @@ class Gzipper {
         fs.mkdirSync(this.outputPath, { recursive: true })
       }
     }
-    this.nativeTarget = target
     this.target = path.resolve(process.cwd(), target)
 
     this.compressionMechanism = zlib.createGzip({
@@ -64,10 +63,11 @@ class Gzipper {
    * @param {number} [successGlobalCount=0] success files count
    * @memberof Gzipper
    */
-  [compileFolderRecursively](target, globalCount = 0, successGlobalCount = 0) {
-    const filesList = fs.readdirSync(target)
-
+  [compileFolderRecursively](target, pending = 0) {
     try {
+      const filesList = fs.readdirSync(target)
+      pending += filesList.length
+
       filesList.forEach(file => {
         const filePath = path.resolve(target, file)
 
@@ -76,37 +76,24 @@ class Gzipper {
           (path.extname(filePath) === '.js' ||
             path.extname(filePath) === '.css')
         ) {
-          ++globalCount
-
           this[compressFile](
             file,
             target,
             this.outputPath,
             (beforeSize, afterSize) => {
-              ++successGlobalCount
+              --pending
               this.logger.info(
                 `File ${file} has been compressed ${beforeSize}Kb -> ${afterSize}Kb.`
               )
 
-              if (globalCount === successGlobalCount) {
-                this.logger.success(
-                  `${globalCount} ${
-                    globalCount > 1 ? 'files have' : 'file has'
-                  } been compressed from folder ${path.relative(
-                    this.nativeTarget,
-                    path.dirname(filePath)
-                  )}.`,
-                  true
-                )
+              if (!pending) {
+                this.logger.success(`All files have been compressed.`, true)
               }
             }
           )
         } else if (fs.lstatSync(filePath).isDirectory()) {
-          this[compileFolderRecursively](
-            filePath,
-            globalCount,
-            successGlobalCount
-          )
+          --pending
+          this[compileFolderRecursively](filePath, pending)
         }
       })
     } catch (err) {
