@@ -14,7 +14,7 @@ const GZIP_NAME = 'GZIP'
 const BROTLI_NAME = 'BROTLI'
 
 /**
- * Gzipping files.
+ * Compressing files.
  *
  * @class Gzipper
  */
