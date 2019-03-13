@@ -63,7 +63,7 @@ class Gzipper {
    * @param {number} [successGlobalCount=0] success files count
    * @memberof Gzipper
    */
-  [compileFolderRecursively](target, pending = 0) {
+  [compileFolderRecursively](target, pending = 0, files = []) {
     try {
       const filesList = fs.readdirSync(target)
       pending += filesList.length
@@ -76,6 +76,7 @@ class Gzipper {
           (path.extname(filePath) === '.js' ||
             path.extname(filePath) === '.css')
         ) {
+          files.push(file)
           this[compressFile](
             file,
             target,
@@ -87,13 +88,18 @@ class Gzipper {
               )
 
               if (!pending) {
-                this.logger.success(`All files have been compressed.`, true)
+                this.logger.success(
+                  `${files.length} ${
+                    files.length > 1 ? 'files have' : 'file has'
+                  } been compressed.`,
+                  true
+                )
               }
             }
           )
         } else if (fs.lstatSync(filePath).isDirectory()) {
           --pending
-          this[compileFolderRecursively](filePath, pending)
+          this[compileFolderRecursively](filePath, pending, files)
         }
       })
     } catch (err) {
@@ -156,7 +162,7 @@ class Gzipper {
       optionsStr += `${key}: ${this.compressionMechanism[value]}, `
     }
 
-    this.logger.warn(`${compressionType} -> ${optionsStr.slice(0, -2)}`)
+    this.logger.warn(`${compressionType} -> ${optionsStr.slice(0, -2)}`, true)
   }
 }
 
