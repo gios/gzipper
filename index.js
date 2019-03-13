@@ -20,6 +20,19 @@ program
     '-gs, --gzip-strategy [strategy]',
     'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)'
   )
+  .option('--brotli', 'enable brotli compression')
+  .option(
+    '-bp, --brotli-param-mode [brotliParamMode]',
+    'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)'
+  )
+  .option(
+    '-bq, --brotli-quality [brotliQuality]',
+    'brotli compression quality 11 (default), 0 - 11'
+  )
+  .option(
+    '-bs, --brotli-size-hint [brotliSizeHint]',
+    'expected input size 0 (default)'
+  )
   .parse(process.argv)
 
 const [target, outputPath] = program.args
@@ -28,6 +41,10 @@ const options = {
   gzipLevel: program.gzipLevel,
   gzipMemoryLevel: program.gzipMemoryLevel,
   gzipStrategy: program.gzipStrategy,
+  brotli: program.brotli,
+  brotliParamMode: program.brotliParamMode,
+  brotliQuality: program.brotliQuality,
+  brotliSizeHint: program.brotliSizeHint,
 }
 
 Object.keys(options).forEach(
@@ -35,7 +52,7 @@ Object.keys(options).forEach(
 )
 
 Object.keys(options).forEach(key => {
-  if (!isNaN(+options[key])) {
+  if (!isNaN(+options[key]) && typeof options[key] !== 'boolean') {
     options[key] = +options[key]
   }
 })

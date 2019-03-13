@@ -6,10 +6,8 @@ const Logger = require('./Logger')
 
 const compileFolderRecursively = Symbol('compileFolderRecursively')
 const compressFile = Symbol('compressFile')
-
-const DEFAULT_GZIP_LEVEL = -1
-const DEFAULT_GZIP_MEMORY_LEVEL = 8
-const DEFAULT_GZIP_STRATEGY = 0
+const compressionTypeLog = Symbol('compressionTypeLog')
+const selectCompressionType = Symbol('selectCompressionType')
 
 /**
  * Gzipping files.
@@ -37,22 +35,8 @@ class Gzipper {
       }
     }
     this.target = path.resolve(process.cwd(), target)
-
-    this.compressionMechanism = zlib.createGzip({
-      level:
-        this.options.gzipLevel !== undefined
-          ? this.options.gzipLevel
-          : DEFAULT_GZIP_LEVEL,
-      memLevel:
-        this.options.gzipMemoryLevel !== undefined
-          ? this.options.gzipMemoryLevel
-          : DEFAULT_GZIP_MEMORY_LEVEL,
-      strategy:
-        this.options.gzipStrategy !== undefined
-          ? this.options.gzipStrategy
-          : DEFAULT_GZIP_STRATEGY,
-    })
-    this.selectCompressionMechanismLog()
+    this[selectCompressionType]()
+    this[compressionTypeLog]()
   }
 
   /**
@@ -121,7 +105,7 @@ class Gzipper {
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
-    input.pipe(this.compressionMechanism).pipe(output)
+    input.pipe(this.compressionType).pipe(output)
 
     if (callback) {
       output.on('finish', () =>
@@ -148,20 +132,96 @@ class Gzipper {
    *
    * @memberof Gzipper
    */
-  selectCompressionMechanismLog() {
+  [compressionTypeLog]() {
     let compressionType,
       optionsStr = '',
       options = new Map([['level', '_level'], ['strategy', '_strategy']])
 
-    if (this.compressionMechanism instanceof zlib.Gzip) {
+    if (this.compressionType instanceof zlib.Gzip) {
       compressionType = 'GZIP'
+    } else if (this.compressionType instanceof zlib.Brotli) {
+      compressionType = 'BROTLI'
     }
 
     for (const [key, value] of options) {
-      optionsStr += `${key}: ${this.compressionMechanism[value]}, `
+      optionsStr += `${key}: ${this.compressionType[value]}, `
     }
 
     this.logger.warn(`${compressionType} -> ${optionsStr.slice(0, -2)}`, true)
+  }
+
+  /**
+   * Select compression type.
+   *
+   * @memberof Gzipper
+   */
+  [selectCompressionType]() {
+    const gzipOptions = {}
+
+    if (this.options.gzipLevel !== undefined) {
+      gzipOptions.gzipLevel = this.options.gzipLevel
+    }
+
+    if (this.options.gzipMemoryLevel !== undefined) {
+      gzipOptions.gzipMemoryLevel = this.options.gzipMemoryLevel
+    }
+
+    if (this.options.gzipStrategy !== undefined) {
+      gzipOptions.gzipStrategy = this.options.gzipStrategy
+    }
+
+    this.compressionType = zlib.createGzip(gzipOptions)
+
+    if (
+      typeof zlib.createBrotliCompress === 'function' &&
+      this.options.brotli
+    ) {
+      const brotliOptions = {}
+
+      if (this.options.brotliParamMode !== undefined) {
+        switch (this.options.brotliParamMode) {
+          case 'default':
+            brotliOptions[zlib.constants.BROTLI_PARAM_MODE] =
+              zlib.constants.BROTLI_MODE_GENERIC
+            break
+
+          case 'text':
+            brotliOptions[zlib.constants.BROTLI_PARAM_MODE] =
+              zlib.constants.BROTLI_MODE_TEXT
+            break
+
+          case 'font':
+            brotliOptions[zlib.constants.BROTLI_PARAM_MODE] =
+              zlib.constants.BROTLI_MODE_FONT
+            break
+
+          default:
+            brotliOptions[zlib.constants.BROTLI_PARAM_MODE] =
+              zlib.constants.BROTLI_MODE_GENERIC
+            break
+        }
+      }
+
+      if (this.options.brotliQuality !== undefined) {
+        brotliOptions[
+          zlib.constants.BROTLI_PARAM_QUALITY
+        ] = this.options.brotliQuality
+      }
+
+      if (this.options.brotliSizeHint !== undefined) {
+        brotliOptions[
+          zlib.constants.BROTLI_PARAM_SIZE_HINT
+        ] = this.options.brotliSizeHint
+      }
+
+      this.compressionType = zlib.createBrotliCompress({
+        params: brotliOptions,
+      })
+    } else {
+      throw new Error(
+        `Can't use brotli compression, Node.js >= v11.7.0 required.`
+      )
+    }
   }
 }
 
