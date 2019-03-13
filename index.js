@@ -20,7 +20,7 @@ program
     '-gs, --gzip-strategy [strategy]',
     'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)'
   )
-  .option('--brotli', 'enable brotli compression')
+  .option('--brotli', 'enable brotli compression, Node.js >= v11.7.0')
   .option(
     '-bp, --brotli-param-mode [brotliParamMode]',
     'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)'

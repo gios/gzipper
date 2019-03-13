@@ -52,7 +52,7 @@ Locally usage.
 - `-gl, --gzip-level [level]` gzip compression level -1 (default), 0 (no compression) - 9 (best compression)
 - `-gm, --gzip-memory-level [memoryLevel]` amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
 - `-gs, --gzip-strategy [strategy]` compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
-- `--brotli` enable brotli compression
+- `--brotli` enable brotli compression, Node.js >= v11.7.0
 - `-bp, --brotli-param-mode [brotliParamMode]` default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
 - `-bq, --brotli-quality [brotliQuality]` brotli compression quality 11 (default), 0 - 11
 - `-bs, --brotli-size-hint [brotliSizeHint]` expected input size 0 (default)
