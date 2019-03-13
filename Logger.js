@@ -44,8 +44,7 @@ class Logger {
     }
 
     return (message, force) =>
-      (this.verbose || force) &&
-      console.log(colorfulMessage.replace('%s', message))
+      (this.verbose || force) && console.log(colorfulMessage, message)
   }
 
   /**

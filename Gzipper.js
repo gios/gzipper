@@ -40,10 +40,20 @@ class Gzipper {
     this.target = path.resolve(process.cwd(), target)
 
     this.compressionMechanism = zlib.createGzip({
-      level: this.options.gzipLevel || DEFAULT_GZIP_LEVEL,
-      memLevel: this.options.gzipMemoryLevel || DEFAULT_GZIP_MEMORY_LEVEL,
-      strategy: this.options.gzipStrategy || DEFAULT_GZIP_STRATEGY,
+      level:
+        this.options.gzipLevel !== undefined
+          ? this.options.gzipLevel
+          : DEFAULT_GZIP_LEVEL,
+      memLevel:
+        this.options.gzipMemoryLevel !== undefined
+          ? this.options.gzipMemoryLevel
+          : DEFAULT_GZIP_MEMORY_LEVEL,
+      strategy:
+        this.options.gzipStrategy !== undefined
+          ? this.options.gzipStrategy
+          : DEFAULT_GZIP_STRATEGY,
     })
+    this.selectCompressionMechanismLog()
   }
 
   /**
@@ -122,10 +132,8 @@ class Gzipper {
     input.pipe(this.compressionMechanism).pipe(output)
 
     if (callback) {
-      output.on(
-        'finish',
-        callback.bind(
-          this,
+      output.on('finish', () =>
+        callback(
           fs.statSync(inputPath).size / 1024,
           fs.statSync(outputPath).size / 1024
         )
@@ -141,6 +149,27 @@ class Gzipper {
    */
   compress() {
     this[compileFolderRecursively](this.target)
+  }
+
+  /**
+   * Show message with compression params.
+   *
+   * @memberof Gzipper
+   */
+  selectCompressionMechanismLog() {
+    let compressionType,
+      optionsStr = '',
+      options = new Map([['level', '_level'], ['strategy', '_strategy']])
+
+    if (this.compressionMechanism instanceof zlib.Gzip) {
+      compressionType = 'GZIP'
+    }
+
+    for (const [key, value] of options) {
+      optionsStr += `${key}: ${this.compressionMechanism[value]}, `
+    }
+
+    this.logger.warn(`${compressionType} -> ${optionsStr.slice(0, -2)}`)
   }
 }
 
