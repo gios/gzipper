@@ -7,7 +7,11 @@ const Logger = require('./Logger')
 const compileFolderRecursively = Symbol('compileFolderRecursively')
 const compressFile = Symbol('compressFile')
 const compressionTypeLog = Symbol('compressionTypeLog')
-const selectCompressionType = Symbol('selectCompressionType')
+const selectCompression = Symbol('selectCompression')
+const getCompressionType = Symbol('getCompressionType')
+
+const GZIP_NAME = 'GZIP'
+const BROTLI_NAME = 'BROTLI'
 
 /**
  * Gzipping files.
@@ -35,7 +39,7 @@ class Gzipper {
       }
     }
     this.target = path.resolve(process.cwd(), target)
-    this[selectCompressionType]()
+    this[selectCompression]()
     this[compressionTypeLog]()
   }
 
@@ -100,12 +104,15 @@ class Gzipper {
    * @memberof Gzipper
    */
   [compressFile](filename, target, outputDir, callback) {
+    const compressionType = this[getCompressionType]()
     const inputPath = path.join(target, filename)
-    const outputPath = `${path.join(outputDir || target, filename)}.gz`
+    const outputPath = `${path.join(outputDir || target, filename)}.${
+      compressionType.ext
+    }`
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
-    input.pipe(this.compressionType).pipe(output)
+    input.pipe(this.compression).pipe(output)
 
     if (callback) {
       output.on('finish', () =>
@@ -133,21 +140,21 @@ class Gzipper {
    * @memberof Gzipper
    */
   [compressionTypeLog]() {
-    let compressionType,
+    let compressionType = this[getCompressionType](),
       optionsStr = '',
-      options = new Map([['level', '_level'], ['strategy', '_strategy']])
+      options = new Map([
+        [GZIP_NAME, new Map([['level', '_level'], ['strategy', '_strategy']])],
+        [BROTLI_NAME, new Map()],
+      ])
 
-    if (this.compressionType instanceof zlib.Gzip) {
-      compressionType = 'GZIP'
-    } else if (this.compressionType instanceof zlib.Brotli) {
-      compressionType = 'BROTLI'
+    for (const [key, value] of options.get(compressionType.name)) {
+      optionsStr += `${key}: ${this.compression[value]}, `
     }
 
-    for (const [key, value] of options) {
-      optionsStr += `${key}: ${this.compressionType[value]}, `
-    }
-
-    this.logger.warn(`${compressionType} -> ${optionsStr.slice(0, -2)}`, true)
+    this.logger.warn(
+      `${compressionType.name} -> ${optionsStr.slice(0, -2)}`,
+      true
+    )
   }
 
   /**
@@ -155,7 +162,7 @@ class Gzipper {
    *
    * @memberof Gzipper
    */
-  [selectCompressionType]() {
+  [selectCompression]() {
     const gzipOptions = {}
 
     if (this.options.gzipLevel !== undefined) {
@@ -170,12 +177,18 @@ class Gzipper {
       gzipOptions.gzipStrategy = this.options.gzipStrategy
     }
 
-    this.compressionType = zlib.createGzip(gzipOptions)
+    this.compression = zlib.createGzip(gzipOptions)
 
     if (
-      typeof zlib.createBrotliCompress === 'function' &&
-      this.options.brotli
+      this.options.brotli &&
+      typeof zlib.createBrotliCompress !== 'function'
     ) {
+      throw new Error(
+        `Can't use brotli compression, Node.js >= v11.7.0 required.`
+      )
+    }
+
+    if (this.options.brotli) {
       const brotliOptions = {}
 
       if (this.options.brotliParamMode !== undefined) {
@@ -214,13 +227,33 @@ class Gzipper {
         ] = this.options.brotliSizeHint
       }
 
-      this.compressionType = zlib.createBrotliCompress({
+      this.compression = zlib.createBrotliCompress({
         params: brotliOptions,
       })
-    } else {
-      throw new Error(
-        `Can't use brotli compression, Node.js >= v11.7.0 required.`
-      )
+    }
+  }
+
+  /**
+   * Get compression type and extension.
+   *
+   * @typedef {Object} CompressionType
+   * @property {string} name compression name
+   * @property {string} ext compression extension
+   *
+   * @returns {CompressionType} compression type and extension
+   * @memberof Gzipper
+   */
+  [getCompressionType]() {
+    if (this.compression instanceof zlib.Gzip) {
+      return {
+        name: GZIP_NAME,
+        ext: 'gz',
+      }
+    } else if (this.compression instanceof zlib.BrotliCompress) {
+      return {
+        name: BROTLI_NAME,
+        ext: 'br',
+      }
     }
   }
 }
