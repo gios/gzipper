@@ -38,22 +38,18 @@ program
 const [target, outputPath] = program.args
 const options = {
   verbose: program.verbose,
-  gzipLevel: program.gzipLevel,
-  gzipMemoryLevel: program.gzipMemoryLevel,
-  gzipStrategy: program.gzipStrategy,
+  gzipLevel: +program.gzipLevel,
+  gzipMemoryLevel: +program.gzipMemoryLevel,
+  gzipStrategy: +program.gzipStrategy,
   brotli: program.brotli,
   brotliParamMode: program.brotliParamMode,
-  brotliQuality: program.brotliQuality,
-  brotliSizeHint: program.brotliSizeHint,
+  brotliQuality: +program.brotliQuality,
+  brotliSizeHint: +program.brotliSizeHint,
 }
 
-Object.keys(options).forEach(
-  key => options[key] === undefined && delete options[key]
-)
-
 Object.keys(options).forEach(key => {
-  if (!isNaN(+options[key]) && typeof options[key] !== 'boolean') {
-    options[key] = +options[key]
+  if (options[key] === undefined || isNaN(options[key])) {
+    delete options[key]
   }
 })
 

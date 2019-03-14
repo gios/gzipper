@@ -39,7 +39,7 @@ class Gzipper {
       }
     }
     this.target = path.resolve(process.cwd(), target)
-    this[selectCompression]()
+    this.compression = this[selectCompression]()
     this[compressionTypeLog]()
   }
 
@@ -115,13 +115,13 @@ class Gzipper {
     input.pipe(this.compression).pipe(output)
 
     if (callback) {
-      output.on('finish', () =>
+      output.once('finish', () =>
         callback(
           fs.statSync(inputPath).size / 1024,
           fs.statSync(outputPath).size / 1024
         )
       )
-      output.on('error', error => this.logger.error(error, true))
+      output.once('error', error => this.logger.error(error, true))
     }
   }
 
@@ -160,6 +160,7 @@ class Gzipper {
   /**
    * Select compression type.
    *
+   * @returns compression instance (Gzip or BrotliCompress)
    * @memberof Gzipper
    */
   [selectCompression]() {
@@ -177,7 +178,7 @@ class Gzipper {
       gzipOptions.gzipStrategy = this.options.gzipStrategy
     }
 
-    this.compression = zlib.createGzip(gzipOptions)
+    let compression = zlib.createGzip(gzipOptions)
 
     if (
       this.options.brotli &&
@@ -227,10 +228,12 @@ class Gzipper {
         ] = this.options.brotliSizeHint
       }
 
-      this.compression = zlib.createBrotliCompress({
+      compression = zlib.createBrotliCompress({
         params: brotliOptions,
       })
     }
+
+    return compression
   }
 
   /**
