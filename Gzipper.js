@@ -10,9 +10,6 @@ const compressionTypeLog = Symbol('compressionTypeLog')
 const selectCompression = Symbol('selectCompression')
 const getCompressionType = Symbol('getCompressionType')
 
-const GZIP_NAME = 'GZIP'
-const BROTLI_NAME = 'BROTLI'
-
 /**
  * Compressing files.
  *
@@ -39,7 +36,9 @@ class Gzipper {
       }
     }
     this.target = path.resolve(process.cwd(), target)
-    this.compression = this[selectCompression]()
+    const [compression, compressionOptions] = this[selectCompression]()
+    this.compression = compression
+    this.compressionOptions = compressionOptions
     this[compressionTypeLog]()
   }
 
@@ -141,44 +140,37 @@ class Gzipper {
    */
   [compressionTypeLog]() {
     let compressionType = this[getCompressionType](),
-      optionsStr = '',
-      options = new Map([
-        [GZIP_NAME, new Map([['level', '_level'], ['strategy', '_strategy']])],
-        [BROTLI_NAME, new Map()],
-      ])
+      options = ''
 
-    for (const [key, value] of options.get(compressionType.name)) {
-      optionsStr += `${key}: ${this.compression[value]}, `
+    for (const [key, value] of Object.entries(this.compressionOptions)) {
+      options += `${key}: ${value}, `
     }
 
-    this.logger.warn(
-      `${compressionType.name} -> ${optionsStr.slice(0, -2)}`,
-      true
-    )
+    this.logger.warn(`${compressionType.name} -> ${options.slice(0, -2)}`, true)
   }
 
   /**
-   * Select compression type.
+   * Select compression type and options.
    *
-   * @returns compression instance (Gzip or BrotliCompress)
+   * @returns {[object, object]} compression instance (Gzip or BrotliCompress) and options
    * @memberof Gzipper
    */
   [selectCompression]() {
-    const gzipOptions = {}
+    let options = {}
 
     if (this.options.gzipLevel !== undefined) {
-      gzipOptions.gzipLevel = this.options.gzipLevel
+      options.gzipLevel = this.options.gzipLevel
     }
 
     if (this.options.gzipMemoryLevel !== undefined) {
-      gzipOptions.gzipMemoryLevel = this.options.gzipMemoryLevel
+      options.gzipMemoryLevel = this.options.gzipMemoryLevel
     }
 
     if (this.options.gzipStrategy !== undefined) {
-      gzipOptions.gzipStrategy = this.options.gzipStrategy
+      options.gzipStrategy = this.options.gzipStrategy
     }
 
-    let compression = zlib.createGzip(gzipOptions)
+    let compression = zlib.createGzip(options)
 
     if (
       this.options.brotli &&
@@ -190,50 +182,50 @@ class Gzipper {
     }
 
     if (this.options.brotli) {
-      const brotliOptions = {}
+      options = {}
 
       if (this.options.brotliParamMode !== undefined) {
         switch (this.options.brotliParamMode) {
           case 'default':
-            brotliOptions[zlib.constants.BROTLI_PARAM_MODE] =
+            options[zlib.constants.BROTLI_PARAM_MODE] =
               zlib.constants.BROTLI_MODE_GENERIC
             break
 
           case 'text':
-            brotliOptions[zlib.constants.BROTLI_PARAM_MODE] =
+            options[zlib.constants.BROTLI_PARAM_MODE] =
               zlib.constants.BROTLI_MODE_TEXT
             break
 
           case 'font':
-            brotliOptions[zlib.constants.BROTLI_PARAM_MODE] =
+            options[zlib.constants.BROTLI_PARAM_MODE] =
               zlib.constants.BROTLI_MODE_FONT
             break
 
           default:
-            brotliOptions[zlib.constants.BROTLI_PARAM_MODE] =
+            options[zlib.constants.BROTLI_PARAM_MODE] =
               zlib.constants.BROTLI_MODE_GENERIC
             break
         }
       }
 
       if (this.options.brotliQuality !== undefined) {
-        brotliOptions[
+        options[
           zlib.constants.BROTLI_PARAM_QUALITY
         ] = this.options.brotliQuality
       }
 
       if (this.options.brotliSizeHint !== undefined) {
-        brotliOptions[
+        options[
           zlib.constants.BROTLI_PARAM_SIZE_HINT
         ] = this.options.brotliSizeHint
       }
 
       compression = zlib.createBrotliCompress({
-        params: brotliOptions,
+        params: options,
       })
     }
 
-    return compression
+    return [compression, options]
   }
 
   /**
@@ -249,12 +241,12 @@ class Gzipper {
   [getCompressionType]() {
     if (this.compression instanceof zlib.Gzip) {
       return {
-        name: GZIP_NAME,
+        name: 'GZIP',
         ext: 'gz',
       }
     } else if (this.compression instanceof zlib.BrotliCompress) {
       return {
-        name: BROTLI_NAME,
+        name: 'BROTLI',
         ext: 'br',
       }
     }
