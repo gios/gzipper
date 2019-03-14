@@ -114,12 +114,12 @@ class Gzipper {
     input.pipe(this.compression).pipe(output)
 
     if (callback) {
-      output.once('finish', () =>
+      output.once('finish', () => {
         callback(
           fs.statSync(inputPath).size / 1024,
           fs.statSync(outputPath).size / 1024
         )
-      )
+      })
       output.once('error', error => this.logger.error(error, true))
     }
   }
