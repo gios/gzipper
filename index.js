@@ -4,6 +4,17 @@ const program = require('commander')
 const version = require('./package.json').version
 const Gzipper = require('./Gzipper')
 
+const {
+  GZIPPER_VERBOSE,
+  GZIPPER_GZIP_LEVEL,
+  GZIPPER_GZIP_MEMORY_LEVEL,
+  GZIPPER_GZIP_STRATEGY,
+  GZIPPER_BROTLI,
+  GZIPPER_BROTLI_PARAM_MODE,
+  GZIPPER_BROTLI_QUALITY,
+  GZIPPER_BROTLI_SIZE_HINT,
+} = process.env
+
 program
   .version(version)
   .usage('[options] <path> [outputPath]')
@@ -37,14 +48,14 @@ program
 
 const [target, outputPath] = program.args
 const options = {
-  verbose: program.verbose,
-  gzipLevel: +program.gzipLevel,
-  gzipMemoryLevel: +program.gzipMemoryLevel,
-  gzipStrategy: +program.gzipStrategy,
-  brotli: program.brotli,
-  brotliParamMode: program.brotliParamMode,
-  brotliQuality: +program.brotliQuality,
-  brotliSizeHint: +program.brotliSizeHint,
+  verbose: Boolean(GZIPPER_VERBOSE) || program.verbose,
+  gzipLevel: +GZIPPER_GZIP_LEVEL || +program.gzipLevel,
+  gzipMemoryLevel: +GZIPPER_GZIP_MEMORY_LEVEL || +program.gzipMemoryLevel,
+  gzipStrategy: +GZIPPER_GZIP_STRATEGY || +program.gzipStrategy,
+  brotli: Boolean(GZIPPER_BROTLI) || program.brotli,
+  brotliParamMode: GZIPPER_BROTLI_PARAM_MODE || program.brotliParamMode,
+  brotliQuality: +GZIPPER_BROTLI_QUALITY || +program.brotliQuality,
+  brotliSizeHint: +GZIPPER_BROTLI_SIZE_HINT || +program.brotliSizeHint,
 }
 
 Object.keys(options).forEach(key => {

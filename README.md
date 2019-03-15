@@ -1,10 +1,15 @@
-# gzipper
+# Gzipper
 
 CLI for compressing files.
 
-## How to use:
+- [Gzipper](#gzipper)
+  - [Install](#install)
+  - [Run script](#run-script)
+  - [Options](#options)
+  - [Contribution](#contribution)
+  - [Requirements](#requirements)
 
-### Install globally the package
+## Install
 
 `npm i gzipper -g`
 
@@ -12,7 +17,7 @@ or locally to devDependencies
 
 `npm i gzipper -D`
 
-### Run script from global scope or from your package.json as a script
+## Run script
 
 Globally usage.
 
@@ -45,23 +50,25 @@ Locally usage.
   }
 ```
 
-### Options:
+## Options
 
-- `-V, --version` output the version number
-- `-v, --verbose` detailed level of logs
-- `-gl, --gzip-level [level]` gzip compression level -1 (default), 0 (no compression) - 9 (best compression)
-- `-gm, --gzip-memory-level [memoryLevel]` amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
-- `-gs, --gzip-strategy [strategy]` compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
-- `--brotli` enable brotli compression, Node.js >= v11.7.0
-- `-bp, --brotli-param-mode [brotliParamMode]` default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
-- `-bq, --brotli-quality [brotliQuality]` brotli compression quality 11 (default), 0 - 11
-- `-bs, --brotli-size-hint [brotliSizeHint]` expected input size 0 (default)
-- `-h, --help` output usage information
+| Option                                       | ENV                         | Description                                                                                                   |
+| -------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `-V, --version`                              |                             | output the version number                                                                                     |
+| `-v, --verbose`                              | `GZIPPER_VERBOSE`           | detailed level of logs                                                                                        |
+| `-gl, --gzip-level [level]`                  | `GZIPPER_GZIP_LEVEL`        | gzip compression level -1 (default), 0 (no compression) - 9 (best compression)                                |
+| `-gm, --gzip-memory-level [memoryLevel]`     | `GZIPPER_GZIP_MEMORY_LEVEL` | amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory) |
+| `-gs, --gzip-strategy [strategy]`            | `GZIPPER_GZIP_STRATEGY`     | compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)                          |
+| `--brotli`                                   | `GZIPPER_BROTLI`            | enable brotli compression, Node.js >= v11.7.0                                                                 |
+| `-bp, --brotli-param-mode [brotliParamMode]` | `GZIPPER_BROTLI_PARAM_MODE` | default, text (for UTF-8 text), font (for WOFF 2.0 fonts)                                                     |
+| `-bq, --brotli-quality [brotliQuality]`      | `GZIPPER_BROTLI_QUALITY`    | brotli compression quality 11 (default), 0 - 11                                                               |
+| `-bs, --brotli-size-hint [brotliSizeHint]`   | `GZIPPER_BROTLI_SIZE_HINT`  | expected input size 0 (default)                                                                               |
+| `-h, --help`                                 |                             | output usage information                                                                                      |
 
-### Contribution
+## Contribution
 
 I appreciate every contribution, just fork the repository and send the pull request with your changes.
 
-### Requirements
+## Requirements
 
 - Node.js >= 8
