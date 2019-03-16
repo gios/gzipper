@@ -1,6 +1,7 @@
 const zlib = require('zlib')
 const fs = require('fs')
-const path = require('path')
+const { resolve, extname, join } = require('path')
+const { promisify } = require('util')
 
 const Logger = require('./Logger')
 
@@ -9,6 +10,10 @@ const compressFile = Symbol('compressFile')
 const compressionTypeLog = Symbol('compressionTypeLog')
 const selectCompression = Symbol('selectCompression')
 const getCompressionType = Symbol('getCompressionType')
+
+const exists = promisify(fs.exists)
+const mkdir = promisify(fs.mkdir)
+const stat = promisify(fs.stat)
 
 /**
  * Compressing files.
@@ -30,16 +35,13 @@ class Gzipper {
     this.options = options
     this.logger = new Logger(this.options.verbose)
     if (outputPath) {
-      this.outputPath = path.resolve(process.cwd(), outputPath)
-      if (!fs.existsSync(this.outputPath)) {
-        fs.mkdirSync(this.outputPath, { recursive: true })
-      }
+      this.outputPath = resolve(process.cwd(), outputPath)
     }
-    this.target = path.resolve(process.cwd(), target)
-    const [compression, compressionOptions] = this[selectCompression]()
-    this.compression = compression
+    this.target = resolve(process.cwd(), target)
+    const [createCompression, compressionOptions] = this[selectCompression]()
+    this.createCompression = createCompression
     this.compressionOptions = compressionOptions
-    this[compressionTypeLog]()
+    this.compressionType = this[getCompressionType]()
   }
 
   /**
@@ -50,44 +52,50 @@ class Gzipper {
    * @param {number} [successGlobalCount=0] success files count
    * @memberof Gzipper
    */
-  [compileFolderRecursively](target, pending = [], files = []) {
+  async [compileFolderRecursively](target, pending = [], files = []) {
     try {
       const filesList = fs.readdirSync(target)
 
-      filesList.forEach(file => {
-        const filePath = path.resolve(target, file)
+      for (const file of filesList) {
+        const filePath = resolve(target, file)
+        const isFile = fs.lstatSync(filePath).isFile()
+        const isDirectory = fs.lstatSync(filePath).isDirectory()
 
         if (
-          fs.lstatSync(filePath).isFile() &&
-          (path.extname(filePath) === '.js' ||
-            path.extname(filePath) === '.css')
+          isFile &&
+          (extname(filePath) === '.js' || extname(filePath) === '.css')
         ) {
           files.push(file)
           pending.push(file)
-          this[compressFile](
+          const fileInfo = await this[compressFile](
             file,
             target,
-            this.outputPath,
-            (beforeSize, afterSize) => {
-              pending.pop()
-              this.logger.info(
-                `File ${file} has been compressed ${beforeSize}Kb -> ${afterSize}Kb.`
-              )
-
-              if (!pending.length) {
-                this.logger.success(
-                  `${files.length} ${
-                    files.length > 1 ? 'files have' : 'file has'
-                  } been compressed.`,
-                  true
-                )
-              }
-            }
+            this.outputPath
           )
-        } else if (fs.lstatSync(filePath).isDirectory()) {
+
+          pending.pop()
+
+          if (fileInfo) {
+            this.logger.info(
+              `File ${file} has been compressed ${fileInfo.beforeSize}Kb -> ${
+                fileInfo.afterSize
+              }Kb.`
+            )
+          }
+
+          if (!pending.length) {
+            this.logger.success(
+              `${files.length} ${
+                files.length > 1 ? 'files have' : 'file has'
+              } been compressed.`,
+              true
+            )
+            return
+          }
+        } else if (isDirectory) {
           this[compileFolderRecursively](filePath, pending, files)
         }
-      })
+      }
     } catch (err) {
       this.logger.error(err, true)
     }
@@ -99,29 +107,36 @@ class Gzipper {
    * @param {string} filename path to file
    * @param {string} target path to target directory
    * @param {string} outputDir path to output directory (default {target})
-   * @param {() => void} callback finish callback
+   * @returns {Promise<{ beforeSize: number, afterSize: number }>} finish promise
    * @memberof Gzipper
    */
-  [compressFile](filename, target, outputDir, callback) {
-    const compressionType = this[getCompressionType]()
-    const inputPath = path.join(target, filename)
-    const outputPath = `${path.join(outputDir || target, filename)}.${
-      compressionType.ext
+  async [compressFile](filename, target, outputDir) {
+    const inputPath = join(target, filename)
+    const outputPath = `${join(outputDir || target, filename)}.${
+      this.compressionType.ext
     }`
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
-    input.pipe(this.compression).pipe(output)
+    input.pipe(this.createCompression()).pipe(output)
 
-    if (callback) {
-      output.once('finish', () => {
-        callback(
-          fs.statSync(inputPath).size / 1024,
-          fs.statSync(outputPath).size / 1024
-        )
+    const compressPromise = new Promise((resolve, reject) => {
+      output.once('finish', async () => {
+        if (this.options.verbose) {
+          const beforeSize = (await stat(inputPath)).size / 1024
+          const afterSize = (await stat(outputPath)).size / 1024
+          resolve({ beforeSize, afterSize })
+        } else {
+          resolve()
+        }
       })
-      output.once('error', error => this.logger.error(error, true))
-    }
+      output.once('error', error => {
+        this.logger.error(error, true)
+        reject(error)
+      })
+    })
+
+    return compressPromise
   }
 
   /**
@@ -129,8 +144,16 @@ class Gzipper {
    *
    * @memberof Gzipper
    */
-  compress() {
-    this[compileFolderRecursively](this.target)
+  async compress() {
+    if (this.outputPath) {
+      const isExists = await exists(this.outputPath)
+
+      if (!isExists) {
+        await mkdir(this.outputPath, { recursive: true })
+      }
+    }
+    this[compressionTypeLog]()
+    await this[compileFolderRecursively](this.target)
   }
 
   /**
@@ -139,20 +162,22 @@ class Gzipper {
    * @memberof Gzipper
    */
   [compressionTypeLog]() {
-    let compressionType = this[getCompressionType](),
-      options = ''
+    let options = ''
 
     for (const [key, value] of Object.entries(this.compressionOptions)) {
       options += `${key}: ${value}, `
     }
 
-    this.logger.warn(`${compressionType.name} -> ${options.slice(0, -2)}`, true)
+    this.logger.warn(
+      `${this.compressionType.name} -> ${options.slice(0, -2)}`,
+      true
+    )
   }
 
   /**
    * Select compression type and options.
    *
-   * @returns {[object, object]} compression instance (Gzip or BrotliCompress) and options
+   * @returns {[() => object, object]} compression instance (Gzip or BrotliCompress) and options
    * @memberof Gzipper
    */
   [selectCompression]() {
@@ -169,8 +194,6 @@ class Gzipper {
     if (this.options.gzipStrategy !== undefined) {
       options.gzipStrategy = this.options.gzipStrategy
     }
-
-    let compression = zlib.createGzip(options)
 
     if (
       this.options.brotli &&
@@ -219,13 +242,21 @@ class Gzipper {
           zlib.constants.BROTLI_PARAM_SIZE_HINT
         ] = this.options.brotliSizeHint
       }
-
-      compression = zlib.createBrotliCompress({
-        params: options,
-      })
     }
 
-    return [compression, options]
+    const createCompression = () => {
+      let compression = zlib.createGzip(options)
+
+      if (this.options.brotli) {
+        compression = zlib.createBrotliCompress({
+          params: options,
+        })
+      }
+
+      return compression
+    }
+
+    return [createCompression, options]
   }
 
   /**
@@ -239,12 +270,13 @@ class Gzipper {
    * @memberof Gzipper
    */
   [getCompressionType]() {
-    if (this.compression instanceof zlib.Gzip) {
+    const compression = this.createCompression()
+    if (compression instanceof zlib.Gzip) {
       return {
         name: 'GZIP',
         ext: 'gz',
       }
-    } else if (this.compression instanceof zlib.BrotliCompress) {
+    } else if (compression instanceof zlib.BrotliCompress) {
       return {
         name: 'BROTLI',
         ext: 'br',
