@@ -1,6 +1,6 @@
 const zlib = require('zlib')
 const fs = require('fs')
-const { resolve, extname, join, relative } = require('path')
+const { resolve, extname, join, relative, sep } = require('path')
 const { promisify } = require('util')
 
 const Logger = require('./Logger')
@@ -10,9 +10,8 @@ const compressFile = Symbol('compressFile')
 const compressionTypeLog = Symbol('compressionTypeLog')
 const selectCompression = Symbol('selectCompression')
 const getCompressionType = Symbol('getCompressionType')
+const createFolders = Symbol('createFolders')
 
-const exists = promisify(fs.exists)
-const mkdir = promisify(fs.mkdir)
 const stat = promisify(fs.stat)
 
 /**
@@ -114,6 +113,7 @@ class Gzipper {
     const inputPath = join(target, filename)
     if (outputDir) {
       target = join(outputDir, relative(this.target, target))
+      this[createFolders](target)
     }
     const outputPath = `${join(target, filename)}.${this.compressionType.ext}`
     const input = fs.createReadStream(inputPath)
@@ -147,11 +147,7 @@ class Gzipper {
    */
   async compress() {
     if (this.outputPath) {
-      const isExists = await exists(this.outputPath)
-
-      if (!isExists) {
-        await mkdir(this.outputPath, { recursive: true })
-      }
+      this[createFolders](this.outputPath)
     }
     this[compressionTypeLog]()
     await this[compileFolderRecursively](this.target)
@@ -282,6 +278,30 @@ class Gzipper {
         name: 'BROTLI',
         ext: 'br',
       }
+    }
+  }
+
+  /**
+   * Create folders by path.
+   *
+   * @todo when Node.js >= 8 support will be removed, rewrite this to mkdir(path, { recursive: true })
+   *
+   * @param {string} target where folders will be created
+   * @memberof Gzipper
+   */
+  [createFolders](target) {
+    target = resolve(process.cwd(), target)
+    const folders = target.split(sep)
+    let prev = folders.shift()
+
+    for (const folder of folders) {
+      const folderPath = join(prev, folder)
+      const isExists = fs.existsSync(folderPath)
+
+      if (!isExists) {
+        fs.mkdirSync(folderPath)
+      }
+      prev = folderPath
     }
   }
 }
