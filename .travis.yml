@@ -10,5 +10,6 @@ script:
 deploy:
   provider: npm
   api_key: $NPM_API_KEY
+  email: $NPM_EMAIL
   on:
     tags: true
