@@ -1,6 +1,6 @@
 const zlib = require('zlib')
 const fs = require('fs')
-const { resolve, extname, join } = require('path')
+const { resolve, extname, join, relative } = require('path')
 const { promisify } = require('util')
 
 const Logger = require('./Logger')
@@ -112,9 +112,10 @@ class Gzipper {
    */
   async [compressFile](filename, target, outputDir) {
     const inputPath = join(target, filename)
-    const outputPath = `${join(outputDir || target, filename)}.${
-      this.compressionType.ext
-    }`
+    if (outputDir) {
+      target = join(outputDir, relative(this.target, target))
+    }
+    const outputPath = `${join(target, filename)}.${this.compressionType.ext}`
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
