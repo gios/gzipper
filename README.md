@@ -1,7 +1,7 @@
 # Gzipper
+[![Build Status](https://travis-ci.org/gios/gzipper.svg?branch=master)](https://travis-ci.org/gios/gzipper)
 
 CLI for compressing files.
-
 - [Gzipper](#gzipper)
   - [Install](#install)
   - [Run script](#run-script)
