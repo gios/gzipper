@@ -6,13 +6,12 @@ const Logger = require('./Logger')
 
 const compileFolderRecursively = Symbol('compileFolderRecursively')
 const compressFile = Symbol('compressFile')
-
-const DEFAULT_GZIP_LEVEL = -1
-const DEFAULT_GZIP_MEMORY_LEVEL = 8
-const DEFAULT_GZIP_STRATEGY = 0
+const compressionTypeLog = Symbol('compressionTypeLog')
+const selectCompression = Symbol('selectCompression')
+const getCompressionType = Symbol('getCompressionType')
 
 /**
- * Gzipping files.
+ * Compressing files.
  *
  * @class Gzipper
  */
@@ -37,22 +36,10 @@ class Gzipper {
       }
     }
     this.target = path.resolve(process.cwd(), target)
-
-    this.compressionMechanism = zlib.createGzip({
-      level:
-        this.options.gzipLevel !== undefined
-          ? this.options.gzipLevel
-          : DEFAULT_GZIP_LEVEL,
-      memLevel:
-        this.options.gzipMemoryLevel !== undefined
-          ? this.options.gzipMemoryLevel
-          : DEFAULT_GZIP_MEMORY_LEVEL,
-      strategy:
-        this.options.gzipStrategy !== undefined
-          ? this.options.gzipStrategy
-          : DEFAULT_GZIP_STRATEGY,
-    })
-    this.selectCompressionMechanismLog()
+    const [compression, compressionOptions] = this[selectCompression]()
+    this.compression = compression
+    this.compressionOptions = compressionOptions
+    this[compressionTypeLog]()
   }
 
   /**
@@ -116,21 +103,24 @@ class Gzipper {
    * @memberof Gzipper
    */
   [compressFile](filename, target, outputDir, callback) {
+    const compressionType = this[getCompressionType]()
     const inputPath = path.join(target, filename)
-    const outputPath = `${path.join(outputDir || target, filename)}.gz`
+    const outputPath = `${path.join(outputDir || target, filename)}.${
+      compressionType.ext
+    }`
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
-    input.pipe(this.compressionMechanism).pipe(output)
+    input.pipe(this.compression).pipe(output)
 
     if (callback) {
-      output.on('finish', () =>
+      output.once('finish', () => {
         callback(
           fs.statSync(inputPath).size / 1024,
           fs.statSync(outputPath).size / 1024
         )
-      )
-      output.on('error', error => this.logger.error(error, true))
+      })
+      output.once('error', error => this.logger.error(error, true))
     }
   }
 
@@ -148,20 +138,118 @@ class Gzipper {
    *
    * @memberof Gzipper
    */
-  selectCompressionMechanismLog() {
-    let compressionType,
-      optionsStr = '',
-      options = new Map([['level', '_level'], ['strategy', '_strategy']])
+  [compressionTypeLog]() {
+    let compressionType = this[getCompressionType](),
+      options = ''
 
-    if (this.compressionMechanism instanceof zlib.Gzip) {
-      compressionType = 'GZIP'
+    for (const [key, value] of Object.entries(this.compressionOptions)) {
+      options += `${key}: ${value}, `
     }
 
-    for (const [key, value] of options) {
-      optionsStr += `${key}: ${this.compressionMechanism[value]}, `
+    this.logger.warn(`${compressionType.name} -> ${options.slice(0, -2)}`, true)
+  }
+
+  /**
+   * Select compression type and options.
+   *
+   * @returns {[object, object]} compression instance (Gzip or BrotliCompress) and options
+   * @memberof Gzipper
+   */
+  [selectCompression]() {
+    let options = {}
+
+    if (this.options.gzipLevel !== undefined) {
+      options.gzipLevel = this.options.gzipLevel
     }
 
-    this.logger.warn(`${compressionType} -> ${optionsStr.slice(0, -2)}`, true)
+    if (this.options.gzipMemoryLevel !== undefined) {
+      options.gzipMemoryLevel = this.options.gzipMemoryLevel
+    }
+
+    if (this.options.gzipStrategy !== undefined) {
+      options.gzipStrategy = this.options.gzipStrategy
+    }
+
+    let compression = zlib.createGzip(options)
+
+    if (
+      this.options.brotli &&
+      typeof zlib.createBrotliCompress !== 'function'
+    ) {
+      throw new Error(
+        `Can't use brotli compression, Node.js >= v11.7.0 required.`
+      )
+    }
+
+    if (this.options.brotli) {
+      options = {}
+
+      if (this.options.brotliParamMode !== undefined) {
+        switch (this.options.brotliParamMode) {
+          case 'default':
+            options[zlib.constants.BROTLI_PARAM_MODE] =
+              zlib.constants.BROTLI_MODE_GENERIC
+            break
+
+          case 'text':
+            options[zlib.constants.BROTLI_PARAM_MODE] =
+              zlib.constants.BROTLI_MODE_TEXT
+            break
+
+          case 'font':
+            options[zlib.constants.BROTLI_PARAM_MODE] =
+              zlib.constants.BROTLI_MODE_FONT
+            break
+
+          default:
+            options[zlib.constants.BROTLI_PARAM_MODE] =
+              zlib.constants.BROTLI_MODE_GENERIC
+            break
+        }
+      }
+
+      if (this.options.brotliQuality !== undefined) {
+        options[
+          zlib.constants.BROTLI_PARAM_QUALITY
+        ] = this.options.brotliQuality
+      }
+
+      if (this.options.brotliSizeHint !== undefined) {
+        options[
+          zlib.constants.BROTLI_PARAM_SIZE_HINT
+        ] = this.options.brotliSizeHint
+      }
+
+      compression = zlib.createBrotliCompress({
+        params: options,
+      })
+    }
+
+    return [compression, options]
+  }
+
+  /**
+   * Get compression type and extension.
+   *
+   * @typedef {Object} CompressionType
+   * @property {string} name compression name
+   * @property {string} ext compression extension
+   *
+   * @returns {CompressionType} compression type and extension
+   * @memberof Gzipper
+   */
+  [getCompressionType]() {
+    if (this.compression instanceof zlib.Gzip) {
+      return {
+        name: 'GZIP',
+        ext: 'gz',
+      }
+    } else if (this.compression instanceof zlib.BrotliCompress) {
+      return {
+        name: 'BROTLI',
+        ext: 'br',
+      }
+    }
   }
 }
 

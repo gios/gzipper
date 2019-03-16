@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - '8'
+  - '10'
+  - '11'
+before_script:
+  - npm ci
+script:
+  - npm test
+deploy:
+  provider: npm
+  api_key: $NPM_API_KEY
+  on:
+    tags: true

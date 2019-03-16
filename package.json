@@ -1,7 +1,7 @@
 {
   "name": "gzipper",
-  "version": "2.1.0",
-  "description": "CLI for gzipping files.",
+  "version": "2.2.0",
+  "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
     "test": "mocha",
@@ -22,6 +22,7 @@
     "gzip",
     "script",
     "gzipper",
+    "brotli",
     "angular",
     "compression"
   ],
