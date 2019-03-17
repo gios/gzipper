@@ -2,6 +2,7 @@ const zlib = require('zlib')
 const fs = require('fs')
 const { resolve, extname, join, relative, sep } = require('path')
 const { promisify } = require('util')
+const { EventEmitter } = require('events')
 
 const Logger = require('./Logger')
 
@@ -41,6 +42,7 @@ class Gzipper {
     this.createCompression = createCompression
     this.compressionOptions = compressionOptions
     this.compressionType = this[getCompressionType]()
+    this.compressEvent = new EventEmitter()
   }
 
   /**
@@ -83,11 +85,11 @@ class Gzipper {
           }
 
           if (!pending.length) {
-            this.logger.success(
+            this.compressEvent.emit(
+              'compress',
               `${files.length} ${
                 files.length > 1 ? 'files have' : 'file has'
-              } been compressed.`,
-              true
+              } been compressed.`
             )
             return
           }
@@ -96,7 +98,7 @@ class Gzipper {
         }
       }
     } catch (err) {
-      this.logger.error(err, true)
+      this.compressEvent.emit('compress-error', err)
     }
   }
 
@@ -146,11 +148,21 @@ class Gzipper {
    * @memberof Gzipper
    */
   async compress() {
-    if (this.outputPath) {
-      this[createFolders](this.outputPath)
-    }
-    this[compressionTypeLog]()
-    await this[compileFolderRecursively](this.target)
+    return new Promise((resolve, reject) => {
+      this.compressEvent.once('compress', message => {
+        this.logger.success(message, true)
+        resolve()
+      })
+      this.compressEvent.once('compress-error', message => {
+        this.logger.error(message, true)
+        reject()
+      })
+      if (this.outputPath) {
+        this[createFolders](this.outputPath)
+      }
+      this[compressionTypeLog]()
+      this[compileFolderRecursively](this.target)
+    })
   }
 
   /**
