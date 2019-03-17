@@ -64,34 +64,39 @@ class Gzipper {
         const isFile = fs.lstatSync(filePath).isFile()
         const isDirectory = fs.lstatSync(filePath).isDirectory()
 
-        if (
-          isFile &&
-          (extname(filePath) === '.js' || extname(filePath) === '.css')
-        ) {
-          files.push(file)
+        if (isFile) {
           pending.push(file)
-          const fileInfo = await this[compressFile](
-            file,
-            target,
-            this.outputPath
-          )
 
+          if (extname(filePath) === '.js' || extname(filePath) === '.css') {
+            files.push(file)
+            const fileInfo = await this[compressFile](
+              file,
+              target,
+              this.outputPath
+            )
+
+            if (fileInfo) {
+              this.logger.info(
+                `File ${file} has been compressed ${fileInfo.beforeSize}Kb -> ${
+                  fileInfo.afterSize
+                }Kb.`
+              )
+            }
+          }
           pending.pop()
 
-          if (fileInfo) {
-            this.logger.info(
-              `File ${file} has been compressed ${fileInfo.beforeSize}Kb -> ${
-                fileInfo.afterSize
-              }Kb.`
-            )
-          }
-
           if (!pending.length) {
+            const filesCount = files.length
+            const message = filesCount
+              ? `${filesCount} ${
+                  filesCount > 1 ? 'files have' : 'file has'
+                } been compressed.`
+              : `we couldn't find any appropriate files (.css, .js)`
+
             this.compressEvent.emit(
               'compress',
-              `${files.length} ${
-                files.length > 1 ? 'files have' : 'file has'
-              } been compressed.`
+              message,
+              filesCount ? 'success' : 'warn'
             )
             return
           }
@@ -151,8 +156,8 @@ class Gzipper {
    */
   async compress() {
     return new Promise((resolve, reject) => {
-      this.compressEvent.once('compress', message => {
-        this.logger.success(message, true)
+      this.compressEvent.once('compress', (message, type) => {
+        this.logger[type](message, true)
         resolve(message)
       })
       this.compressEvent.once('compress-error', error => {
