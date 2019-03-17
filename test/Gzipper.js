@@ -1,38 +1,20 @@
 const assert = require('assert')
-const fs = require('fs')
-const path = require('path')
 
 const Gzipper = require('../Gzipper')
-
-const RESOURCES_PATH = path.resolve(__dirname, './resources')
+const { RESOURCES_PATH, clear } = require('./utils')
 
 describe('Gzipper', () => {
   describe('verbose', () => {
-    beforeEach(() => clearDirectory())
+    beforeEach(async () => await clear())
 
-    it('should print logs to console about every file', () => {
+    it('should print logs to console with --verbose', async () => {
       const options = { verbose: true }
-      new Gzipper(RESOURCES_PATH, null, options).compress()
-      this.timeout(100)
-      assert.equal()
+      const gzipper = new Gzipper(RESOURCES_PATH, null, options)
+      const message = await gzipper.compress()
+      console.log(message)
+      assert.equal(true, true)
     })
+
+    afterEach(async () => await clear())
   })
 })
-
-function clearDirectory() {
-  try {
-    const files = fs.readdirSync(RESOURCES_PATH)
-
-    for (const file of files) {
-      const filePath = path.resolve(RESOURCES_PATH, file)
-
-      if (fs.lstatSync(filePath).isFile()) {
-        fs.unlink(path.join(RESOURCES_PATH, filePath), err => {
-          if (err) throw err
-        })
-      }
-    }
-  } catch (err) {
-    console.error(err)
-  }
-}
