@@ -30,7 +30,9 @@ class Gzipper {
    */
   constructor(target, outputPath, options = {}) {
     if (!target) {
-      throw new Error(`Can't find a path.`)
+      const message = `Can't find a path.`
+      this.logger.error(message, true)
+      throw new Error(message)
     }
     this.options = options
     this.logger = new Logger(this.options.verbose)
@@ -208,9 +210,9 @@ class Gzipper {
       this.options.brotli &&
       typeof zlib.createBrotliCompress !== 'function'
     ) {
-      throw new Error(
-        `Can't use brotli compression, Node.js >= v11.7.0 required.`
-      )
+      const message = `Can't use brotli compression, Node.js >= v11.7.0 required.`
+      this.logger.error(message, true)
+      throw new Error(message)
     }
 
     if (this.options.brotli) {
