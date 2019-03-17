@@ -65,4 +65,4 @@ Object.keys(options).forEach(key => {
 })
 
 const gzipper = new Gzipper(target, outputPath, options)
-gzipper.compress()
+gzipper.compress().catch(err => console.error(err))

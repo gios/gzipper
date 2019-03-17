@@ -151,11 +151,11 @@ class Gzipper {
     return new Promise((resolve, reject) => {
       this.compressEvent.once('compress', message => {
         this.logger.success(message, true)
-        resolve()
+        resolve(message)
       })
-      this.compressEvent.once('compress-error', message => {
-        this.logger.error(message, true)
-        reject()
+      this.compressEvent.once('compress-error', error => {
+        this.logger.error(error, true)
+        reject(error)
       })
       if (this.outputPath) {
         this[createFolders](this.outputPath)
