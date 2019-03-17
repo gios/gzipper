@@ -58,6 +58,7 @@ class Gzipper {
   async [compileFolderRecursively](target, pending = [], files = []) {
     try {
       const filesList = fs.readdirSync(target)
+      pending.push(...filesList)
 
       for (const file of filesList) {
         const filePath = resolve(target, file)
@@ -65,8 +66,6 @@ class Gzipper {
         const isDirectory = fs.lstatSync(filePath).isDirectory()
 
         if (isFile) {
-          pending.push(file)
-
           if (extname(filePath) === '.js' || extname(filePath) === '.css') {
             files.push(file)
             const fileInfo = await this[compressFile](
@@ -101,6 +100,7 @@ class Gzipper {
             return
           }
         } else if (isDirectory) {
+          pending.pop()
           this[compileFolderRecursively](filePath, pending, files)
         }
       }
@@ -155,7 +155,7 @@ class Gzipper {
    * @memberof Gzipper
    */
   async compress() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       this.compressEvent.once('compress', (message, type) => {
         this.logger[type](message, true)
         resolve(message)
@@ -168,7 +168,7 @@ class Gzipper {
         this[createFolders](this.outputPath)
       }
       this[compressionTypeLog]()
-      this[compileFolderRecursively](this.target)
+      await this[compileFolderRecursively](this.target)
     })
   }
 
