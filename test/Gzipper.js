@@ -1,8 +1,11 @@
 const assert = require('assert')
 const sinon = require('sinon')
+const zlib = require('zlib')
 
 const Gzipper = require('../Gzipper')
 const { RESOURCES_PATH, clear } = require('./utils')
+
+const FILES_COUNT = 6
 
 describe('Gzipper', () => {
   describe('verbose', () => {
@@ -19,7 +22,12 @@ describe('Gzipper', () => {
 
       assert.ok(messageRegExp.test(message))
       assert.strictEqual(compressEventSpy.callCount, 1)
-      assert.strictEqual(loggerInfoSpy.callCount, 6)
+      assert.strictEqual(loggerInfoSpy.callCount, FILES_COUNT)
+      assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+      assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+      assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+      assert.strictEqual(gzipper.compressionType.ext, 'gz')
+      assert.strictEqual(Object.keys(gzipper.options).length, 1)
       for (const [arg] of loggerInfoSpy.args) {
         assert.ok(verboseRegExp.test(arg))
       }
