@@ -12,6 +12,15 @@ const MESSAGE_REGEXP = /[^\s]+ files have been compressed./
 describe('Gzipper', () => {
   beforeEach(async () => await clear())
 
+  it('should throw error if no path found', async () => {
+    try {
+      new Gzipper(null, null)
+    } catch (err) {
+      assert.ok(err instanceof Error)
+      assert.strictEqual(err.message, `Can't find a path.`)
+    }
+  })
+
   it('--verbose should print logs to console with and use default configuration', async () => {
     const options = { verbose: true }
     const gzipper = new Gzipper(RESOURCES_PATH, null, options)

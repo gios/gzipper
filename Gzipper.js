@@ -29,13 +29,13 @@ class Gzipper {
    * @memberof Gzipper
    */
   constructor(target, outputPath, options = {}) {
+    this.logger = new Logger(options.verbose)
     if (!target) {
       const message = `Can't find a path.`
       this.logger.error(message, true)
       throw new Error(message)
     }
     this.options = options
-    this.logger = new Logger(this.options.verbose)
     if (outputPath) {
       this.outputPath = resolve(process.cwd(), outputPath)
     }
