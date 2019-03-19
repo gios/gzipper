@@ -47,6 +47,15 @@ function clear() {
   })
 }
 
+function getPrivateSymbol(instance, method) {
+  const symbol = Object.getOwnPropertySymbols(instance.__proto__).find(item => {
+    return item.toString() === `Symbol(${method})`
+  })
+
+  return symbol
+}
+
 exports.RESOURCES_PATH = RESOURCES_PATH
 exports.clearDirectory = clearDirectory
 exports.clear = clear
+exports.getPrivateSymbol = getPrivateSymbol
