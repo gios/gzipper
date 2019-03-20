@@ -26,7 +26,7 @@ describe('Gzipper', () => {
     const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
     sinon
       .stub(gzipper, getPrivateSymbol(gzipper, 'compressFile'))
-      .throws('UNKNOWN_ERROR', 'Compressing error.')
+      .rejects('UNKNOWN_ERROR', 'Compressing error.')
 
     try {
       await gzipper.compress()
