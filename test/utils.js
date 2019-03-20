@@ -6,9 +6,13 @@ const { promisify } = require('util')
 const compressionExtensions = ['.gz', '.br']
 const clearEvent = new EventEmitter()
 const unlink = promisify(fs.unlink)
-const RESOURCES_PATH = resolve(__dirname, './resources')
+const COMPRESS_PATH = resolve(__dirname, './resources/folder_to_compress')
+const NO_FILES_COMPRESS_PATH = resolve(
+  __dirname,
+  './resources/no_file_to_compress'
+)
 
-async function clearDirectory(target = RESOURCES_PATH, pending = []) {
+async function clearDirectory(target = COMPRESS_PATH, pending = []) {
   try {
     const files = fs.readdirSync(target)
     pending.push(...files)
@@ -55,7 +59,8 @@ function getPrivateSymbol(instance, method) {
   return symbol
 }
 
-exports.RESOURCES_PATH = RESOURCES_PATH
+exports.COMPRESS_PATH = COMPRESS_PATH
+exports.NO_FILES_COMPRESS_PATH = NO_FILES_COMPRESS_PATH
 exports.clearDirectory = clearDirectory
 exports.clear = clear
 exports.getPrivateSymbol = getPrivateSymbol

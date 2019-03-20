@@ -90,7 +90,7 @@ class Gzipper {
               ? `${filesCount} ${
                   filesCount > 1 ? 'files have' : 'file has'
                 } been compressed.`
-              : `we couldn't find any appropriate files (.css, .js)`
+              : `we couldn't find any appropriate files (.css, .js).`
 
             this.compressEvent.emit(
               'compress',
