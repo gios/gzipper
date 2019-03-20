@@ -87,8 +87,8 @@ describe('Gzipper', () => {
     }
   })
 
-  it('--gzip-level should change gzip level for gzip compression', async () => {
-    const options = { gzipLevel: 6 }
+  it('--gzip-level, --gzip-memory-level, --gzip-strategy should change gzip configuration', async () => {
+    const options = { gzipLevel: 6, gzipMemoryLevel: 4, gzipStrategy: 2 }
     const gzipper = new Gzipper(COMPRESS_PATH, null, options)
     const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
     const message = await gzipper.compress()
@@ -105,9 +105,24 @@ describe('Gzipper', () => {
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
     assert.strictEqual(gzipper.compressionType.ext, 'gz')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 1)
-    assert.strictEqual(Object.keys(gzipper.options).length, 1)
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 3)
+    assert.strictEqual(Object.keys(gzipper.options).length, 3)
     assert.strictEqual(gzipper.compressionOptions.gzipLevel, 6)
+    assert.strictEqual(gzipper.compressionOptions.gzipMemoryLevel, 4)
+    assert.strictEqual(gzipper.compressionOptions.gzipStrategy, 2)
+  })
+
+  it('--brotli should emit compress-error on compress error', async () => {
+    try {
+      delete zlib.createBrotliCompress
+      new Gzipper(COMPRESS_PATH, null, { brotli: true })
+    } catch (err) {
+      assert.ok(err instanceof Error)
+      assert.strictEqual(
+        err.message,
+        `Can't use brotli compression, Node.js >= v11.7.0 required.`
+      )
+    }
   })
 
   afterEach(async () => await clear())
