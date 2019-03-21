@@ -6,7 +6,7 @@ const Gzipper = require('../Gzipper')
 const {
   COMPRESS_PATH,
   NO_FILES_COMPRESS_PATH,
-  // COMPRESS_TARGET_PATH,
+  COMPRESS_TARGET_PATH,
   createFolderInResources,
   clear,
   getPrivateSymbol,
@@ -19,9 +19,7 @@ const MESSAGE_REGEXP = /[^\s]+ files have been compressed./
 describe('Gzipper', () => {
   beforeEach(async () => {
     await clear()
-    console.log('1')
-    // await clear(COMPRESS_TARGET_PATH)
-    console.log('2')
+    await clear(COMPRESS_TARGET_PATH)
   })
 
   it('should throw an error if no path found', () => {
@@ -58,7 +56,7 @@ describe('Gzipper', () => {
     assert.ok(message === responseMessage)
     assert.ok(compressEventSpy.calledOnce)
     assert.ok(
-      compressEventSpy.calledOnceWith('compress', responseMessage, 'warn')
+      compressEventSpy.calledOnceWith('compress-empty', responseMessage)
     )
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
@@ -77,7 +75,7 @@ describe('Gzipper', () => {
     assert.ok(message === responseMessage)
     assert.ok(compressEventSpy.calledOnce)
     assert.ok(
-      compressEventSpy.calledOnceWith('compress', responseMessage, 'warn')
+      compressEventSpy.calledOnceWith('compress-empty', responseMessage)
     )
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
@@ -94,13 +92,12 @@ describe('Gzipper', () => {
     const message = await gzipper.compress()
 
     assert.ok(MESSAGE_REGEXP.test(message))
-    assert.ok(compressEventSpy.calledOnce)
+    assert.strictEqual(compressEventSpy.withArgs('compress-file').callCount, 6)
     assert.ok(
-      compressEventSpy.calledOnceWith(
+      compressEventSpy.withArgs(
         'compress',
-        `${FILES_COUNT} files have been compressed.`,
-        'success'
-      )
+        `${FILES_COUNT} files have been compressed.`
+      ).calledOnce
     )
     assert.strictEqual(loggerInfoSpy.callCount, FILES_COUNT)
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
@@ -120,13 +117,11 @@ describe('Gzipper', () => {
     const message = await gzipper.compress()
 
     assert.ok(MESSAGE_REGEXP.test(message))
-    assert.ok(compressEventSpy.calledOnce)
     assert.ok(
-      compressEventSpy.calledOnceWith(
+      compressEventSpy.withArgs(
         'compress',
-        `${FILES_COUNT} files have been compressed.`,
-        'success'
-      )
+        `${FILES_COUNT} files have been compressed.`
+      ).calledOnce
     )
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
@@ -165,13 +160,11 @@ describe('Gzipper', () => {
     const message = await gzipper.compress()
 
     assert.ok(MESSAGE_REGEXP.test(message))
-    assert.ok(compressEventSpy.calledOnce)
     assert.ok(
-      compressEventSpy.calledOnceWith(
+      compressEventSpy.withArgs(
         'compress',
-        `${FILES_COUNT} files have been compressed.`,
-        'success'
-      )
+        `${FILES_COUNT} files have been compressed.`
+      ).calledOnce
     )
     assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
     assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
@@ -192,31 +185,28 @@ describe('Gzipper', () => {
     )
   })
 
-  // it('should compress files to a certain folder with existing folder structure', async () => {
-  //   const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_TARGET_PATH)
-  //   const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
-  //   const message = await gzipper.compress()
+  it('should compress files to a certain folder with existing folder structure', async () => {
+    // TODO: Write more efficient tests
+    const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_TARGET_PATH)
+    const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
+    const message = await gzipper.compress()
 
-  //   assert.ok(MESSAGE_REGEXP.test(message))
-  //   assert.ok(compressEventSpy.calledOnce)
-  //   assert.ok(
-  //     compressEventSpy.calledOnceWith(
-  //       'compress',
-  //       `${FILES_COUNT} files have been compressed.`,
-  //       'success'
-  //     )
-  //   )
-  //   assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-  //   assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-  //   assert.strictEqual(gzipper.compressionType.ext, 'gz')
-  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
-  //   assert.strictEqual(Object.keys(gzipper.options).length, 0)
-  // })
+    assert.ok(MESSAGE_REGEXP.test(message))
+    assert.ok(
+      compressEventSpy.withArgs(
+        'compress',
+        `${FILES_COUNT} files have been compressed.`
+      ).calledOnce
+    )
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+    assert.strictEqual(gzipper.compressionType.ext, 'gz')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(Object.keys(gzipper.options).length, 0)
+  })
 
-  // afterEach(async () => {
-  //   await clear()
-  //   console.log('3')
-  //   // await clear(COMPRESS_TARGET_PATH)
-  //   console.log('4')
-  // })
+  afterEach(async () => {
+    await clear()
+    await clear(COMPRESS_TARGET_PATH)
+  })
 })

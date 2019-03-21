@@ -56,9 +56,21 @@ class Gzipper {
    * @param {number} [successGlobalCount=0] success files count
    * @memberof Gzipper
    */
-  async [compileFolderRecursively](target, pending = [], files = []) {
+  async [compileFolderRecursively](
+    target,
+    pending = [],
+    files = [],
+    first = true
+  ) {
     try {
       const filesList = fs.readdirSync(target)
+      if (first && !filesList.length) {
+        this.compressEvent.emit(
+          'compress-empty',
+          `we couldn't find any appropriate files (.css, .js).`
+        )
+        return
+      }
       pending.push(...filesList)
 
       for (const file of filesList) {
@@ -67,42 +79,49 @@ class Gzipper {
         const isDirectory = fs.lstatSync(filePath).isDirectory()
 
         if (isFile) {
-          if (extname(filePath) === '.js' || extname(filePath) === '.css') {
-            files.push(file)
-            const fileInfo = await this[compressFile](
-              file,
-              target,
-              this.outputPath
-            )
+          setImmediate(async () => {
+            try {
+              if (extname(filePath) === '.js' || extname(filePath) === '.css') {
+                files.push(file)
+                const fileInfo = await this[compressFile](
+                  file,
+                  target,
+                  this.outputPath
+                )
 
-            if (fileInfo) {
-              this.logger.info(
-                `File ${file} has been compressed ${fileInfo.beforeSize}Kb -> ${
-                  fileInfo.afterSize
-                }Kb.`
-              )
+                if (fileInfo) {
+                  this.compressEvent.emit(
+                    'compress-file',
+                    `File ${file} has been compressed ${
+                      fileInfo.beforeSize
+                    }Kb -> ${fileInfo.afterSize}Kb.`
+                  )
+                }
+              }
+              pending.pop()
+
+              if (!pending.length) {
+                const filesCount = files.length
+                if (filesCount) {
+                  const message = `${filesCount} ${
+                    filesCount > 1 ? 'files have' : 'file has'
+                  } been compressed.`
+                  this.compressEvent.emit('compress', message)
+                } else {
+                  this.compressEvent.emit(
+                    'compress-empty',
+                    `we couldn't find any appropriate files (.css, .js).`
+                  )
+                }
+                return
+              }
+            } catch (err) {
+              this.compressEvent.emit('compress-error', err)
             }
-          }
-          pending.pop()
-
-          if (!pending.length) {
-            const filesCount = files.length
-            const message = filesCount
-              ? `${filesCount} ${
-                  filesCount > 1 ? 'files have' : 'file has'
-                } been compressed.`
-              : `we couldn't find any appropriate files (.css, .js).`
-
-            this.compressEvent.emit(
-              'compress',
-              message,
-              filesCount ? 'success' : 'warn'
-            )
-            return
-          }
+          })
         } else if (isDirectory) {
           pending.pop()
-          this[compileFolderRecursively](filePath, pending, files)
+          this[compileFolderRecursively](filePath, pending, files, false)
         }
       }
     } catch (err) {
@@ -157,8 +176,15 @@ class Gzipper {
    */
   async compress() {
     return new Promise(async (resolve, reject) => {
-      this.compressEvent.once('compress', (message, type) => {
-        this.logger[type](message, true)
+      this.compressEvent.once('compress', message => {
+        this.logger.success(message, true)
+        resolve(message)
+      })
+      this.compressEvent.on('compress-file', message =>
+        this.logger.info(message)
+      )
+      this.compressEvent.once('compress-empty', message => {
+        this.logger.warn(message, true)
         resolve(message)
       })
       this.compressEvent.once('compress-error', error => {

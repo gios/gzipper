@@ -15,45 +15,58 @@ const NO_FILES_COMPRESS_PATH = resolve(
 
 async function clearDirectory(
   target = COMPRESS_PATH,
+  clearEvent,
   pending = [],
-  clearEvent
+  files = [],
+  first = true
 ) {
   try {
-    const files = fs.readdirSync(target)
-    pending.push(...files)
+    const filesList = fs.readdirSync(target)
+    if (first && !filesList.length) {
+      clearEvent.emit('clear')
+      return
+    }
+    pending.push(...filesList)
 
-    for (const file of files) {
+    for (const file of filesList) {
       const filePath = resolve(target, file)
       const isFile = fs.lstatSync(filePath).isFile()
       const isDirectory = fs.lstatSync(filePath).isDirectory()
 
       if (isFile) {
-        if (compressionExtensions.includes(extname(filePath))) {
-          await unlink(resolve(target, filePath))
-        }
-        pending.pop()
+        setImmediate(async () => {
+          try {
+            if (compressionExtensions.includes(extname(filePath))) {
+              files.push(file)
+              await unlink(resolve(target, filePath))
+            }
+            pending.pop()
 
-        if (!pending.length) {
-          clearEvent.emit('clear')
-          return
-        }
+            if (!pending.length || !files.length) {
+              clearEvent.emit('clear')
+              return
+            }
+          } catch (err) {
+            clearEvent.emit('clear-error', err)
+          }
+        })
       } else if (isDirectory) {
         pending.pop()
-        clearDirectory(filePath, pending, clearEvent)
+        clearDirectory(filePath, clearEvent, pending, files, false)
       }
     }
   } catch (err) {
-    console.error(err)
+    clearEvent.emit('clear-error', err)
   }
 }
 
 function clear(directory) {
   const clearEvent = new EventEmitter()
-  return new Promise(async resolve => {
-    clearEvent.once('clear', () => {
-      resolve()
-    })
-    await clearDirectory(directory, [], clearEvent)
+
+  return new Promise(async (resolve, reject) => {
+    clearEvent.once('clear', resolve.bind(this))
+    clearEvent.once('clear-error', reject.bind(this))
+    await clearDirectory(directory, clearEvent)
   })
 }
 
