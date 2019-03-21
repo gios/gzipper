@@ -113,6 +113,7 @@ describe('Gzipper', () => {
   })
 
   it('--brotli should emit compress-error on compress error', async () => {
+    const createBrotliCompress = zlib.createBrotliCompress.bind({})
     try {
       delete zlib.createBrotliCompress
       new Gzipper(COMPRESS_PATH, null, { brotli: true })
@@ -123,6 +124,46 @@ describe('Gzipper', () => {
         `Can't use brotli compression, Node.js >= v11.7.0 required.`
       )
     }
+    zlib.createBrotliCompress = createBrotliCompress
+  })
+
+  it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
+    const options = {
+      brotli: true,
+      brotliParamMode: 'text',
+      brotliQuality: 10,
+      brotliSizeHint: 5,
+    }
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
+    const message = await gzipper.compress()
+
+    assert.ok(MESSAGE_REGEXP.test(message))
+    assert.ok(compressEventSpy.calledOnce)
+    assert.ok(
+      compressEventSpy.calledOnceWith(
+        'compress',
+        `${FILES_COUNT} files have been compressed.`,
+        'success'
+      )
+    )
+    assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
+    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
+    assert.strictEqual(gzipper.compressionType.ext, 'br')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 3)
+    assert.strictEqual(Object.keys(gzipper.options).length, 4)
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      zlib.constants.BROTLI_MODE_TEXT
+    )
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_QUALITY],
+      10
+    )
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_SIZE_HINT],
+      5
+    )
   })
 
   afterEach(async () => await clear())

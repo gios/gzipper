@@ -12,6 +12,7 @@ const compressionTypeLog = Symbol('compressionTypeLog')
 const selectCompression = Symbol('selectCompression')
 const getCompressionType = Symbol('getCompressionType')
 const createFolders = Symbol('createFolders')
+const getBrotliOptionName = Symbol('getBrotliOptionName')
 
 const stat = promisify(fs.stat)
 
@@ -181,7 +182,13 @@ class Gzipper {
     let options = ''
 
     for (const [key, value] of Object.entries(this.compressionOptions)) {
-      options += `${key}: ${value}, `
+      switch (this.compressionType.name) {
+        case 'BROTLI':
+          options += `${this[getBrotliOptionName](key)}: ${value}, `
+          break
+        default:
+          options += `${key}: ${value}, `
+      }
     }
 
     this.logger.warn(
@@ -321,6 +328,29 @@ class Gzipper {
         fs.mkdirSync(folderPath)
       }
       prev = folderPath
+    }
+  }
+
+  /**
+   * Returns human-readable brotli option name.
+   *
+   * @param {number} index
+   * @returns {string}
+   * @memberof Gzipper
+   */
+  [getBrotliOptionName](index) {
+    switch (+index) {
+      case zlib.constants.BROTLI_PARAM_MODE:
+        return 'brotliParamMode'
+
+      case zlib.constants.BROTLI_PARAM_QUALITY:
+        return 'brotliQuality'
+
+      case zlib.constants.BROTLI_PARAM_SIZE_HINT:
+        return 'brotliSizeHint'
+
+      default:
+        return 'unknown'
     }
   }
 }
