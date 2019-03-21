@@ -4,15 +4,20 @@ const { EventEmitter } = require('events')
 const { promisify } = require('util')
 
 const compressionExtensions = ['.gz', '.br']
-const clearEvent = new EventEmitter()
 const unlink = promisify(fs.unlink)
+const mkdir = promisify(fs.mkdir)
+const exists = promisify(fs.exists)
 const COMPRESS_PATH = resolve(__dirname, './resources/folder_to_compress')
 const NO_FILES_COMPRESS_PATH = resolve(
   __dirname,
   './resources/no_file_to_compress'
 )
 
-async function clearDirectory(target = COMPRESS_PATH, pending = []) {
+async function clearDirectory(
+  target = COMPRESS_PATH,
+  pending = [],
+  clearEvent
+) {
   try {
     const files = fs.readdirSync(target)
     pending.push(...files)
@@ -34,7 +39,7 @@ async function clearDirectory(target = COMPRESS_PATH, pending = []) {
         }
       } else if (isDirectory) {
         pending.pop()
-        clearDirectory(filePath, pending)
+        clearDirectory(filePath, pending, clearEvent)
       }
     }
   } catch (err) {
@@ -42,12 +47,13 @@ async function clearDirectory(target = COMPRESS_PATH, pending = []) {
   }
 }
 
-function clear() {
+function clear(directory) {
+  const clearEvent = new EventEmitter()
   return new Promise(async resolve => {
     clearEvent.once('clear', () => {
       resolve()
     })
-    await clearDirectory()
+    await clearDirectory(directory, [], clearEvent)
   })
 }
 
@@ -59,8 +65,18 @@ function getPrivateSymbol(instance, method) {
   return symbol
 }
 
+async function createFolderInResources(name) {
+  const path = resolve(__dirname, `./resources/${name}`)
+  const isExists = await exists(path)
+  if (!isExists) {
+    await mkdir(path)
+  }
+  return path
+}
+
 exports.COMPRESS_PATH = COMPRESS_PATH
 exports.NO_FILES_COMPRESS_PATH = NO_FILES_COMPRESS_PATH
 exports.clearDirectory = clearDirectory
 exports.clear = clear
 exports.getPrivateSymbol = getPrivateSymbol
+exports.createFolderInResources = createFolderInResources
