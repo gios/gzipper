@@ -69,7 +69,6 @@ describe('Gzipper', () => {
 
   it('should print message about empty folder', async () => {
     const emptyFolderPath = await createFolderInResources('empty_folder')
-    await createFolderInResources('empty_folder/test1')
     const gzipper = new Gzipper(emptyFolderPath, null)
     const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
     const message = await gzipper.compress()
