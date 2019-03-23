@@ -133,7 +133,8 @@ describe('Gzipper', () => {
   })
 
   it('--brotli should emit compress-error on compress error', () => {
-    const createBrotliCompress = zlib.createBrotliCompress.bind({})
+    const createBrotliCompress =
+      zlib.createBrotliCompress && zlib.createBrotliCompress.bind({})
     try {
       delete zlib.createBrotliCompress
       new Gzipper(COMPRESS_PATH, null, { brotli: true })
