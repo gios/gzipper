@@ -108,104 +108,104 @@ describe('Gzipper', () => {
     }
   })
 
-  // it('--gzip-level, --gzip-memory-level, --gzip-strategy should change gzip configuration', async () => {
-  //   const options = { gzipLevel: 6, gzipMemoryLevel: 4, gzipStrategy: 2 }
-  //   const gzipper = new Gzipper(COMPRESS_PATH, null, options)
-  //   const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
-  //   const message = await gzipper.compress()
+  it('--gzip-level, --gzip-memory-level, --gzip-strategy should change gzip configuration', async () => {
+    const options = { gzipLevel: 6, gzipMemoryLevel: 4, gzipStrategy: 2 }
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    await gzipper.compress()
 
-  //   assert.ok(MESSAGE_REGEXP.test(message))
-  //   assert.ok(
-  //     compressEventSpy.withArgs(
-  //       'compress',
-  //       `${FILES_COUNT} files have been compressed.`
-  //     ).calledOnce
-  //   )
-  //   assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-  //   assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-  //   assert.strictEqual(gzipper.compressionType.ext, 'gz')
-  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 3)
-  //   assert.strictEqual(Object.keys(gzipper.options).length, 3)
-  //   assert.strictEqual(gzipper.compressionOptions.gzipLevel, 6)
-  //   assert.strictEqual(gzipper.compressionOptions.gzipMemoryLevel, 4)
-  //   assert.strictEqual(gzipper.compressionOptions.gzipStrategy, 2)
-  // })
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${FILES_COUNT} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+    assert.strictEqual(gzipper.compressionType.ext, 'gz')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 3)
+    assert.strictEqual(Object.keys(gzipper.options).length, 3)
+    assert.strictEqual(gzipper.compressionOptions.gzipLevel, 6)
+    assert.strictEqual(gzipper.compressionOptions.gzipMemoryLevel, 4)
+    assert.strictEqual(gzipper.compressionOptions.gzipStrategy, 2)
+  })
 
-  // it('--brotli should emit compress-error on compress error', () => {
-  //   const createBrotliCompress =
-  //     zlib.createBrotliCompress && zlib.createBrotliCompress.bind({})
-  //   try {
-  //     delete zlib.createBrotliCompress
-  //     new Gzipper(COMPRESS_PATH, null, { brotli: true })
-  //   } catch (err) {
-  //     assert.ok(err instanceof Error)
-  //     assert.strictEqual(
-  //       err.message,
-  //       `Can't use brotli compression, Node.js >= v11.7.0 required.`
-  //     )
-  //   }
-  //   zlib.createBrotliCompress = createBrotliCompress
-  // })
+  it('--brotli should emit compress-error on compress error', () => {
+    const createBrotliCompress =
+      zlib.createBrotliCompress && zlib.createBrotliCompress.bind({})
+    try {
+      delete zlib.createBrotliCompress
+      new Gzipper(COMPRESS_PATH, null, { brotli: true })
+    } catch (err) {
+      assert.ok(err instanceof Error)
+      assert.strictEqual(
+        err.message,
+        `Can't use brotli compression, Node.js >= v11.7.0 required.`
+      )
+    }
+    zlib.createBrotliCompress = createBrotliCompress
+  })
 
-  // it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
-  //   const options = {
-  //     brotli: true,
-  //     brotliParamMode: 'text',
-  //     brotliQuality: 10,
-  //     brotliSizeHint: 5,
-  //   }
-  //   if (zlib.createBrotliCompress !== 'function') {
-  //     return
-  //   }
-  //   const gzipper = new Gzipper(COMPRESS_PATH, null, options)
-  //   const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
-  //   const message = await gzipper.compress()
+  it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
+    const options = {
+      brotli: true,
+      brotliParamMode: 'text',
+      brotliQuality: 10,
+      brotliSizeHint: 5,
+    }
+    if (zlib.createBrotliCompress !== 'function') {
+      return
+    }
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    await gzipper.compress()
 
-  //   assert.ok(MESSAGE_REGEXP.test(message))
-  //   assert.ok(
-  //     compressEventSpy.withArgs(
-  //       'compress',
-  //       `${FILES_COUNT} files have been compressed.`
-  //     ).calledOnce
-  //   )
-  //   assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
-  //   assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
-  //   assert.strictEqual(gzipper.compressionType.ext, 'br')
-  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 3)
-  //   assert.strictEqual(Object.keys(gzipper.options).length, 4)
-  //   assert.strictEqual(
-  //     gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
-  //     zlib.constants.BROTLI_MODE_TEXT
-  //   )
-  //   assert.strictEqual(
-  //     gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_QUALITY],
-  //     10
-  //   )
-  //   assert.strictEqual(
-  //     gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_SIZE_HINT],
-  //     5
-  //   )
-  // })
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${FILES_COUNT} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
+    assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
+    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
+    assert.strictEqual(gzipper.compressionType.ext, 'br')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 3)
+    assert.strictEqual(Object.keys(gzipper.options).length, 4)
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      zlib.constants.BROTLI_MODE_TEXT
+    )
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_QUALITY],
+      10
+    )
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_SIZE_HINT],
+      5
+    )
+  })
 
-  // it('should compress files to a certain folder with existing folder structure', async () => {
-  //   // TODO: Write more efficient tests
-  //   const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_TARGET_PATH)
-  //   const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
-  //   const message = await gzipper.compress()
+  it('should compress files to a certain folder with existing folder structure', async () => {
+    // TODO: Write more efficient tests
+    const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_TARGET_PATH)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    await gzipper.compress()
 
-  //   assert.ok(MESSAGE_REGEXP.test(message))
-  //   assert.ok(
-  //     compressEventSpy.withArgs(
-  //       'compress',
-  //       `${FILES_COUNT} files have been compressed.`
-  //     ).calledOnce
-  //   )
-  //   assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-  //   assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-  //   assert.strictEqual(gzipper.compressionType.ext, 'gz')
-  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
-  //   assert.strictEqual(Object.keys(gzipper.options).length, 0)
-  // })
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${FILES_COUNT} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+    assert.strictEqual(gzipper.compressionType.ext, 'gz')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(Object.keys(gzipper.options).length, 0)
+  })
 
   afterEach(async () => {
     await clear()
