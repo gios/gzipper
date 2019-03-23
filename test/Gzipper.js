@@ -12,7 +12,7 @@ const {
   getPrivateSymbol,
 } = require('./utils')
 
-const FILES_COUNT = 6
+const FILES_COUNT = 8
 const VERBOSE_REGEXP = /File [^\s]+ has been compressed [^\s]+Kb -> [^\s]+Kb./
 const MESSAGE_REGEXP = /[^\s]+ files have been compressed./
 
@@ -48,72 +48,65 @@ describe('Gzipper', () => {
       assert.ok(err instanceof Error)
       assert.strictEqual(err.message, 'Compressing error.')
       assert.ok(compileFolderRecursivelySpy.calledWithExactly(COMPRESS_PATH))
-      // console.log(errorSpy.args)
-      assert.ok(errorSpy.calledWithExactly(sinon.match.instanceOf(Error), true))
+      assert.ok(
+        errorSpy.calledOnceWithExactly(sinon.match.instanceOf(Error), true)
+      )
     }
   })
 
-  // it('should print message about appropriate files', async () => {
-  //   const gzipper = new Gzipper(NO_FILES_COMPRESS_PATH, null)
-  //   const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
-  //   const message = await gzipper.compress()
-  //   const responseMessage = `we couldn't find any appropriate files (.css, .js).`
+  it('should print message about appropriate files', async () => {
+    const gzipper = new Gzipper(NO_FILES_COMPRESS_PATH, null)
+    const noFilesWarnSpy = sinon.spy(gzipper.logger, 'warn')
+    await gzipper.compress()
+    const responseMessage = `we couldn't find any appropriate files (.css, .js).`
 
-  //   assert.ok(message === responseMessage)
-  //   assert.ok(compressEventSpy.calledOnce)
-  //   assert.ok(
-  //     compressEventSpy.calledOnceWith('compress-empty', responseMessage)
-  //   )
-  //   assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-  //   assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-  //   assert.strictEqual(gzipper.compressionType.ext, 'gz')
-  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
-  //   assert.strictEqual(Object.keys(gzipper.options).length, 0)
-  // })
+    assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true))
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+    assert.strictEqual(gzipper.compressionType.ext, 'gz')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(Object.keys(gzipper.options).length, 0)
+  })
 
-  // it('should print message about empty folder', async () => {
-  //   const emptyFolderPath = await createFolderInResources('empty_folder')
-  //   const gzipper = new Gzipper(emptyFolderPath, null)
-  //   const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
-  //   const message = await gzipper.compress()
-  //   const responseMessage = `we couldn't find any appropriate files (.css, .js).`
+  it('should print message about empty folder', async () => {
+    const emptyFolderPath = await createFolderInResources('empty_folder')
+    const gzipper = new Gzipper(emptyFolderPath, null)
+    const noFilesWarnSpy = sinon.spy(gzipper.logger, 'warn')
+    await gzipper.compress()
+    const responseMessage = `we couldn't find any appropriate files (.css, .js).`
 
-  //   assert.ok(message === responseMessage)
-  //   assert.ok(compressEventSpy.calledOnce)
-  //   assert.ok(
-  //     compressEventSpy.calledOnceWith('compress-empty', responseMessage)
-  //   )
-  //   assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-  //   assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-  //   assert.strictEqual(gzipper.compressionType.ext, 'gz')
-  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
-  //   assert.strictEqual(Object.keys(gzipper.options).length, 0)
-  // })
+    assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true))
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+    assert.strictEqual(gzipper.compressionType.ext, 'gz')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(Object.keys(gzipper.options).length, 0)
+  })
 
-  // it('--verbose should print logs to console with and use default configuration', async () => {
-  //   const options = { verbose: true }
-  //   const gzipper = new Gzipper(COMPRESS_PATH, null, options)
-  //   const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
-  //   const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
-  //   const message = await gzipper.compress()
+  it('--verbose should print logs to console with and use default configuration', async () => {
+    const options = { verbose: true }
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
+    await gzipper.compress()
 
-  //   assert.ok(MESSAGE_REGEXP.test(message))
-  //   assert.ok(
-  //     compressEventSpy.withArgs(
-  //       'compress',
-  //       `${FILES_COUNT} files have been compressed.`
-  //     ).calledOnce
-  //   )
-  //   assert.strictEqual(loggerInfoSpy.callCount, FILES_COUNT)
-  //   assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-  //   assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-  //   assert.strictEqual(gzipper.compressionType.ext, 'gz')
-  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
-  //   assert.strictEqual(Object.keys(gzipper.options).length, 1)
-  //   for (const [arg] of loggerInfoSpy.args) {
-  //     assert.ok(VERBOSE_REGEXP.test(arg))
-  //   }
-  // })
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${FILES_COUNT} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
+    assert.strictEqual(loggerInfoSpy.callCount, FILES_COUNT)
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+    assert.strictEqual(gzipper.compressionType.ext, 'gz')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(Object.keys(gzipper.options).length, 1)
+    for (const [arg] of loggerInfoSpy.args) {
+      assert.ok(VERBOSE_REGEXP.test(arg))
+    }
+  })
 
   // it('--gzip-level, --gzip-memory-level, --gzip-strategy should change gzip configuration', async () => {
   //   const options = { gzipLevel: 6, gzipMemoryLevel: 4, gzipStrategy: 2 }
