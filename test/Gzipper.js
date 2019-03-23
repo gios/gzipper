@@ -92,7 +92,6 @@ describe('Gzipper', () => {
     const message = await gzipper.compress()
 
     assert.ok(MESSAGE_REGEXP.test(message))
-    assert.strictEqual(compressEventSpy.withArgs('compress-file').callCount, 6)
     assert.ok(
       compressEventSpy.withArgs(
         'compress',

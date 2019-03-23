@@ -90,8 +90,7 @@ class Gzipper {
                 )
 
                 if (fileInfo) {
-                  this.compressEvent.emit(
-                    'compress-file',
+                  this.logger.info(
                     `File ${file} has been compressed ${
                       fileInfo.beforeSize
                     }Kb -> ${fileInfo.afterSize}Kb.`
@@ -180,9 +179,6 @@ class Gzipper {
         this.logger.success(message, true)
         resolve(message)
       })
-      this.compressEvent.on('compress-file', message =>
-        this.logger.info(message)
-      )
       this.compressEvent.once('compress-empty', message => {
         this.logger.warn(message, true)
         resolve(message)
