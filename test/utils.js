@@ -31,13 +31,13 @@ async function clearDirectory(target = COMPRESS_PATH) {
             await unlink(resolve(target, filePath))
           }
         } catch (error) {
-          throw new Error(error)
+          throw error
         }
       }
     }
     return filesCount
   } catch (error) {
-    throw new Error(error)
+    throw error
   }
 }
 

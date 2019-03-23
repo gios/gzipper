@@ -31,21 +31,27 @@ describe('Gzipper', () => {
     }
   })
 
-  // it('should throw on compress error', async () => {
-  //   const gzipper = new Gzipper(COMPRESS_PATH, null)
-  //   const compressEventSpy = sinon.spy(gzipper.compressEvent, 'emit')
-  //   sinon
-  //     .stub(gzipper, getPrivateSymbol(gzipper, 'compressFile'))
-  //     .rejects('UNKNOWN_ERROR', 'Compressing error.')
+  it('should throw on compress error', async () => {
+    const gzipper = new Gzipper(COMPRESS_PATH, null)
+    const compileFolderRecursivelySpy = sinon.spy(
+      gzipper,
+      getPrivateSymbol(gzipper, 'compileFolderRecursively')
+    )
+    const errorSpy = sinon.spy(gzipper.logger, 'error')
+    sinon
+      .stub(gzipper, getPrivateSymbol(gzipper, 'compressFile'))
+      .rejects('UNKNOWN_ERROR', 'Compressing error.')
 
-  //   try {
-  //     await gzipper.compress()
-  //   } catch (err) {
-  //     assert.ok(err instanceof Error)
-  //     assert.strictEqual(err.message, 'Compressing error.')
-  //     assert.ok(compressEventSpy.alwaysCalledWith('compress-error'))
-  //   }
-  // })
+    try {
+      await gzipper.compress()
+    } catch (err) {
+      assert.ok(err instanceof Error)
+      assert.strictEqual(err.message, 'Compressing error.')
+      assert.ok(compileFolderRecursivelySpy.calledWithExactly(COMPRESS_PATH))
+      // console.log(errorSpy.args)
+      assert.ok(errorSpy.calledWithExactly(sinon.match.instanceOf(Error), true))
+    }
+  })
 
   // it('should print message about appropriate files', async () => {
   //   const gzipper = new Gzipper(NO_FILES_COMPRESS_PATH, null)

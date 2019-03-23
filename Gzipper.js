@@ -85,13 +85,13 @@ class Gzipper {
               }
             }
           } catch (error) {
-            throw new Error(error)
+            throw error
           }
         }
       }
       return compressedFiles
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   }
 
