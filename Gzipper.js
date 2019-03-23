@@ -2,7 +2,6 @@ const zlib = require('zlib')
 const fs = require('fs')
 const { resolve, extname, join, relative, sep } = require('path')
 const { promisify } = require('util')
-const { EventEmitter } = require('events')
 
 const Logger = require('./Logger')
 
@@ -45,86 +44,54 @@ class Gzipper {
     this.createCompression = createCompression
     this.compressionOptions = compressionOptions
     this.compressionType = this[getCompressionType]()
-    this.compressEvent = new EventEmitter()
   }
 
   /**
    * Compile files in folder recursively.
    *
    * @param {string} target path to target directory
-   * @param {number} [globalCount=0] global files count
-   * @param {number} [successGlobalCount=0] success files count
    * @memberof Gzipper
    */
-  async [compileFolderRecursively](
-    target,
-    pending = [],
-    files = [],
-    first = true
-  ) {
+  async [compileFolderRecursively](target) {
     try {
+      const compressedFiles = []
       const filesList = fs.readdirSync(target)
-      if (first && !filesList.length) {
-        this.compressEvent.emit(
-          'compress-empty',
-          `we couldn't find any appropriate files (.css, .js).`
-        )
-        return
-      }
-      pending.push(...filesList)
 
       for (const file of filesList) {
         const filePath = resolve(target, file)
         const isFile = fs.lstatSync(filePath).isFile()
         const isDirectory = fs.lstatSync(filePath).isDirectory()
 
-        if (isFile) {
-          setImmediate(async () => {
-            try {
-              if (extname(filePath) === '.js' || extname(filePath) === '.css') {
-                files.push(file)
-                const fileInfo = await this[compressFile](
-                  file,
-                  target,
-                  this.outputPath
+        if (isDirectory) {
+          compressedFiles.push(
+            ...(await this[compileFolderRecursively](filePath))
+          )
+        } else if (isFile) {
+          try {
+            if (extname(filePath) === '.js' || extname(filePath) === '.css') {
+              compressedFiles.push(filePath)
+              const fileInfo = await this[compressFile](
+                file,
+                target,
+                this.outputPath
+              )
+
+              if (fileInfo) {
+                this.logger.info(
+                  `File ${file} has been compressed ${
+                    fileInfo.beforeSize
+                  }Kb -> ${fileInfo.afterSize}Kb.`
                 )
-
-                if (fileInfo) {
-                  this.logger.info(
-                    `File ${file} has been compressed ${
-                      fileInfo.beforeSize
-                    }Kb -> ${fileInfo.afterSize}Kb.`
-                  )
-                }
               }
-              pending.pop()
-
-              if (!pending.length) {
-                const filesCount = files.length
-                if (filesCount) {
-                  const message = `${filesCount} ${
-                    filesCount > 1 ? 'files have' : 'file has'
-                  } been compressed.`
-                  this.compressEvent.emit('compress', message)
-                } else {
-                  this.compressEvent.emit(
-                    'compress-empty',
-                    `we couldn't find any appropriate files (.css, .js).`
-                  )
-                }
-                return
-              }
-            } catch (err) {
-              this.compressEvent.emit('compress-error', err)
             }
-          })
-        } else if (isDirectory) {
-          pending.pop()
-          this[compileFolderRecursively](filePath, pending, files, false)
+          } catch (error) {
+            throw new Error(error)
+          }
         }
       }
-    } catch (err) {
-      this.compressEvent.emit('compress-error', err)
+      return compressedFiles
+    } catch (error) {
+      throw new Error(error)
     }
   }
 
@@ -174,25 +141,32 @@ class Gzipper {
    * @memberof Gzipper
    */
   async compress() {
-    return new Promise(async (resolve, reject) => {
-      this.compressEvent.once('compress', message => {
-        this.logger.success(message, true)
-        resolve(message)
-      })
-      this.compressEvent.once('compress-empty', message => {
-        this.logger.warn(message, true)
-        resolve(message)
-      })
-      this.compressEvent.once('compress-error', error => {
-        this.logger.error(error, true)
-        reject(error)
-      })
+    let files
+    try {
       if (this.outputPath) {
         this[createFolders](this.outputPath)
       }
       this[compressionTypeLog]()
-      await this[compileFolderRecursively](this.target)
-    })
+      files = await this[compileFolderRecursively](this.target)
+    } catch (error) {
+      this.logger.error(error, true)
+      throw new Error(error.message)
+    }
+
+    const filesCount = files.length
+    if (filesCount) {
+      this.logger.success(
+        `${filesCount} ${
+          filesCount > 1 ? 'files have' : 'file has'
+        } been compressed.`,
+        true
+      )
+    } else {
+      this.logger.warn(
+        `we couldn't find any appropriate files (.css, .js).`,
+        true
+      )
+    }
   }
 
   /**

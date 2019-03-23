@@ -1,6 +1,5 @@
-const { extname, resolve } = require('path')
+const { extname, resolve, basename } = require('path')
 const fs = require('fs')
-const { EventEmitter } = require('events')
 const { promisify } = require('util')
 
 const compressionExtensions = ['.gz', '.br']
@@ -10,64 +9,40 @@ const exists = promisify(fs.exists)
 const COMPRESS_PATH = resolve(__dirname, './resources/folder_to_compress')
 const NO_FILES_COMPRESS_PATH = resolve(
   __dirname,
-  './resources/no_file_to_compress'
+  './resources/no_files_to_compress'
 )
 
-async function clearDirectory(
-  target = COMPRESS_PATH,
-  clearEvent,
-  pending = [],
-  files = [],
-  first = true
-) {
+async function clearDirectory(target = COMPRESS_PATH) {
   try {
+    const filesCount = []
     const filesList = fs.readdirSync(target)
-    if (first && !filesList.length) {
-      clearEvent.emit('clear')
-      return
-    }
-    pending.push(...filesList)
 
     for (const file of filesList) {
       const filePath = resolve(target, file)
       const isFile = fs.lstatSync(filePath).isFile()
       const isDirectory = fs.lstatSync(filePath).isDirectory()
 
-      if (isFile) {
-        setImmediate(async () => {
-          try {
-            if (compressionExtensions.includes(extname(filePath))) {
-              files.push(file)
-              await unlink(resolve(target, filePath))
-            }
-            pending.pop()
-
-            if (!pending.length || !files.length) {
-              clearEvent.emit('clear')
-              return
-            }
-          } catch (err) {
-            clearEvent.emit('clear-error', err)
+      if (isDirectory) {
+        filesCount.push(...(await clearDirectory(filePath)))
+      } else if (isFile) {
+        try {
+          if (compressionExtensions.includes(extname(filePath))) {
+            filesCount.push(file)
+            await unlink(resolve(target, filePath))
           }
-        })
-      } else if (isDirectory) {
-        pending.pop()
-        clearDirectory(filePath, clearEvent, pending, files, false)
+        } catch (error) {
+          throw new Error(error)
+        }
       }
     }
-  } catch (err) {
-    clearEvent.emit('clear-error', err)
+    return filesCount
+  } catch (error) {
+    throw new Error(error)
   }
 }
 
-function clear(directory) {
-  const clearEvent = new EventEmitter()
-
-  return new Promise(async (resolve, reject) => {
-    clearEvent.once('clear', resolve.bind(this))
-    clearEvent.once('clear-error', reject.bind(this))
-    await clearDirectory(directory, clearEvent)
-  })
+async function clear(directory) {
+  await clearDirectory(directory)
 }
 
 function getPrivateSymbol(instance, method) {
@@ -87,9 +62,33 @@ async function createFolderInResources(name) {
   return path
 }
 
+function dirTree(target) {
+  const stats = fs.lstatSync(target)
+  const info = {
+    path: target,
+    name: basename(target),
+  }
+
+  if (stats.isDirectory()) {
+    info.type = 'folder'
+    info.children = fs.readdirSync(target).map(function(child) {
+      return dirTree(target + '/' + child)
+    })
+  } else {
+    info.type = 'file'
+  }
+
+  return info
+}
+
+function getFolderStructure(target) {
+  return dirTree(target)
+}
+
 exports.COMPRESS_PATH = COMPRESS_PATH
 exports.NO_FILES_COMPRESS_PATH = NO_FILES_COMPRESS_PATH
 exports.clearDirectory = clearDirectory
 exports.clear = clear
 exports.getPrivateSymbol = getPrivateSymbol
 exports.createFolderInResources = createFolderInResources
+exports.getFolderStructure = getFolderStructure
