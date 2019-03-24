@@ -28,6 +28,9 @@ async function clearDirectory(target = COMPRESS_PATH, extensions) {
 
     for (const file of filesList) {
       const filePath = path.resolve(target, file)
+      if (!(await exists(filePath))) {
+        continue
+      }
       const isFile = (await lstat(filePath)).isFile()
       const isDirectory = (await lstat(filePath)).isDirectory()
 
