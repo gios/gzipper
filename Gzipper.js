@@ -119,11 +119,7 @@ class Gzipper {
       console.log('OUTPUTDIR target: ', target)
       await this[createFolders](target)
     }
-    console.log(
-      'EXISTS FOLDER ',
-      await exists(path.join(target, filename)),
-      path.join(target, filename)
-    )
+    console.log('EXISTS FOLDER ', await exists(target), target)
     const outputPath = `${path.join(target, filename)}.${
       this.compressionType.ext
     }`
