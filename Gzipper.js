@@ -120,8 +120,6 @@ class Gzipper {
     const outputPath = `${path.join(target, filename)}.${
       this.compressionType.ext
     }`
-    var util = require('util')
-    console.log(util.inspect(dirTree(outputPath), false, null))
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
@@ -362,24 +360,3 @@ class Gzipper {
 }
 
 module.exports = Gzipper
-
-function dirTree(filename) {
-  var stats = fs.lstatSync(filename),
-    info = {
-      path: filename,
-      name: path.basename(filename),
-    }
-
-  if (stats.isDirectory()) {
-    info.type = 'folder'
-    info.children = fs.readdirSync(filename).map(function(child) {
-      return dirTree(filename + '/' + child)
-    })
-  } else {
-    // Assuming it's a file. In real life it could be a symlink or
-    // something else!
-    info.type = 'file'
-  }
-
-  return info
-}
