@@ -221,7 +221,7 @@ describe('Gzipper', () => {
     //       return withoutExtFile === file
     //     })
     //   )
-    }
+    // }
     assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
