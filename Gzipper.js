@@ -12,11 +12,11 @@ const selectCompression = Symbol('selectCompression')
 const getCompressionType = Symbol('getCompressionType')
 const createFolders = Symbol('createFolders')
 const getBrotliOptionName = Symbol('getBrotliOptionName')
+const statExists = Symbol('statExists')
 
 const stat = util.promisify(fs.stat)
 const lstat = util.promisify(fs.lstat)
 const readdir = util.promisify(fs.readdir)
-const exists = util.promisify(fs.exists)
 const mkdir = util.promisify(fs.mkdir)
 
 /**
@@ -321,18 +321,17 @@ class Gzipper {
    * @memberof Gzipper
    */
   async [createFolders](target) {
-    target = path.resolve(process.cwd(), target)
-    const folders = target.split(path.sep)
-    let prev = folders.shift()
+    const initDir = path.isAbsolute(target) ? path.sep : ''
 
-    for (const folder of folders) {
-      const folderPath = path.join(prev, folder)
-      const isExists = await exists(folderPath)
-      if (!isExists) {
+    await target.split(path.sep).reduce(async (parentDir, childDir) => {
+      parentDir = await parentDir
+      childDir = await childDir
+      const folderPath = path.resolve(parentDir, childDir)
+      if (!(await this[statExists](folderPath))) {
         await mkdir(folderPath)
       }
-      prev = folderPath
-    }
+      return folderPath
+    }, initDir)
   }
 
   /**
@@ -356,6 +355,28 @@ class Gzipper {
       default:
         return 'unknown'
     }
+  }
+
+  /**
+   * Returns if the file or folder exists.
+   *
+   * @param {string} target
+   * @returns {Promise<boolean>}
+   * @memberof Gzipper
+   */
+  [statExists](target) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await stat(target)
+        resolve(true)
+      } catch (error) {
+        if (error && error.code === 'ENOENT') {
+          resolve(false)
+        } else {
+          reject(error)
+        }
+      }
+    })
   }
 }
 

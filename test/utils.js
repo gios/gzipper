@@ -4,8 +4,8 @@ const util = require('util')
 
 const unlink = util.promisify(fs.unlink)
 const mkdir = util.promisify(fs.mkdir)
-const exists = util.promisify(fs.exists)
 const lstat = util.promisify(fs.lstat)
+const stat = util.promisify(fs.stat)
 const readdir = util.promisify(fs.readdir)
 const rmdir = util.promisify(fs.rmdir)
 
@@ -70,7 +70,7 @@ function getPrivateSymbol(instance, method) {
 
 async function createFolder(target) {
   const folderPath = path.resolve(__dirname, target)
-  const isExists = await exists(folderPath)
+  const isExists = await statExists(folderPath)
   if (!isExists) {
     await mkdir(folderPath)
   }
@@ -102,6 +102,21 @@ async function getFiles(target, filterByExtensions = []) {
   } catch (error) {
     throw new Error(error)
   }
+}
+
+function statExists(target) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await stat(target)
+      resolve(true)
+    } catch (error) {
+      if (error && error.code === 'ENOENT') {
+        resolve(false)
+      } else {
+        reject(error)
+      }
+    }
+  })
 }
 
 exports.COMPRESS_PATH_TARGET = COMPRESS_PATH_TARGET
