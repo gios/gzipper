@@ -196,21 +196,9 @@ describe('Gzipper', () => {
   it('should compress files to a certain folder with existing folder structure', async () => {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
-    console.log('______________________________________')
-    console.log(
-      'gzipper.compress(): ',
-      COMPRESS_PATH,
-      COMPRESS_PATH_TARGET,
-      fs.readdirSync(COMPRESS_PATH_TARGET)
-    )
-    console.log('______________________________________')
     await gzipper.compress()
     const files = await getFiles(COMPRESS_PATH)
     const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz'])
-    console.log('______________________________________')
-    console.log('files: ', files)
-    console.log('compressedFiles: ', compressedFiles)
-    console.log('______________________________________')
 
     const filesRelative = files.map(file => path.relative(COMPRESS_PATH, file))
     const compressedRelative = compressedFiles.map(file =>

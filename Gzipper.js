@@ -340,8 +340,9 @@ class Gzipper {
     for (const folder of folders) {
       const folderPath = path.join(prev, folder)
       const isExists = await exists(folderPath)
-
+      console.log('BEFORE CREATE FOLDER: ', folderPath, isExists)
       if (!isExists) {
+        console.log('CREATE FOLDER: ', folderPath)
         await mkdir(folderPath)
       }
       prev = folderPath
