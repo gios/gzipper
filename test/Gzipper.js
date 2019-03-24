@@ -7,12 +7,12 @@ const {
   COMPRESS_PATH,
   NO_FILES_COMPRESS_PATH,
   COMPRESS_TARGET_PATH,
+  getFiles,
   createFolderInResources,
   clear,
   getPrivateSymbol,
 } = require('./utils')
 
-const FILES_COUNT = 8
 const VERBOSE_REGEXP = /File [^\s]+ has been compressed [^\s]+Kb -> [^\s]+Kb./
 const MESSAGE_REGEXP = /[^\s]+ files have been compressed./
 
@@ -89,15 +89,16 @@ describe('Gzipper', () => {
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
     const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
     await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.gz'])
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
-        `${FILES_COUNT} files have been compressed.`,
+        `${files.length} files have been compressed.`,
         true
       )
     )
     assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
-    assert.strictEqual(loggerInfoSpy.callCount, FILES_COUNT)
+    assert.strictEqual(loggerInfoSpy.callCount, files.length)
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
     assert.strictEqual(gzipper.compressionType.ext, 'gz')
@@ -113,10 +114,11 @@ describe('Gzipper', () => {
     const gzipper = new Gzipper(COMPRESS_PATH, null, options)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
     await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.gz'])
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
-        `${FILES_COUNT} files have been compressed.`,
+        `${files.length} files have been compressed.`,
         true
       )
     )
@@ -160,10 +162,11 @@ describe('Gzipper', () => {
     const gzipper = new Gzipper(COMPRESS_PATH, null, options)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
     await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.br'])
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
-        `${FILES_COUNT} files have been compressed.`,
+        `${files.length} files have been compressed.`,
         true
       )
     )
@@ -192,10 +195,11 @@ describe('Gzipper', () => {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_TARGET_PATH)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
     await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.gz'])
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
-        `${FILES_COUNT} files have been compressed.`,
+        `${files.length} files have been compressed.`,
         true
       )
     )

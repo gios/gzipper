@@ -1,7 +1,7 @@
 const zlib = require('zlib')
 const fs = require('fs')
-const { resolve, extname, join, relative, sep } = require('path')
-const { promisify } = require('util')
+const path = require('path')
+const util = require('util')
 
 const Logger = require('./Logger')
 
@@ -13,7 +13,11 @@ const getCompressionType = Symbol('getCompressionType')
 const createFolders = Symbol('createFolders')
 const getBrotliOptionName = Symbol('getBrotliOptionName')
 
-const stat = promisify(fs.stat)
+const stat = util.promisify(fs.stat)
+const lstat = util.promisify(fs.lstat)
+const readdir = util.promisify(fs.readdir)
+const exists = util.promisify(fs.exists)
+const mkdir = util.promisify(fs.mkdir)
 
 /**
  * Compressing files.
@@ -37,9 +41,9 @@ class Gzipper {
     }
     this.options = options
     if (outputPath) {
-      this.outputPath = resolve(process.cwd(), outputPath)
+      this.outputPath = path.resolve(process.cwd(), outputPath)
     }
-    this.target = resolve(process.cwd(), target)
+    this.target = path.resolve(process.cwd(), target)
     const [createCompression, compressionOptions] = this[selectCompression]()
     this.createCompression = createCompression
     this.compressionOptions = compressionOptions
@@ -55,12 +59,12 @@ class Gzipper {
   async [compileFolderRecursively](target) {
     try {
       const compressedFiles = []
-      const filesList = fs.readdirSync(target)
+      const filesList = await readdir(target)
 
       for (const file of filesList) {
-        const filePath = resolve(target, file)
-        const isFile = fs.lstatSync(filePath).isFile()
-        const isDirectory = fs.lstatSync(filePath).isDirectory()
+        const filePath = path.resolve(target, file)
+        const isFile = (await lstat(filePath)).isFile()
+        const isDirectory = (await lstat(filePath)).isDirectory()
 
         if (isDirectory) {
           compressedFiles.push(
@@ -68,7 +72,10 @@ class Gzipper {
           )
         } else if (isFile) {
           try {
-            if (extname(filePath) === '.js' || extname(filePath) === '.css') {
+            if (
+              path.extname(filePath) === '.js' ||
+              path.extname(filePath) === '.css'
+            ) {
               compressedFiles.push(filePath)
               const fileInfo = await this[compressFile](
                 file,
@@ -105,12 +112,14 @@ class Gzipper {
    * @memberof Gzipper
    */
   async [compressFile](filename, target, outputDir) {
-    const inputPath = join(target, filename)
+    const inputPath = path.join(target, filename)
     if (outputDir) {
-      target = join(outputDir, relative(this.target, target))
-      this[createFolders](target)
+      target = path.join(outputDir, path.relative(this.target, target))
+      await this[createFolders](target)
     }
-    const outputPath = `${join(target, filename)}.${this.compressionType.ext}`
+    const outputPath = `${path.join(target, filename)}.${
+      this.compressionType.ext
+    }`
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
@@ -144,7 +153,7 @@ class Gzipper {
     let files
     try {
       if (this.outputPath) {
-        this[createFolders](this.outputPath)
+        await this[createFolders](this.outputPath)
       }
       this[compressionTypeLog]()
       files = await this[compileFolderRecursively](this.target)
@@ -311,17 +320,17 @@ class Gzipper {
    * @param {string} target where folders will be created
    * @memberof Gzipper
    */
-  [createFolders](target) {
-    target = resolve(process.cwd(), target)
-    const folders = target.split(sep)
+  async [createFolders](target) {
+    target = path.resolve(process.cwd(), target)
+    const folders = target.split(path.sep)
     let prev = folders.shift()
 
     for (const folder of folders) {
-      const folderPath = join(prev, folder)
-      const isExists = fs.existsSync(folderPath)
+      const folderPath = path.join(prev, folder)
+      const isExists = await exists(folderPath)
 
       if (!isExists) {
-        fs.mkdirSync(folderPath)
+        await mkdir(folderPath)
       }
       prev = folderPath
     }

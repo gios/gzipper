@@ -1,13 +1,16 @@
-const { extname, resolve, basename } = require('path')
+const path = require('path')
 const fs = require('fs')
-const { promisify } = require('util')
+const util = require('util')
 
 const compressionExtensions = ['.gz', '.br']
-const unlink = promisify(fs.unlink)
-const mkdir = promisify(fs.mkdir)
-const exists = promisify(fs.exists)
-const COMPRESS_PATH = resolve(__dirname, './resources/folder_to_compress')
-const NO_FILES_COMPRESS_PATH = resolve(
+const unlink = util.promisify(fs.unlink)
+const mkdir = util.promisify(fs.mkdir)
+const exists = util.promisify(fs.exists)
+const lstat = util.promisify(fs.lstat)
+const readdir = util.promisify(fs.readdir)
+
+const COMPRESS_PATH = path.resolve(__dirname, './resources/folder_to_compress')
+const NO_FILES_COMPRESS_PATH = path.resolve(
   __dirname,
   './resources/no_files_to_compress'
 )
@@ -15,20 +18,20 @@ const NO_FILES_COMPRESS_PATH = resolve(
 async function clearDirectory(target = COMPRESS_PATH) {
   try {
     const filesCount = []
-    const filesList = fs.readdirSync(target)
+    const filesList = await readdir(target)
 
     for (const file of filesList) {
-      const filePath = resolve(target, file)
-      const isFile = fs.lstatSync(filePath).isFile()
-      const isDirectory = fs.lstatSync(filePath).isDirectory()
+      const filePath = path.resolve(target, file)
+      const isFile = (await lstat(filePath)).isFile()
+      const isDirectory = (await lstat(filePath)).isDirectory()
 
       if (isDirectory) {
         filesCount.push(...(await clearDirectory(filePath)))
       } else if (isFile) {
         try {
-          if (compressionExtensions.includes(extname(filePath))) {
+          if (compressionExtensions.includes(path.extname(filePath))) {
             filesCount.push(file)
-            await unlink(resolve(target, filePath))
+            await unlink(path.resolve(target, filePath))
           }
         } catch (error) {
           throw error
@@ -54,35 +57,39 @@ function getPrivateSymbol(instance, method) {
 }
 
 async function createFolderInResources(name) {
-  const path = resolve(__dirname, `./resources/${name}`)
-  const isExists = await exists(path)
+  const folderPath = path.resolve(__dirname, `./resources/${name}`)
+  const isExists = await exists(folderPath)
   if (!isExists) {
-    await mkdir(path)
+    await mkdir(folderPath)
   }
-  return path
+  return folderPath
 }
 
-function dirTree(target) {
-  const stats = fs.lstatSync(target)
-  const info = {
-    path: target,
-    name: basename(target),
+async function getFiles(target, filterByExtensions = []) {
+  try {
+    const files = []
+    const filesList = await readdir(target)
+
+    for (const file of filesList) {
+      const filePath = path.resolve(target, file)
+      const isFile = (await lstat(filePath)).isFile()
+      const isDirectory = (await lstat(filePath)).isDirectory()
+
+      if (isDirectory) {
+        files.push(...(await getFiles(filePath, filterByExtensions)))
+      } else if (isFile) {
+        if (filterByExtensions.length) {
+          filterByExtensions.includes(path.extname(filePath)) &&
+            files.push(filePath)
+        } else {
+          files.push(filePath)
+        }
+      }
+    }
+    return files
+  } catch (error) {
+    throw new Error(error)
   }
-
-  if (stats.isDirectory()) {
-    info.type = 'folder'
-    info.children = fs.readdirSync(target).map(function(child) {
-      return dirTree(target + '/' + child)
-    })
-  } else {
-    info.type = 'file'
-  }
-
-  return info
-}
-
-function getFolderStructure(target) {
-  return dirTree(target)
 }
 
 exports.COMPRESS_PATH = COMPRESS_PATH
@@ -91,4 +98,4 @@ exports.clearDirectory = clearDirectory
 exports.clear = clear
 exports.getPrivateSymbol = getPrivateSymbol
 exports.createFolderInResources = createFolderInResources
-exports.getFolderStructure = getFolderStructure
+exports.getFiles = getFiles
