@@ -136,6 +136,7 @@ class Gzipper {
         }
       })
       output.once('error', error => {
+        console.log('AAAAAAAAAAAAAAAAAAAAAA ', error)
         this.logger.error(error, true)
         reject(error)
       })
@@ -158,6 +159,7 @@ class Gzipper {
       this[compressionTypeLog]()
       files = await this[compileFolderRecursively](this.target)
     } catch (error) {
+      console.log('BBBBBBBBBBBBBBBBBBBBBBBBB ', error)
       this.logger.error(error, true)
       throw new Error(error.message)
     }
