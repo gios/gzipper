@@ -195,14 +195,21 @@ describe('Gzipper', () => {
   it('should compress files to a certain folder with existing folder structure', async () => {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    console.log('______________________________________')
+    console.log('gzipper.compress(): ', COMPRESS_PATH, COMPRESS_PATH_TARGET)
+    console.log('______________________________________')
     await gzipper.compress()
     const files = await getFiles(COMPRESS_PATH)
-    // const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz'])
+    const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz'])
+    console.log('______________________________________')
+    console.log('files: ', files)
+    console.log('compressedFiles: ', compressedFiles)
+    console.log('______________________________________')
 
-    // const filesRelative = files.map(file => path.relative(COMPRESS_PATH, file))
-    // const compressedRelative = compressedFiles.map(file =>
-    //   path.relative(COMPRESS_PATH_TARGET, file)
-    // )
+    const filesRelative = files.map(file => path.relative(COMPRESS_PATH, file))
+    const compressedRelative = compressedFiles.map(file =>
+      path.relative(COMPRESS_PATH_TARGET, file)
+    )
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
@@ -210,18 +217,18 @@ describe('Gzipper', () => {
         true
       )
     )
-    // assert.strictEqual(files.length, compressedFiles.length)
-    // for (const file of filesRelative) {
-    //   assert.ok(
-    //     compressedRelative.some(compressedFile => {
-    //       const withoutExtFile = compressedFile.replace(
-    //         path.basename(compressedFile),
-    //         path.parse(path.basename(compressedFile)).name
-    //       )
-    //       return withoutExtFile === file
-    //     })
-    //   )
-    // }
+    assert.strictEqual(files.length, compressedFiles.length)
+    for (const file of filesRelative) {
+      assert.ok(
+        compressedRelative.some(compressedFile => {
+          const withoutExtFile = compressedFile.replace(
+            path.basename(compressedFile),
+            path.parse(path.basename(compressedFile)).name
+          )
+          return withoutExtFile === file
+        })
+      )
+    }
     assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
