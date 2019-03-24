@@ -232,7 +232,7 @@ describe('Gzipper', () => {
 
   afterEach(async () => {
     await clear(EMPTY_FOLDER_PATH, true)
-    await clear(COMPRESS_PATH_TARGET, true)
+    // await clear(COMPRESS_PATH_TARGET, true)
     await clear(COMPRESS_PATH, ['.gz', '.br'])
   })
 })
