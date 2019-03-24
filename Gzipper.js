@@ -113,22 +113,17 @@ class Gzipper {
    */
   async [compressFile](filename, target, outputDir) {
     const inputPath = path.join(target, filename)
-    console.log('OUTPUTDIR: ', outputDir, filename, target)
     if (outputDir) {
       target = path.join(outputDir, path.relative(this.target, target))
-      console.log('OUTPUTDIR target: ', target)
       await this[createFolders](target)
     }
-    console.log('EXISTS FOLDER ', await exists(target), target)
     const outputPath = `${path.join(target, filename)}.${
       this.compressionType.ext
     }`
-    console.log('FINAL OUTPUT PATH ', outputPath, await exists(outputPath))
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
     output.once('open', async () => {
-      console.log('EXISTS? ', await exists(outputPath))
       input.pipe(this.createCompression()).pipe(output)
     })
 
@@ -143,7 +138,6 @@ class Gzipper {
         }
       })
       output.once('error', error => {
-        console.log('AAAAAAAAAAAAAAAAAAAAAA ', error)
         this.logger.error(error, true)
         reject(error)
       })
@@ -336,9 +330,7 @@ class Gzipper {
     for (const folder of folders) {
       const folderPath = path.join(prev, folder)
       const isExists = await exists(folderPath)
-      console.log('BEFORE CREATE FOLDER: ', folderPath, isExists)
       if (!isExists) {
-        console.log('CREATE FOLDER: ', folderPath)
         await mkdir(folderPath)
       }
       prev = folderPath
