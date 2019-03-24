@@ -59,4 +59,5 @@ typings/
 
 # Project
 *.gz
+*.br
 .vscode
