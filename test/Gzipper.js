@@ -20,8 +20,9 @@ const MESSAGE_REGEXP = /[^\s]+ files have been compressed./
 
 describe('Gzipper', () => {
   beforeEach(async () => {
-    await clear()
-    await clear(COMPRESS_PATH_TARGET)
+    await createFolder(EMPTY_FOLDER_PATH)
+    await createFolder(COMPRESS_PATH_TARGET)
+    await clear(COMPRESS_PATH, ['.gz', '.br'])
   })
 
   it('should throw an error if no path found', () => {
@@ -71,8 +72,7 @@ describe('Gzipper', () => {
   })
 
   it('should print message about empty folder', async () => {
-    const emptyFolderPath = await createFolder(EMPTY_FOLDER_PATH)
-    const gzipper = new Gzipper(emptyFolderPath, null)
+    const gzipper = new Gzipper(EMPTY_FOLDER_PATH, null)
     const noFilesWarnSpy = sinon.spy(gzipper.logger, 'warn')
     await gzipper.compress()
     const responseMessage = `we couldn't find any appropriate files (.css, .js).`
@@ -193,16 +193,15 @@ describe('Gzipper', () => {
   })
 
   it('should compress files to a certain folder with existing folder structure', async () => {
-    const target = await createFolder(COMPRESS_PATH_TARGET)
-    const gzipper = new Gzipper(COMPRESS_PATH, target)
+    const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
     await gzipper.compress()
     const files = await getFiles(COMPRESS_PATH)
-    const compressedFiles = await getFiles(target, ['.gz'])
+    const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz'])
 
     const filesRelative = files.map(file => path.relative(COMPRESS_PATH, file))
     const compressedRelative = compressedFiles.map(file =>
-      path.relative(target, file)
+      path.relative(COMPRESS_PATH_TARGET, file)
     )
 
     assert.ok(
@@ -232,7 +231,8 @@ describe('Gzipper', () => {
   })
 
   afterEach(async () => {
-    await clear()
-    await clear(COMPRESS_PATH_TARGET)
+    await clear(EMPTY_FOLDER_PATH, true)
+    await clear(COMPRESS_PATH_TARGET, true)
+    await clear(COMPRESS_PATH, ['.gz', '.br'])
   })
 })

@@ -2,12 +2,12 @@ const path = require('path')
 const fs = require('fs')
 const util = require('util')
 
-const compressionExtensions = ['.gz', '.br']
 const unlink = util.promisify(fs.unlink)
 const mkdir = util.promisify(fs.mkdir)
 const exists = util.promisify(fs.exists)
 const lstat = util.promisify(fs.lstat)
 const readdir = util.promisify(fs.readdir)
+const rmdir = util.promisify(fs.rmdir)
 
 const EMPTY_FOLDER_PATH = path.resolve(__dirname, './resources/empty_folder')
 const COMPRESS_PATH = path.resolve(__dirname, './resources/folder_to_compress')
@@ -20,9 +20,10 @@ const NO_FILES_COMPRESS_PATH = path.resolve(
   './resources/no_files_to_compress'
 )
 
-async function clearDirectory(target = COMPRESS_PATH) {
+async function clearDirectory(target = COMPRESS_PATH, extensions) {
   try {
-    const filesCount = []
+    const force = typeof extensions === 'boolean' && extensions
+    const files = []
     const filesList = await readdir(target)
 
     for (const file of filesList) {
@@ -31,26 +32,32 @@ async function clearDirectory(target = COMPRESS_PATH) {
       const isDirectory = (await lstat(filePath)).isDirectory()
 
       if (isDirectory) {
-        filesCount.push(...(await clearDirectory(filePath)))
+        files.push(...(await clearDirectory(filePath, extensions)))
       } else if (isFile) {
         try {
-          if (compressionExtensions.includes(path.extname(filePath))) {
-            filesCount.push(file)
+          if (Array.isArray(extensions) && extensions.length) {
+            if (extensions.includes(path.extname(filePath))) {
+              await unlink(path.resolve(target, filePath))
+              files.push(filePath)
+            }
+          } else if (force) {
             await unlink(path.resolve(target, filePath))
+            files.push(filePath)
           }
         } catch (error) {
           throw error
         }
       }
     }
-    return filesCount
+    force && (await rmdir(target))
+    return files
   } catch (error) {
     throw error
   }
 }
 
-async function clear(directory) {
-  await clearDirectory(directory)
+async function clear(directory, extensions) {
+  await clearDirectory(directory, extensions)
 }
 
 function getPrivateSymbol(instance, method) {
