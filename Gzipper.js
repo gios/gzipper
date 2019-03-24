@@ -122,6 +122,7 @@ class Gzipper {
     const outputPath = `${path.join(target, filename)}.${
       this.compressionType.ext
     }`
+    console.log('FINAL OUTPUT PATH ', outputPath, await exists(outputPath))
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
@@ -130,8 +131,8 @@ class Gzipper {
     const compressPromise = new Promise((resolve, reject) => {
       output.once('finish', async () => {
         if (this.options.verbose) {
-          const beforeSize = 1
-          const afterSize = 2
+          const beforeSize = (await stat(inputPath)).size / 1024
+          const afterSize = (await stat(outputPath)).size / 1024
           resolve({ beforeSize, afterSize })
         } else {
           resolve()
