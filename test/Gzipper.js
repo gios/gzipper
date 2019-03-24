@@ -2,6 +2,7 @@ const assert = require('assert')
 const sinon = require('sinon')
 const zlib = require('zlib')
 const path = require('path')
+const fs = require('fs')
 
 const Gzipper = require('../Gzipper')
 const {
@@ -196,7 +197,12 @@ describe('Gzipper', () => {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
     console.log('______________________________________')
-    console.log('gzipper.compress(): ', COMPRESS_PATH, COMPRESS_PATH_TARGET)
+    console.log(
+      'gzipper.compress(): ',
+      COMPRESS_PATH,
+      COMPRESS_PATH_TARGET,
+      fs.readdirSync(COMPRESS_PATH_TARGET)
+    )
     console.log('______________________________________')
     await gzipper.compress()
     const files = await getFiles(COMPRESS_PATH)
