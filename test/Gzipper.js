@@ -1,14 +1,16 @@
 const assert = require('assert')
 const sinon = require('sinon')
 const zlib = require('zlib')
+const path = require('path')
 
 const Gzipper = require('../Gzipper')
 const {
+  EMPTY_FOLDER_PATH,
   COMPRESS_PATH,
   NO_FILES_COMPRESS_PATH,
-  COMPRESS_TARGET_PATH,
+  COMPRESS_PATH_TARGET,
   getFiles,
-  createFolderInResources,
+  createFolder,
   clear,
   getPrivateSymbol,
 } = require('./utils')
@@ -19,7 +21,7 @@ const MESSAGE_REGEXP = /[^\s]+ files have been compressed./
 describe('Gzipper', () => {
   beforeEach(async () => {
     await clear()
-    await clear(COMPRESS_TARGET_PATH)
+    await clear(COMPRESS_PATH_TARGET)
   })
 
   it('should throw an error if no path found', () => {
@@ -69,7 +71,7 @@ describe('Gzipper', () => {
   })
 
   it('should print message about empty folder', async () => {
-    const emptyFolderPath = await createFolderInResources('empty_folder')
+    const emptyFolderPath = await createFolder(EMPTY_FOLDER_PATH)
     const gzipper = new Gzipper(emptyFolderPath, null)
     const noFilesWarnSpy = sinon.spy(gzipper.logger, 'warn')
     await gzipper.compress()
@@ -191,11 +193,17 @@ describe('Gzipper', () => {
   })
 
   it('should compress files to a certain folder with existing folder structure', async () => {
-    // TODO: Write more efficient tests
-    const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_TARGET_PATH)
+    const target = await createFolder(COMPRESS_PATH_TARGET)
+    const gzipper = new Gzipper(COMPRESS_PATH, target)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
     await gzipper.compress()
-    const files = await getFiles(COMPRESS_PATH, ['.gz'])
+    const files = await getFiles(COMPRESS_PATH)
+    const compressedFiles = await getFiles(target, ['.gz'])
+
+    const filesRelative = files.map(file => path.relative(COMPRESS_PATH, file))
+    const compressedRelative = compressedFiles.map(file =>
+      path.relative(target, file)
+    )
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
@@ -203,6 +211,18 @@ describe('Gzipper', () => {
         true
       )
     )
+    assert.strictEqual(files.length, compressedFiles.length)
+    for (const file of filesRelative) {
+      assert.ok(
+        compressedRelative.some(compressedFile => {
+          const withoutExtFile = compressedFile.replace(
+            path.basename(compressedFile),
+            path.parse(path.basename(compressedFile)).name
+          )
+          return withoutExtFile === file
+        })
+      )
+    }
     assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
@@ -213,6 +233,6 @@ describe('Gzipper', () => {
 
   afterEach(async () => {
     await clear()
-    await clear(COMPRESS_TARGET_PATH)
+    await clear(COMPRESS_PATH_TARGET)
   })
 })

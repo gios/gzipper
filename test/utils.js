@@ -9,7 +9,12 @@ const exists = util.promisify(fs.exists)
 const lstat = util.promisify(fs.lstat)
 const readdir = util.promisify(fs.readdir)
 
+const EMPTY_FOLDER_PATH = path.resolve(__dirname, './resources/empty_folder')
 const COMPRESS_PATH = path.resolve(__dirname, './resources/folder_to_compress')
+const COMPRESS_PATH_TARGET = path.resolve(
+  __dirname,
+  './resources/folder_to_compress_target'
+)
 const NO_FILES_COMPRESS_PATH = path.resolve(
   __dirname,
   './resources/no_files_to_compress'
@@ -56,8 +61,8 @@ function getPrivateSymbol(instance, method) {
   return symbol
 }
 
-async function createFolderInResources(name) {
-  const folderPath = path.resolve(__dirname, `./resources/${name}`)
+async function createFolder(target) {
+  const folderPath = path.resolve(__dirname, target)
   const isExists = await exists(folderPath)
   if (!isExists) {
     await mkdir(folderPath)
@@ -92,10 +97,12 @@ async function getFiles(target, filterByExtensions = []) {
   }
 }
 
+exports.COMPRESS_PATH_TARGET = COMPRESS_PATH_TARGET
+exports.EMPTY_FOLDER_PATH = EMPTY_FOLDER_PATH
 exports.COMPRESS_PATH = COMPRESS_PATH
 exports.NO_FILES_COMPRESS_PATH = NO_FILES_COMPRESS_PATH
 exports.clearDirectory = clearDirectory
 exports.clear = clear
 exports.getPrivateSymbol = getPrivateSymbol
-exports.createFolderInResources = createFolderInResources
+exports.createFolder = createFolder
 exports.getFiles = getFiles
