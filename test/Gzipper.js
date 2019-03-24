@@ -2,7 +2,6 @@ const assert = require('assert')
 const sinon = require('sinon')
 const zlib = require('zlib')
 const path = require('path')
-const fs = require('fs')
 
 const Gzipper = require('../Gzipper')
 const {
