@@ -13,7 +13,7 @@ const EMPTY_FOLDER_PATH = path.resolve(__dirname, './resources/empty_folder')
 const COMPRESS_PATH = path.resolve(__dirname, './resources/folder_to_compress')
 const COMPRESS_PATH_TARGET = path.resolve(
   __dirname,
-  './resources/folder_to_compress_target'
+  './resources/compress_target'
 )
 const NO_FILES_COMPRESS_PATH = path.resolve(
   __dirname,
