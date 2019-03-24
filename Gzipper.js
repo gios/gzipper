@@ -113,7 +113,7 @@ class Gzipper {
    */
   async [compressFile](filename, target, outputDir) {
     const inputPath = path.join(target, filename)
-    console.log('OUTPUTDIR: ', outputDir)
+    console.log('OUTPUTDIR: ', outputDir, filename, target)
     if (outputDir) {
       target = path.join(outputDir, path.relative(this.target, target))
       console.log('OUTPUTDIR target: ', target)
