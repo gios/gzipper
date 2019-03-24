@@ -113,8 +113,10 @@ class Gzipper {
    */
   async [compressFile](filename, target, outputDir) {
     const inputPath = path.join(target, filename)
+    console.log('OUTPUTDIR: ', outputDir)
     if (outputDir) {
       target = path.join(outputDir, path.relative(this.target, target))
+      console.log('OUTPUTDIR target: ', target)
       await this[createFolders](target)
     }
     const outputPath = `${path.join(target, filename)}.${
@@ -159,7 +161,6 @@ class Gzipper {
       this[compressionTypeLog]()
       files = await this[compileFolderRecursively](this.target)
     } catch (error) {
-      console.log('BBBBBBBBBBBBBBBBBBBBBBBBB ', error)
       this.logger.error(error, true)
       throw new Error(error.message)
     }
