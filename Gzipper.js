@@ -126,8 +126,8 @@ class Gzipper {
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
-    output.once('open', () => {
-      console.log("EXISTS? ", await exists(outputPath))
+    output.once('open', async () => {
+      console.log('EXISTS? ', await exists(outputPath))
       input.pipe(this.createCompression()).pipe(output)
     })
 
