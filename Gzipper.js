@@ -120,14 +120,12 @@ class Gzipper {
     const outputPath = `${path.join(target, filename)}.${
       this.compressionType.ext
     }`
+    var util = require('util')
+    console.log(util.inspect(dirTree(outputPath), false, null))
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
-    output.once('open', () => {
-      var util = require('util')
-      console.log(util.inspect(dirTree(outputPath), false, null))
-      input.pipe(this.createCompression()).pipe(output)
-    })
+    output.once('open', () => input.pipe(this.createCompression()).pipe(output))
 
     const compressPromise = new Promise((resolve, reject) => {
       output.once('finish', async () => {
