@@ -76,6 +76,7 @@ class Gzipper {
               path.extname(filePath) === '.js' ||
               path.extname(filePath) === '.css'
             ) {
+              const hrtimeStart = process.hrtime()
               compressedFiles.push(filePath)
               const fileInfo = await this[compressFile](
                 file,
@@ -84,10 +85,13 @@ class Gzipper {
               )
 
               if (fileInfo) {
+                const [seconds, nanoseconds] = process.hrtime(hrtimeStart)
                 this.logger.info(
-                  `File ${file} has been compressed ${
-                    fileInfo.beforeSize
-                  }Kb -> ${fileInfo.afterSize}Kb.`
+                  `File ${file} has been compressed ${fileInfo.beforeSize.toFixed(
+                    4
+                  )}Kb -> ${fileInfo.afterSize.toFixed(4)}Kb (${
+                    seconds ? seconds + 's ' : ''
+                  }${nanoseconds / 1e6}ms)`
                 )
               }
             }

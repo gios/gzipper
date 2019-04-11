@@ -15,7 +15,7 @@ const {
   getPrivateSymbol,
 } = require('./utils')
 
-const VERBOSE_REGEXP = /File [^\s]+ has been compressed [^\s]+Kb -> [^\s]+Kb./
+const VERBOSE_REGEXP = /File [^\s]+ has been compressed [^\s]+Kb -> [^\s]+Kb/
 const MESSAGE_REGEXP = /[^\s]+ files have been compressed./
 
 describe('Gzipper', () => {
