@@ -222,21 +222,27 @@ describe('Gzipper', () => {
 
   it('getOutputPath should returns correct file path', () => {
     const gzipper = new Gzipper(COMPRESS_PATH, null)
-    const target = '\\the\\elder\\scrolls\\'
+    const target = '/the/elder/scrolls/'
     const file = 'skyrim.js'
 
     let outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
       target,
       file
     )
-    assert.strictEqual(outputFilePath, '\\the\\elder\\scrolls\\skyrim.js.gz')
+    assert.strictEqual(
+      outputFilePath,
+      '/the/elder/scrolls/skyrim.js.gz'.split('/').join(path.sep)
+    )
 
     gzipper.options.outputFileFormat = '[filename].[compressExt].[ext]'
     outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
       target,
       file
     )
-    assert.strictEqual(outputFilePath, '\\the\\elder\\scrolls\\skyrim.gz.js')
+    assert.strictEqual(
+      outputFilePath,
+      '/the/elder/scrolls/skyrim.gz.js'.split('/').join(path.sep)
+    )
   })
 
   it('should use default file format artifacts with --outputFileFormat and print to console with --verbose flag', async () => {
