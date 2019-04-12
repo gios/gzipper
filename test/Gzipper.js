@@ -15,9 +15,6 @@ const {
   getPrivateSymbol,
 } = require('./utils')
 
-const VERBOSE_REGEXP = /File [^\s]+ has been compressed [^\s]+Kb -> [^\s]+Kb/
-const MESSAGE_REGEXP = /[^\s]+ files have been compressed./
-
 describe('Gzipper', () => {
   beforeEach(async () => {
     await createFolder(EMPTY_FOLDER_PATH)
@@ -85,7 +82,7 @@ describe('Gzipper', () => {
     assert.strictEqual(Object.keys(gzipper.options).length, 0)
   })
 
-  it('--verbose should print logs to console with and use default configuration', async () => {
+  it('--verbose should print logs to console and use default configuration', async () => {
     const options = { verbose: true }
     const gzipper = new Gzipper(COMPRESS_PATH, null, options)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
@@ -99,16 +96,12 @@ describe('Gzipper', () => {
         true
       )
     )
-    assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
-    assert.strictEqual(loggerInfoSpy.callCount, files.length)
+    assert.strictEqual(loggerInfoSpy.callCount, files.length + 1)
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
     assert.strictEqual(gzipper.compressionType.ext, 'gz')
     assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
     assert.strictEqual(Object.keys(gzipper.options).length, 1)
-    for (const [arg] of loggerInfoSpy.args) {
-      assert.ok(VERBOSE_REGEXP.test(arg))
-    }
   })
 
   it('--gzip-level, --gzip-memory-level, --gzip-strategy should change gzip configuration', async () => {
@@ -124,7 +117,6 @@ describe('Gzipper', () => {
         true
       )
     )
-    assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
     assert.strictEqual(gzipper.compressionType.ext, 'gz')
@@ -172,7 +164,6 @@ describe('Gzipper', () => {
         true
       )
     )
-    assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
     assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
     assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
     assert.strictEqual(gzipper.compressionType.ext, 'br')
@@ -222,13 +213,102 @@ describe('Gzipper', () => {
         })
       )
     }
-    assert.ok(MESSAGE_REGEXP.test(loggerSuccessSpy.args[0][0]))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
     assert.strictEqual(gzipper.compressionType.ext, 'gz')
     assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
     assert.strictEqual(Object.keys(gzipper.options).length, 0)
   })
+
+  it('getOutputPath should returns correct file path', () => {
+    const gzipper = new Gzipper(COMPRESS_PATH, null)
+    const target = '\\the\\elder\\scrolls\\'
+    const file = 'skyrim.js'
+
+    let outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
+      target,
+      file
+    )
+    assert.strictEqual(outputFilePath, '\\the\\elder\\scrolls\\skyrim.js.gz')
+
+    gzipper.options.outputFileFormat = '[filename].[compressExt].[ext]'
+    outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
+      target,
+      file
+    )
+    assert.strictEqual(outputFilePath, '\\the\\elder\\scrolls\\skyrim.gz.js')
+  })
+
+  it('should use default file format artifacts with --outputFileFormat and print to console with --verbose flag', async () => {
+    const options = { verbose: true }
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
+    const getOutputPathSpy = sinon.spy(
+      gzipper,
+      getPrivateSymbol(gzipper, 'getOutputPath')
+    )
+    await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.gz'])
+
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${files.length} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(
+      loggerInfoSpy.calledWithExactly(
+        `Use default output file format [filename].[ext].[compressExt]`
+      )
+    )
+    assert.strictEqual(loggerInfoSpy.callCount, files.length + 1)
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+    assert.strictEqual(gzipper.compressionType.ext, 'gz')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(Object.keys(gzipper.options).length, 1)
+    assert.strictEqual(gzipper.options.outputFileFormat, undefined)
+  })
+
+  // it('should set custom file format artifacts with --outputFileFormat', async () => {
+  //   const options = {
+  //     outputFileFormat: '[filename].[compressExt].[ext]',
+  //     verbose: true,
+  //   }
+  //   const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+  //   const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+  //   const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
+  //   await gzipper.compress()
+  //   const files = await getFiles(COMPRESS_PATH, ['.gz'])
+
+  //   assert.ok(
+  //     loggerSuccessSpy.calledOnceWithExactly(
+  //       `${files.length} files have been compressed.`,
+  //       true
+  //     )
+  //   )
+  //   assert.ok(
+  //     loggerInfoSpy.notCalledWithExactly(
+  //       `Use default output file format [filename].[ext].[compressExt]`
+  //     )
+  //   )
+  //   assert.strictEqual(loggerInfoSpy.callCount, files.length + 1)
+  //   assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+  //   assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+  //   assert.strictEqual(gzipper.compressionType.ext, 'gz')
+  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+  //   assert.strictEqual(Object.keys(gzipper.options).length, 1)
+
+  //   const target = '\\the\\elder\\scrolls\\'
+  //   const file = 'skyrim.js'
+
+  //   const outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
+  //     target,
+  //     file
+  //   )
+  //   assert.strictEqual(outputFilePath, '\\the\\elder\\scrolls\\skyrim.js.gz')
+  // })
 
   afterEach(async () => {
     await clear(EMPTY_FOLDER_PATH, true)

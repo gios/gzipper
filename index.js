@@ -13,6 +13,7 @@ const {
   GZIPPER_BROTLI_PARAM_MODE,
   GZIPPER_BROTLI_QUALITY,
   GZIPPER_BROTLI_SIZE_HINT,
+  GZIPPER_OUTPUT_FILE_FORMAT,
 } = process.env
 
 program
@@ -44,6 +45,16 @@ program
     '-bs, --brotli-size-hint [brotliSizeHint]',
     'expected input size 0 (default)'
   )
+  .option(
+    '--outputFileFormat [outputFileFormat]',
+    'output file format with default artifacts [filename].[ext].[compressExt]'
+  )
+  .option('', 'where:')
+  .option(
+    '',
+    'filename -> file name, ext -> file extension, compressExt -> compress extension (.gz, .br, etc).'
+  )
+  .option('', 'sample: [filename].[compressExt].[ext]')
   .parse(process.argv)
 
 const [target, outputPath] = program.args
@@ -56,6 +67,7 @@ const options = {
   brotliParamMode: GZIPPER_BROTLI_PARAM_MODE || program.brotliParamMode,
   brotliQuality: +GZIPPER_BROTLI_QUALITY || +program.brotliQuality,
   brotliSizeHint: +GZIPPER_BROTLI_SIZE_HINT || +program.brotliSizeHint,
+  outputFileFormat: GZIPPER_OUTPUT_FILE_FORMAT || +program.outputFileFormat,
 }
 
 Object.keys(options).forEach(key => {

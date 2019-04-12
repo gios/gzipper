@@ -5,14 +5,16 @@ const util = require('util')
 
 const Logger = require('./Logger')
 
+const NUMBER_OF_OUTPUT_FORMAT_ARTIFACTS = 3
 const compileFolderRecursively = Symbol('compileFolderRecursively')
 const compressFile = Symbol('compressFile')
-const compressionTypeLog = Symbol('compressionTypeLog')
+const compressionLog = Symbol('compressionLog')
 const selectCompression = Symbol('selectCompression')
 const getCompressionType = Symbol('getCompressionType')
 const createFolders = Symbol('createFolders')
 const getBrotliOptionName = Symbol('getBrotliOptionName')
 const statExists = Symbol('statExists')
+const getOutputPath = Symbol('getOutputPath')
 
 const stat = util.promisify(fs.stat)
 const lstat = util.promisify(fs.lstat)
@@ -121,9 +123,7 @@ class Gzipper {
       target = path.join(outputDir, path.relative(this.target, target))
       await this[createFolders](target)
     }
-    const outputPath = `${path.join(target, filename)}.${
-      this.compressionType.ext
-    }`
+    const outputPath = this[getOutputPath](target, filename)
     const input = fs.createReadStream(inputPath)
     const output = fs.createWriteStream(outputPath)
 
@@ -159,7 +159,7 @@ class Gzipper {
       if (this.outputPath) {
         await this[createFolders](this.outputPath)
       }
-      this[compressionTypeLog]()
+      this[compressionLog]()
       files = await this[compileFolderRecursively](this.target)
     } catch (error) {
       this.logger.error(error, true)
@@ -187,7 +187,7 @@ class Gzipper {
    *
    * @memberof Gzipper
    */
-  [compressionTypeLog]() {
+  [compressionLog]() {
     let options = ''
 
     for (const [key, value] of Object.entries(this.compressionOptions)) {
@@ -204,6 +204,12 @@ class Gzipper {
       `${this.compressionType.name} -> ${options.slice(0, -2)}`,
       true
     )
+
+    if (!this.options.outputFileFormat) {
+      this.logger.info(
+        'Use default output file format [filename].[ext].[compressExt]'
+      )
+    }
   }
 
   /**
@@ -381,6 +387,50 @@ class Gzipper {
         }
       }
     })
+  }
+
+  /**
+   * Get output path which is based on [outputFileFormat].
+   *
+   * @param {string} target
+   * @param {string} file - file name with extension
+   * @returns {string}
+   * @memberof Gzipper
+   */
+  [getOutputPath](target, file) {
+    const artifactsMap = new Map([
+      ['[filename]', path.parse(file).name],
+      ['[ext]', path.extname(file).slice(1)],
+      ['[compressExt]', this.compressionType.ext],
+    ])
+    let artifacts = [...artifactsMap.values()]
+
+    if (this.options.outputFileFormat) {
+      artifacts = []
+      const formatArtifacts = this.options.outputFileFormat.split('.')
+
+      for (const artifact of formatArtifacts) {
+        if (artifactsMap.has(artifact)) {
+          artifacts.push(artifactsMap.get(artifact))
+          artifactsMap.delete(artifact)
+        } else {
+          throw new Error(
+            `Can't recognize outputFileFormat artifact -> ${artifact}`
+          )
+        }
+      }
+
+      if (artifacts.length !== NUMBER_OF_OUTPUT_FORMAT_ARTIFACTS) {
+        throw new Error(
+          `You have missed some artifacts from outputFileFormat -> ${[
+            ...artifactsMap.keys(),
+          ]}`
+        )
+      }
+    }
+
+    artifacts = artifacts.reduce((prev, curr) => `${prev}.${curr}`)
+    return `${path.join(target, artifacts)}`
   }
 }
 

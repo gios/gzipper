@@ -52,18 +52,19 @@ Locally usage.
 
 ## Options
 
-| Option                                       | ENV                         | Description                                                                                                   |
-| -------------------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `-V, --version`                              |                             | output the version number                                                                                     |
-| `-v, --verbose`                              | `GZIPPER_VERBOSE`           | detailed level of logs                                                                                        |
-| `-gl, --gzip-level [level]`                  | `GZIPPER_GZIP_LEVEL`        | gzip compression level -1 (default), 0 (no compression) - 9 (best compression)                                |
-| `-gm, --gzip-memory-level [memoryLevel]`     | `GZIPPER_GZIP_MEMORY_LEVEL` | amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory) |
-| `-gs, --gzip-strategy [strategy]`            | `GZIPPER_GZIP_STRATEGY`     | compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)                          |
-| `--brotli`                                   | `GZIPPER_BROTLI`            | enable brotli compression, Node.js >= v11.7.0                                                                 |
-| `-bp, --brotli-param-mode [brotliParamMode]` | `GZIPPER_BROTLI_PARAM_MODE` | default, text (for UTF-8 text), font (for WOFF 2.0 fonts)                                                     |
-| `-bq, --brotli-quality [brotliQuality]`      | `GZIPPER_BROTLI_QUALITY`    | brotli compression quality 11 (default), 0 - 11                                                               |
-| `-bs, --brotli-size-hint [brotliSizeHint]`   | `GZIPPER_BROTLI_SIZE_HINT`  | expected input size 0 (default)                                                                               |
-| `-h, --help`                                 |                             | output usage information                                                                                      |
+| Option                                       | ENV                          | Description                                                                                                                                                                                                                      |
+| -------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-V, --version`                              |                              | output the version number                                                                                                                                                                                                        |
+| `-v, --verbose`                              | `GZIPPER_VERBOSE`            | detailed level of logs                                                                                                                                                                                                           |
+| `-gl, --gzip-level [level]`                  | `GZIPPER_GZIP_LEVEL`         | gzip compression level -1 (default), 0 (no compression) - 9 (best compression)                                                                                                                                                   |
+| `-gm, --gzip-memory-level [memoryLevel]`     | `GZIPPER_GZIP_MEMORY_LEVEL`  | amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)                                                                                                                    |
+| `-gs, --gzip-strategy [strategy]`            | `GZIPPER_GZIP_STRATEGY`      | compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)                                                                                                                                             |
+| `--brotli`                                   | `GZIPPER_BROTLI`             | enable brotli compression, Node.js >= v11.7.0                                                                                                                                                                                    |
+| `-bp, --brotli-param-mode [brotliParamMode]` | `GZIPPER_BROTLI_PARAM_MODE`  | default, text (for UTF-8 text), font (for WOFF 2.0 fonts)                                                                                                                                                                        |
+| `-bq, --brotli-quality [brotliQuality]`      | `GZIPPER_BROTLI_QUALITY`     | brotli compression quality 11 (default), 0 - 11                                                                                                                                                                                  |
+| `-bs, --brotli-size-hint [brotliSizeHint]`   | `GZIPPER_BROTLI_SIZE_HINT`   | expected input size 0 (default)                                                                                                                                                                                                  |
+| `--outputFileFormat [outputFileFormat]`      | `GZIPPER_OUTPUT_FILE_FORMAT` | output file format with default artifacts [filename].[ext].[compressExt], where: filename -> name of your file, ext -> file extension, compressExt -> compress extension (.gz, .br, etc). Sample: [filename].[compressExt].[ext] |
+| `-h, --help`                                 |                              | output usage information                                                                                                                                                                                                         |
 
 ## Contribution
 
