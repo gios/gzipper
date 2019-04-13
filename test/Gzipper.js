@@ -260,7 +260,7 @@ describe('Gzipper', () => {
       target,
       file
     )
-    const hash = /\\skyrim-(.*)-skyrim/.exec(outputFilePath)[1]
+    const hash = /skyrim-(.*)-skyrim/.exec(outputFilePath)[1]
     assert.strictEqual(
       outputFilePath,
       `/the/elder/scrolls/skyrim-${hash}-skyrim-test.gz.js`
