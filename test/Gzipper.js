@@ -376,6 +376,24 @@ describe('Gzipper', () => {
     }
   })
 
+  it('should throw error via --output-file-format', async () => {
+    const options = {
+      outputFileFormat: '[filename].[ext',
+    }
+
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+
+    try {
+      await gzipper.compress()
+    } catch (err) {
+      assert.ok(err instanceof Error)
+      assert.strictEqual(
+        err.message,
+        "Can't recognize outputFileFormat artifact -> [ext"
+      )
+    }
+  })
+
   afterEach(async () => {
     await clear(EMPTY_FOLDER_PATH, true)
     await clear(COMPRESS_PATH_TARGET, true)
