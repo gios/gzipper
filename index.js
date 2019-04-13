@@ -50,11 +50,14 @@ program
     'output file format with default artifacts [filename].[ext].[compressExt]'
   )
   .option('', 'where:')
-  .option(
-    '',
-    'filename -> file name, ext -> file extension, compressExt -> compress extension (.gz, .br, etc).'
-  )
-  .option('', 'sample: [filename].[compressExt].[ext]')
+  .option('', 'filename -> file name')
+  .option('', 'ext -> file extension')
+  .option('', 'compressExt -> compress extension (.gz, .br, etc)')
+  .option('', 'hash -> uniq uuid/v4 hash')
+  .option('', 'samples:')
+  .option('', '[filename].[compressExt].[ext]')
+  .option('', 'test-[filename]-[hash].[compressExt].[ext]')
+  .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
   .parse(process.argv)
 
 const [target, outputPath] = program.args

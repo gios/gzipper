@@ -2,7 +2,9 @@ const zlib = require('zlib')
 const fs = require('fs')
 const path = require('path')
 const util = require('util')
+const uuid = require('uuid/v4')
 
+const OUTPUT_FILE_FORMAT_REGEXP = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g
 const Logger = require('./Logger')
 
 const compileFolderRecursively = Symbol('compileFolderRecursively')
@@ -402,26 +404,30 @@ class Gzipper {
       ['[ext]', path.extname(file).slice(1)],
       ['[compressExt]', this.compressionType.ext],
     ])
-    let artifacts = [...artifactsMap.values()]
+    let filename = `${artifactsMap.get('[filename]')}.${artifactsMap.get(
+      '[ext]'
+    )}.${artifactsMap.get('[compressExt]')}`
 
     if (this.options.outputFileFormat) {
-      artifacts = []
-      const formatArtifacts = this.options.outputFileFormat.split('.')
+      artifactsMap.set('[hash]', null)
 
-      for (const artifact of formatArtifacts) {
-        if (artifactsMap.has(artifact)) {
-          artifacts.push(artifactsMap.get(artifact))
-          artifactsMap.delete(artifact)
-        } else {
-          throw new Error(
-            `Can't recognize outputFileFormat artifact -> ${artifact}`
-          )
+      filename = this.options.outputFileFormat.replace(
+        OUTPUT_FILE_FORMAT_REGEXP,
+        artifact => {
+          if (artifactsMap.has(artifact)) {
+            // Need to generate hash only if we have appropriate param
+            if (artifact === '[hash]') {
+              artifactsMap.set('[hash]', uuid())
+            }
+            return artifactsMap.get(artifact)
+          } else {
+            return artifact
+          }
         }
-      }
+      )
     }
 
-    artifacts = artifacts.reduce((prev, curr) => `${prev}.${curr}`)
-    return `${path.join(target, artifacts)}`
+    return `${path.join(target, filename)}`
   }
 }
 

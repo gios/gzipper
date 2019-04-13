@@ -234,24 +234,38 @@ describe('Gzipper', () => {
       '/the/elder/scrolls/skyrim.js.gz'.split('/').join(path.sep)
     )
 
-    gzipper.options.outputFileFormat = '[filename].[compressExt].[ext]'
+    gzipper.options.outputFileFormat = 'test[filename].[compressExt].[ext]'
     outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
       target,
       file
     )
     assert.strictEqual(
       outputFilePath,
-      '/the/elder/scrolls/skyrim.gz.js'.split('/').join(path.sep)
+      '/the/elder/scrolls/testskyrim.gz.js'.split('/').join(path.sep)
     )
 
-    gzipper.options.outputFileFormat = '[filename].[compressExt]'
+    gzipper.options.outputFileFormat = '[filename]-test.[compressExt]'
     outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
       target,
       file
     )
     assert.strictEqual(
       outputFilePath,
-      '/the/elder/scrolls/skyrim.gz'.split('/').join(path.sep)
+      '/the/elder/scrolls/skyrim-test.gz'.split('/').join(path.sep)
+    )
+
+    gzipper.options.outputFileFormat =
+      '[filename]-[hash]-[filename]-test.[compressExt].[ext]'
+    outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
+      target,
+      file
+    )
+    const hash = /\\skyrim-(.*)-skyrim/.exec(outputFilePath)[1]
+    assert.strictEqual(
+      outputFilePath,
+      `/the/elder/scrolls/skyrim-${hash}-skyrim-test.gz.js`
+        .split('/')
+        .join(path.sep)
     )
   })
 
@@ -330,9 +344,9 @@ describe('Gzipper', () => {
     return [gzipper, getOutputPathSpy]
   }
 
-  it('should set custom file format artifacts ([filename].[compressExt].[ext]) via --output-file-format', async () => {
+  it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
     const options = {
-      outputFileFormat: '[filename].[compressExt].[ext]',
+      outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
       verbose: true,
     }
 
@@ -348,14 +362,19 @@ describe('Gzipper', () => {
       const ext = path.extname(file).slice(1)
       assert.strictEqual(
         call.returnValue,
-        path.join(fullPath, `${filename}.${gzipper.compressionType.ext}.${ext}`)
+        path.join(
+          fullPath,
+          `test-${filename}-55-${filename}.${
+            gzipper.compressionType.ext
+          }x.${ext}`
+        )
       )
     }
   })
 
-  it('should set custom file format artifacts ([filename].[ext]) via --output-file-format', async () => {
+  it('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
     const options = {
-      outputFileFormat: '[filename].[ext]',
+      outputFileFormat: '[filename]-[hash]-55.[ext]',
       verbose: true,
     }
 
@@ -368,28 +387,13 @@ describe('Gzipper', () => {
       const call = getOutputPathSpy.getCall(index)
       const [fullPath, file] = call.args
       const filename = path.parse(file).name
-      const ext = path.extname(file)
+      const ext = path.extname(file).slice(1)
+      const hash = new RegExp(`${filename}-(.*)-55`, 'g').exec(
+        call.returnValue
+      )[1]
       assert.strictEqual(
         call.returnValue,
-        path.join(fullPath, `${filename}${ext}`)
-      )
-    }
-  })
-
-  it('should throw error via --output-file-format', async () => {
-    const options = {
-      outputFileFormat: '[filename].[ext',
-    }
-
-    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
-
-    try {
-      await gzipper.compress()
-    } catch (err) {
-      assert.ok(err instanceof Error)
-      assert.strictEqual(
-        err.message,
-        "Can't recognize outputFileFormat artifact -> [ext"
+        path.join(fullPath, `${filename}-${hash}-55.${ext}`)
       )
     }
   })
