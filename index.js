@@ -46,7 +46,7 @@ program
     'expected input size 0 (default)'
   )
   .option(
-    '--outputFileFormat [outputFileFormat]',
+    '--output-file-format [outputFileFormat]',
     'output file format with default artifacts [filename].[ext].[compressExt]'
   )
   .option('', 'where:')
@@ -67,11 +67,11 @@ const options = {
   brotliParamMode: GZIPPER_BROTLI_PARAM_MODE || program.brotliParamMode,
   brotliQuality: +GZIPPER_BROTLI_QUALITY || +program.brotliQuality,
   brotliSizeHint: +GZIPPER_BROTLI_SIZE_HINT || +program.brotliSizeHint,
-  outputFileFormat: GZIPPER_OUTPUT_FILE_FORMAT || +program.outputFileFormat,
+  outputFileFormat: GZIPPER_OUTPUT_FILE_FORMAT || program.outputFileFormat,
 }
 
 Object.keys(options).forEach(key => {
-  if (options[key] === undefined || isNaN(options[key])) {
+  if (options[key] === undefined || options[key] !== options[key]) {
     delete options[key]
   }
 })

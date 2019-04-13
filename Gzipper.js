@@ -5,7 +5,6 @@ const util = require('util')
 
 const Logger = require('./Logger')
 
-const NUMBER_OF_OUTPUT_FORMAT_ARTIFACTS = 3
 const compileFolderRecursively = Symbol('compileFolderRecursively')
 const compressFile = Symbol('compressFile')
 const compressionLog = Symbol('compressionLog')
@@ -418,14 +417,6 @@ class Gzipper {
             `Can't recognize outputFileFormat artifact -> ${artifact}`
           )
         }
-      }
-
-      if (artifacts.length !== NUMBER_OF_OUTPUT_FORMAT_ARTIFACTS) {
-        throw new Error(
-          `You have missed some artifacts from outputFileFormat -> ${[
-            ...artifactsMap.keys(),
-          ]}`
-        )
       }
     }
 

@@ -243,9 +243,19 @@ describe('Gzipper', () => {
       outputFilePath,
       '/the/elder/scrolls/skyrim.gz.js'.split('/').join(path.sep)
     )
+
+    gzipper.options.outputFileFormat = '[filename].[compressExt]'
+    outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
+      target,
+      file
+    )
+    assert.strictEqual(
+      outputFilePath,
+      '/the/elder/scrolls/skyrim.gz'.split('/').join(path.sep)
+    )
   })
 
-  it('should use default file format artifacts with --outputFileFormat and print to console with --verbose flag', async () => {
+  it('should use default file format artifacts via --output-file-format and print to console via --verbose flag', async () => {
     const options = { verbose: true }
     const gzipper = new Gzipper(COMPRESS_PATH, null, options)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
@@ -269,52 +279,102 @@ describe('Gzipper', () => {
       )
     )
     assert.strictEqual(loggerInfoSpy.callCount, files.length + 1)
+    assert.strictEqual(getOutputPathSpy.callCount, files.length)
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
     assert.strictEqual(gzipper.compressionType.name, 'GZIP')
     assert.strictEqual(gzipper.compressionType.ext, 'gz')
     assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
     assert.strictEqual(Object.keys(gzipper.options).length, 1)
     assert.strictEqual(gzipper.options.outputFileFormat, undefined)
+
+    for (let index = 0; index < getOutputPathSpy.callCount; index++) {
+      const call = getOutputPathSpy.getCall(index)
+      const [fullPath, filename] = call.args
+      assert.strictEqual(
+        call.returnValue,
+        path.join(fullPath, `${filename}.${gzipper.compressionType.ext}`)
+      )
+    }
   })
 
-  // it('should set custom file format artifacts with --outputFileFormat', async () => {
-  //   const options = {
-  //     outputFileFormat: '[filename].[compressExt].[ext]',
-  //     verbose: true,
-  //   }
-  //   const gzipper = new Gzipper(COMPRESS_PATH, null, options)
-  //   const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
-  //   const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
-  //   await gzipper.compress()
-  //   const files = await getFiles(COMPRESS_PATH, ['.gz'])
+  async function validateOutputFileFormat(options, outputFileFormat) {
+    const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
+    const getOutputPathSpy = sinon.spy(
+      gzipper,
+      getPrivateSymbol(gzipper, 'getOutputPath')
+    )
+    await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH_TARGET)
 
-  //   assert.ok(
-  //     loggerSuccessSpy.calledOnceWithExactly(
-  //       `${files.length} files have been compressed.`,
-  //       true
-  //     )
-  //   )
-  //   assert.ok(
-  //     loggerInfoSpy.notCalledWithExactly(
-  //       `Use default output file format [filename].[ext].[compressExt]`
-  //     )
-  //   )
-  //   assert.strictEqual(loggerInfoSpy.callCount, files.length + 1)
-  //   assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-  //   assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-  //   assert.strictEqual(gzipper.compressionType.ext, 'gz')
-  //   assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
-  //   assert.strictEqual(Object.keys(gzipper.options).length, 1)
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${files.length} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(
+      loggerInfoSpy.neverCalledWithMatch(
+        `Use default output file format [filename].[ext].[compressExt]`
+      )
+    )
+    assert.strictEqual(getOutputPathSpy.callCount, files.length)
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
+    assert.strictEqual(gzipper.compressionType.ext, 'gz')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(Object.keys(gzipper.options).length, 2)
+    assert.strictEqual(gzipper.options.outputFileFormat, outputFileFormat)
 
-  //   const target = '\\the\\elder\\scrolls\\'
-  //   const file = 'skyrim.js'
+    return [gzipper, getOutputPathSpy]
+  }
 
-  //   const outputFilePath = gzipper[getPrivateSymbol(gzipper, 'getOutputPath')](
-  //     target,
-  //     file
-  //   )
-  //   assert.strictEqual(outputFilePath, '\\the\\elder\\scrolls\\skyrim.js.gz')
-  // })
+  it('should set custom file format artifacts ([filename].[compressExt].[ext]) via --output-file-format', async () => {
+    const options = {
+      outputFileFormat: '[filename].[compressExt].[ext]',
+      verbose: true,
+    }
+
+    const [gzipper, getOutputPathSpy] = await validateOutputFileFormat(
+      options,
+      options.outputFileFormat
+    )
+
+    for (let index = 0; index < getOutputPathSpy.callCount; index++) {
+      const call = getOutputPathSpy.getCall(index)
+      const [fullPath, file] = call.args
+      const filename = path.parse(file).name
+      const ext = path.extname(file).slice(1)
+      assert.strictEqual(
+        call.returnValue,
+        path.join(fullPath, `${filename}.${gzipper.compressionType.ext}.${ext}`)
+      )
+    }
+  })
+
+  it('should set custom file format artifacts ([filename].[ext]) via --output-file-format', async () => {
+    const options = {
+      outputFileFormat: '[filename].[ext]',
+      verbose: true,
+    }
+
+    const [, getOutputPathSpy] = await validateOutputFileFormat(
+      options,
+      options.outputFileFormat
+    )
+
+    for (let index = 0; index < getOutputPathSpy.callCount; index++) {
+      const call = getOutputPathSpy.getCall(index)
+      const [fullPath, file] = call.args
+      const filename = path.parse(file).name
+      const ext = path.extname(file)
+      assert.strictEqual(
+        call.returnValue,
+        path.join(fullPath, `${filename}${ext}`)
+      )
+    }
+  })
 
   afterEach(async () => {
     await clear(EMPTY_FOLDER_PATH, true)
