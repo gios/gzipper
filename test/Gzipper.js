@@ -260,7 +260,7 @@ describe('Gzipper', () => {
       target,
       file
     )
-    const hash = /skyrim-(.*)-skyrim/.exec(outputFilePath)[1]
+    const [hash] = /(?<=skyrim-)(.*)(?=-skyrim)/.exec(outputFilePath)
     assert.strictEqual(
       outputFilePath,
       `/the/elder/scrolls/skyrim-${hash}-skyrim-test.gz.js`
@@ -388,9 +388,9 @@ describe('Gzipper', () => {
       const [fullPath, file] = call.args
       const filename = path.parse(file).name
       const ext = path.extname(file).slice(1)
-      const hash = new RegExp(`${filename}-(.*)-55`, 'g').exec(
+      const [hash] = new RegExp(`(?<=${filename}-)(.*)(?=-55)`, 'g').exec(
         call.returnValue
-      )[1]
+      )
       assert.strictEqual(
         call.returnValue,
         path.join(fullPath, `${filename}-${hash}-55.${ext}`)
