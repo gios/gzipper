@@ -23,7 +23,8 @@ const readdir = util.promisify(fs.readdir)
 const mkdir = util.promisify(fs.mkdir)
 
 const validExtensions = [
-  '.js', '.css', '.html'
+  '.js', '.css', '.html',
+  '.png', '.jpg', '.jpeg', '.webp', '.svg'
 ];
 
 /**
