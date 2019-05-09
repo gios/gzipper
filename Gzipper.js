@@ -24,7 +24,8 @@ const mkdir = util.promisify(fs.mkdir)
 
 const validExtensions = [
   '.js', '.css', '.html',
-  '.png', '.jpg', '.jpeg', '.webp', '.svg'
+  '.png', '.jpg', '.jpeg', '.webp', '.svg',
+  '.json', '.csv'
 ];
 
 /**
