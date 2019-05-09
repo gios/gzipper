@@ -22,6 +22,10 @@ const lstat = util.promisify(fs.lstat)
 const readdir = util.promisify(fs.readdir)
 const mkdir = util.promisify(fs.mkdir)
 
+const validExtensions = [
+  '.js', '.css', '.html'
+];
+
 /**
  * Compressing files.
  *
@@ -75,11 +79,7 @@ class Gzipper {
           )
         } else if (isFile) {
           try {
-            if (
-              path.extname(filePath) === '.js' ||
-              path.extname(filePath) === '.css' ||
-              path.extname(filePath) === '.html'
-            ) {
+            if (validExtensions.includes(path.extname(filePath))) {
               const hrtimeStart = process.hrtime()
               compressedFiles.push(filePath)
               const fileInfo = await this[compressFile](
@@ -178,7 +178,7 @@ class Gzipper {
       )
     } else {
       this.logger.warn(
-        `we couldn't find any appropriate files (.css, .js, .html).`,
+        `we couldn't find any appropriate files. valid extensions are: ${validExtensions.join(', ')}`,
         true
       )
     }
