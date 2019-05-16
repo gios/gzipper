@@ -58,7 +58,7 @@ describe('Gzipper', () => {
     const gzipper = new Gzipper(NO_FILES_COMPRESS_PATH, null)
     const noFilesWarnSpy = sinon.spy(gzipper.logger, 'warn')
     await gzipper.compress()
-    const responseMessage = `we couldn't find any appropriate files (.css, .js).`
+    const responseMessage = `we couldn't find any appropriate files. valid extensions are: .js, .css, .html, .png, .jpg, .jpeg, .webp, .svg, .json, .csv`
 
     assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
@@ -72,7 +72,7 @@ describe('Gzipper', () => {
     const gzipper = new Gzipper(EMPTY_FOLDER_PATH, null)
     const noFilesWarnSpy = sinon.spy(gzipper.logger, 'warn')
     await gzipper.compress()
-    const responseMessage = `we couldn't find any appropriate files (.css, .js).`
+    const responseMessage = `we couldn't find any appropriate files. valid extensions are: .js, .css, .html, .png, .jpg, .jpeg, .webp, .svg, .json, .csv`
 
     assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
