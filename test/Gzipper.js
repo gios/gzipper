@@ -183,6 +183,96 @@ describe('Gzipper', () => {
     )
   })
 
+  it('--brotli-param-mode=default should change brotli configuration', async () => {
+    const options = {
+      brotli: true,
+      brotliParamMode: 'default',
+    }
+    if (typeof zlib.createBrotliCompress !== 'function') {
+      return
+    }
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.br'])
+
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${files.length} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
+    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
+    assert.strictEqual(gzipper.compressionType.ext, 'br')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 1)
+    assert.strictEqual(Object.keys(gzipper.options).length, 2)
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      zlib.constants.BROTLI_MODE_GENERIC
+    )
+  })
+
+  it('wrong value for --brotli-param-mode should change brotli configuration to brotliParamMode=default', async () => {
+    const options = {
+      brotli: true,
+      brotliParamMode: 'amigos',
+    }
+    if (typeof zlib.createBrotliCompress !== 'function') {
+      return
+    }
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.br'])
+
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${files.length} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
+    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
+    assert.strictEqual(gzipper.compressionType.ext, 'br')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 1)
+    assert.strictEqual(Object.keys(gzipper.options).length, 2)
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      zlib.constants.BROTLI_MODE_GENERIC
+    )
+  })
+
+  it('--brotli-param-mode=font should change brotli configuration', async () => {
+    const options = {
+      brotli: true,
+      brotliParamMode: 'font',
+    }
+    if (typeof zlib.createBrotliCompress !== 'function') {
+      return
+    }
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.br'])
+
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${files.length} files have been compressed.`,
+        true
+      )
+    )
+    assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
+    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
+    assert.strictEqual(gzipper.compressionType.ext, 'br')
+    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 1)
+    assert.strictEqual(Object.keys(gzipper.options).length, 2)
+    assert.strictEqual(
+      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      zlib.constants.BROTLI_MODE_FONT
+    )
+  })
+
   it('should compress files to a certain folder with existing folder structure', async () => {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET)
     const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
