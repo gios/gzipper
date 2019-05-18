@@ -4,7 +4,7 @@
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --check-coverage --reporter='text' mocha --timeout=3000 ",
+    "test": "nyc --reporter='text' mocha --timeout=3000 ",
     "coverage": "nyc mocha --timeout=3000",
     "prettier": "prettier --write \"**/*.js\"",
     "eslint": "eslint \"**/*.js\"",
