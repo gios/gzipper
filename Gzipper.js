@@ -122,7 +122,7 @@ class Gzipper {
   /**
    * File compression.
    *
-   * @param {string} filena nnnn  me path to file
+   * @param {string} filename path to file
    * @param {string} target path to target directory
    * @param {string} outputDir path to output directory (default {target})
    * @returns {Promise<{ beforeSize: number, afterSize: number }>} finish promise
