@@ -23,10 +23,17 @@ const readdir = util.promisify(fs.readdir)
 const mkdir = util.promisify(fs.mkdir)
 
 const VALID_EXTENSIONS = [
-  '.js', '.css', '.html',
-  '.png', '.jpg', '.jpeg', '.webp', '.svg',
-  '.json', '.csv'
-];
+  '.js',
+  '.css',
+  '.html',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.webp',
+  '.svg',
+  '.json',
+  '.csv',
+]
 
 /**
  * Compressing files.
@@ -180,7 +187,9 @@ class Gzipper {
       )
     } else {
       this.logger.warn(
-        `we couldn't find any appropriate files. valid extensions are: ${VALID_EXTENSIONS.join(', ')}`,
+        `we couldn't find any appropriate files. valid extensions are: ${VALID_EXTENSIONS.join(
+          ', '
+        )}`,
         true
       )
     }
