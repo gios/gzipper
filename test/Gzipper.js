@@ -150,7 +150,7 @@ describe('Gzipper', () => {
       brotliQuality: 10,
       brotliSizeHint: 5,
     }
-    if (zlib.createBrotliCompress !== 'function') {
+    if (typeof zlib.createBrotliCompress !== 'function') {
       return
     }
     const gzipper = new Gzipper(COMPRESS_PATH, null, options)
