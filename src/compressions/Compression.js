@@ -14,6 +14,7 @@ module.exports = class Compression {
    * Returns human-readable compression options info.
    *
    */
+  /* istanbul ignore next */
   readableOptions() {
     throw new Error('You have to implement the method readableOptions!')
   }
@@ -22,6 +23,7 @@ module.exports = class Compression {
    * Returns a compression instance in closure.
    *
    */
+  /* istanbul ignore next */
   getCompression() {
     throw new Error('You have to implement the method getCompression!')
   }
