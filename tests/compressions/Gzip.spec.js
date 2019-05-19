@@ -3,19 +3,10 @@ const sinon = require('sinon')
 const zlib = require('zlib')
 
 const Gzipper = require('../../src/Gzipper')
-const {
-  COMPRESS_PATH,
-  EMPTY_FOLDER_PATH,
-  COMPRESS_PATH_TARGET,
-  getFiles,
-  createFolder,
-  clear,
-} = require('../utils')
+const { COMPRESS_PATH, getFiles, clear } = require('../utils')
 
 describe('Gzipper -> Gzip compression', () => {
   beforeEach(async () => {
-    await createFolder(EMPTY_FOLDER_PATH)
-    await createFolder(COMPRESS_PATH_TARGET)
     await clear(COMPRESS_PATH, ['.gz', '.br'])
   })
 
@@ -54,8 +45,6 @@ describe('Gzipper -> Gzip compression', () => {
   })
 
   afterEach(async () => {
-    await clear(EMPTY_FOLDER_PATH, true)
-    await clear(COMPRESS_PATH_TARGET, true)
     await clear(COMPRESS_PATH, ['.gz', '.br'])
   })
 })
