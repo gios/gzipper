@@ -1,4 +1,6 @@
 const zlib = require('zlib')
+
+const availability = Symbol('availability')
 const Compression = require('./Compression')
 
 module.exports = class BrotliCompression extends Compression {
@@ -6,10 +8,11 @@ module.exports = class BrotliCompression extends Compression {
    * Creates an instance of BrotliCompression
    .
    * @param {object} options
+   * @param {Logger} logger logger instance
    */
-  constructor(options) {
-    super()
-    this.options = options
+  constructor(options, logger) {
+    super(options, logger)
+    this[availability]()
   }
 
   /**
@@ -20,6 +23,7 @@ module.exports = class BrotliCompression extends Compression {
    */
   selectCompression() {
     const options = {}
+
     if (this.options.brotliParamMode !== undefined) {
       switch (this.options.brotliParamMode) {
         case 'default':
@@ -83,6 +87,14 @@ module.exports = class BrotliCompression extends Compression {
 
       default:
         return 'unknown'
+    }
+  }
+
+  [availability]() {
+    if (typeof zlib.createBrotliCompress !== 'function') {
+      const message = `Can't use brotli compression, Node.js >= v11.7.0 required.`
+      this.logger.error(message, true)
+      throw new Error(message)
     }
   }
 }

@@ -8,8 +8,7 @@ module.exports = class GzipCompression extends Compression {
    * @param {object} options
    */
   constructor(options) {
-    super()
-    this.options = options
+    super(options)
   }
 
   /**

@@ -48,8 +48,8 @@ class Gzipper {
       this.outputPath = path.resolve(process.cwd(), outputPath)
     }
     this.compressionInstance = this.options.brotli
-      ? new BrotliCompression(this.options)
-      : new GzipCompression(this.options)
+      ? new BrotliCompression(this.options, this.logger)
+      : new GzipCompression(this.options, this.logger)
     this.target = path.resolve(process.cwd(), target)
     const [
       createCompression,
