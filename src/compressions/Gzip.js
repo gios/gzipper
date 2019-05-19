@@ -4,7 +4,13 @@ const selectCompression = Symbol('selectCompression')
 
 const Compression = require('./Compression')
 
-module.exports = class GzipCompression extends Compression {
+/**
+ * Gzip
+ *
+ * @class GzipCompression
+ * @extends {Compression}
+ */
+class GzipCompression extends Compression {
   /**
    * Creates an instance of GzipCompression.
    *
@@ -64,3 +70,5 @@ module.exports = class GzipCompression extends Compression {
     return () => zlib.createGzip(this.compressionOptions)
   }
 }
+
+module.exports = GzipCompression

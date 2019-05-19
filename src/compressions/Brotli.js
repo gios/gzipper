@@ -6,7 +6,13 @@ const getBrotliOptionName = Symbol('getBrotliOptionName')
 
 const Compression = require('./Compression')
 
-module.exports = class BrotliCompression extends Compression {
+/**
+ * Brotli
+ *
+ * @class BrotliCompression
+ * @extends {Compression}
+ */
+class BrotliCompression extends Compression {
   /**
    * Creates an instance of BrotliCompression
    .
@@ -128,3 +134,5 @@ module.exports = class BrotliCompression extends Compression {
       })
   }
 }
+
+module.exports = BrotliCompression
