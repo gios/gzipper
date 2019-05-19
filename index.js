@@ -2,7 +2,7 @@
 const program = require('commander')
 
 const version = require('./package.json').version
-const Gzipper = require('./Gzipper')
+const Gzipper = require('./src/Gzipper')
 
 const {
   GZIPPER_VERBOSE,

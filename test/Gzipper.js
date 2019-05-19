@@ -3,7 +3,7 @@ const sinon = require('sinon')
 const zlib = require('zlib')
 const path = require('path')
 
-const Gzipper = require('../Gzipper')
+const Gzipper = require('../src/Gzipper')
 const {
   EMPTY_FOLDER_PATH,
   COMPRESS_PATH,

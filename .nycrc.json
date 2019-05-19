@@ -1,6 +1,6 @@
 {
   "all": true,
-  "include": ["Gzipper.js", "Logger.js"],
+  "include": ["src/**"],
   "exclude": ["test/**"],
   "reporter": ["html", "text-summary"],
   "branches": 85,
