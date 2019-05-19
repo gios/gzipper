@@ -1,4 +1,7 @@
 const zlib = require('zlib')
+
+const selectCompression = Symbol('selectCompression')
+
 const Compression = require('./Compression')
 
 module.exports = class GzipCompression extends Compression {
@@ -9,15 +12,16 @@ module.exports = class GzipCompression extends Compression {
    */
   constructor(options) {
     super(options)
+    this.ext = 'gz'
+    this[selectCompression]()
   }
 
   /**
-   * Select gzip compression type and options.
+   * Build gzip options object [compressionOptions].
    *
-   * @returns {[() => object, object]} compression instance and options
    * @memberof GzipCompression
    */
-  selectCompression() {
+  [selectCompression]() {
     const options = {}
 
     if (this.options.gzipLevel !== undefined) {
@@ -31,7 +35,32 @@ module.exports = class GzipCompression extends Compression {
     if (this.options.gzipStrategy !== undefined) {
       options.gzipStrategy = this.options.gzipStrategy
     }
+    this.compressionOptions = options
+  }
 
-    return [() => zlib.createGzip(options), options]
+  /**
+   * Returns human-readable gzip compression options info.
+   *
+   * @returns {string} formatted string with compression options
+   * @memberof GzipCompression
+   */
+  readableOptions() {
+    let options = ''
+
+    for (const [key, value] of Object.entries(this.compressionOptions)) {
+      options += `${key}: ${value}, `
+    }
+
+    return `GZIP -> ${options.slice(0, -2)}`
+  }
+
+  /**
+   * Returns gzip compression instance in closure.
+   *
+   * @returns {() => Gzip} brotli instance in closure
+   * @memberof GzipCompression
+   */
+  getCompression() {
+    return () => zlib.createGzip(this.compressionOptions)
   }
 }

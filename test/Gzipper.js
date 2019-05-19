@@ -62,9 +62,11 @@ describe('Gzipper', () => {
 
     assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-    assert.strictEqual(gzipper.compressionType.ext, 'gz')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      0
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 0)
   })
 
@@ -76,9 +78,11 @@ describe('Gzipper', () => {
 
     assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-    assert.strictEqual(gzipper.compressionType.ext, 'gz')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      0
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 0)
   })
 
@@ -98,9 +102,11 @@ describe('Gzipper', () => {
     )
     assert.strictEqual(loggerInfoSpy.callCount, files.length + 1)
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-    assert.strictEqual(gzipper.compressionType.ext, 'gz')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      0
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 1)
   })
 
@@ -118,13 +124,24 @@ describe('Gzipper', () => {
       )
     )
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-    assert.strictEqual(gzipper.compressionType.ext, 'gz')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 3)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      3
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 3)
-    assert.strictEqual(gzipper.compressionOptions.gzipLevel, 6)
-    assert.strictEqual(gzipper.compressionOptions.gzipMemoryLevel, 4)
-    assert.strictEqual(gzipper.compressionOptions.gzipStrategy, 2)
+    assert.strictEqual(
+      gzipper.compressionInstance.compressionOptions.gzipLevel,
+      6
+    )
+    assert.strictEqual(
+      gzipper.compressionInstance.compressionOptions.gzipMemoryLevel,
+      4
+    )
+    assert.strictEqual(
+      gzipper.compressionInstance.compressionOptions.gzipStrategy,
+      2
+    )
   })
 
   it('--brotli should emit compress-error on compress error', () => {
@@ -165,20 +182,28 @@ describe('Gzipper', () => {
       )
     )
     assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
-    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
-    assert.strictEqual(gzipper.compressionType.ext, 'br')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 3)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'br')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      3
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 4)
     assert.strictEqual(
-      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      gzipper.compressionInstance.compressionOptions[
+        zlib.constants.BROTLI_PARAM_MODE
+      ],
       zlib.constants.BROTLI_MODE_TEXT
     )
     assert.strictEqual(
-      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_QUALITY],
+      gzipper.compressionInstance.compressionOptions[
+        zlib.constants.BROTLI_PARAM_QUALITY
+      ],
       10
     )
     assert.strictEqual(
-      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_SIZE_HINT],
+      gzipper.compressionInstance.compressionOptions[
+        zlib.constants.BROTLI_PARAM_SIZE_HINT
+      ],
       5
     )
   })
@@ -203,12 +228,16 @@ describe('Gzipper', () => {
       )
     )
     assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
-    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
-    assert.strictEqual(gzipper.compressionType.ext, 'br')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 1)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'br')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      1
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 2)
     assert.strictEqual(
-      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      gzipper.compressionInstance.compressionOptions[
+        zlib.constants.BROTLI_PARAM_MODE
+      ],
       zlib.constants.BROTLI_MODE_GENERIC
     )
   })
@@ -233,12 +262,16 @@ describe('Gzipper', () => {
       )
     )
     assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
-    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
-    assert.strictEqual(gzipper.compressionType.ext, 'br')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 1)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'br')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      1
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 2)
     assert.strictEqual(
-      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      gzipper.compressionInstance.compressionOptions[
+        zlib.constants.BROTLI_PARAM_MODE
+      ],
       zlib.constants.BROTLI_MODE_GENERIC
     )
   })
@@ -263,12 +296,16 @@ describe('Gzipper', () => {
       )
     )
     assert.ok(gzipper.createCompression() instanceof zlib.BrotliCompress)
-    assert.strictEqual(gzipper.compressionType.name, 'BROTLI')
-    assert.strictEqual(gzipper.compressionType.ext, 'br')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 1)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'br')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      1
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 2)
     assert.strictEqual(
-      gzipper.compressionOptions[zlib.constants.BROTLI_PARAM_MODE],
+      gzipper.compressionInstance.compressionOptions[
+        zlib.constants.BROTLI_PARAM_MODE
+      ],
       zlib.constants.BROTLI_MODE_FONT
     )
   })
@@ -304,9 +341,11 @@ describe('Gzipper', () => {
       )
     }
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-    assert.strictEqual(gzipper.compressionType.ext, 'gz')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      0
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 0)
   })
 
@@ -385,9 +424,11 @@ describe('Gzipper', () => {
     assert.strictEqual(loggerInfoSpy.callCount, files.length + 1)
     assert.strictEqual(getOutputPathSpy.callCount, files.length)
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-    assert.strictEqual(gzipper.compressionType.ext, 'gz')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      0
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 1)
     assert.strictEqual(gzipper.options.outputFileFormat, undefined)
 
@@ -396,7 +437,7 @@ describe('Gzipper', () => {
       const [fullPath, filename] = call.args
       assert.strictEqual(
         call.returnValue,
-        path.join(fullPath, `${filename}.${gzipper.compressionType.ext}`)
+        path.join(fullPath, `${filename}.${gzipper.compressionInstance.ext}`)
       )
     }
   })
@@ -425,9 +466,11 @@ describe('Gzipper', () => {
     )
     assert.strictEqual(getOutputPathSpy.callCount, files.length)
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
-    assert.strictEqual(gzipper.compressionType.name, 'GZIP')
-    assert.strictEqual(gzipper.compressionType.ext, 'gz')
-    assert.strictEqual(Object.keys(gzipper.compressionOptions).length, 0)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      0
+    )
     assert.strictEqual(Object.keys(gzipper.options).length, 2)
     assert.strictEqual(gzipper.options.outputFileFormat, outputFileFormat)
 
@@ -455,7 +498,7 @@ describe('Gzipper', () => {
         path.join(
           fullPath,
           `test-${filename}-55-${filename}.${
-            gzipper.compressionType.ext
+            gzipper.compressionInstance.ext
           }x.${ext}`
         )
       )

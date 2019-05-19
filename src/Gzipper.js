@@ -1,4 +1,3 @@
-const zlib = require('zlib')
 const fs = require('fs')
 const path = require('path')
 const util = require('util')
@@ -13,7 +12,6 @@ const { VALID_EXTENSIONS } = require('./constants')
 const compileFolderRecursively = Symbol('compileFolderRecursively')
 const compressFile = Symbol('compressFile')
 const compressionLog = Symbol('compressionLog')
-const getCompressionType = Symbol('getCompressionType')
 const createFolders = Symbol('createFolders')
 const statExists = Symbol('statExists')
 const getOutputPath = Symbol('getOutputPath')
@@ -51,13 +49,7 @@ class Gzipper {
       ? new BrotliCompression(this.options, this.logger)
       : new GzipCompression(this.options, this.logger)
     this.target = path.resolve(process.cwd(), target)
-    const [
-      createCompression,
-      compressionOptions,
-    ] = this.compressionInstance.selectCompression()
-    this.createCompression = createCompression
-    this.compressionOptions = compressionOptions
-    this.compressionType = this[getCompressionType]()
+    this.createCompression = this.compressionInstance.getCompression()
   }
 
   /**
@@ -195,54 +187,13 @@ class Gzipper {
    * @memberof Gzipper
    */
   [compressionLog]() {
-    let options = ''
-
-    for (const [key, value] of Object.entries(this.compressionOptions)) {
-      switch (this.compressionType.name) {
-        case 'BROTLI':
-          options += `${this.compressionInstance.getBrotliOptionName(
-            key
-          )}: ${value}, `
-          break
-        default:
-          options += `${key}: ${value}, `
-      }
-    }
-
-    this.logger.warn(
-      `${this.compressionType.name} -> ${options.slice(0, -2)}`,
-      true
-    )
+    const options = this.compressionInstance.readableOptions()
+    this.logger.warn(options, true)
 
     if (!this.options.outputFileFormat) {
       this.logger.info(
         'Use default output file format [filename].[ext].[compressExt]'
       )
-    }
-  }
-
-  /**
-   * Get compression type and extension.
-   *
-   * @typedef {Object} CompressionType
-   * @property {string} name compression name
-   * @property {string} ext compression extension
-   *
-   * @returns {CompressionType} compression type and extension
-   * @memberof Gzipper
-   */
-  [getCompressionType]() {
-    const compression = this.createCompression()
-    if (compression instanceof zlib.Gzip) {
-      return {
-        name: 'GZIP',
-        ext: 'gz',
-      }
-    } else if (compression instanceof zlib.BrotliCompress) {
-      return {
-        name: 'BROTLI',
-        ext: 'br',
-      }
     }
   }
 
@@ -302,7 +253,7 @@ class Gzipper {
     const artifactsMap = new Map([
       ['[filename]', path.parse(file).name],
       ['[ext]', path.extname(file).slice(1)],
-      ['[compressExt]', this.compressionType.ext],
+      ['[compressExt]', this.compressionInstance.ext],
     ])
     let filename = `${artifactsMap.get('[filename]')}.${artifactsMap.get(
       '[ext]'

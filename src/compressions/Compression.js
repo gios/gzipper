@@ -10,7 +10,19 @@ module.exports = class Compression {
     this.logger = logger
   }
 
-  selectCompression() {
-    throw new Error('Override selectCompression method in child class.')
+  /**
+   * Returns human-readable compression options info.
+   *
+   */
+  readableOptions() {
+    throw new Error('You have to implement the method readableOptions!')
+  }
+
+  /**
+   * Returns a compression instance in closure.
+   *
+   */
+  getCompression() {
+    throw new Error('You have to implement the method getCompression!')
   }
 }
