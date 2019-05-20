@@ -4,8 +4,8 @@
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --check-coverage --reporter='text-summary' mocha --timeout=3000 --recursive ./tests/**/*.spec.js",
-    "coverage": "nyc mocha --timeout=3000 --recursive ./tests/**/*.spec.js",
+    "test": "nyc --check-coverage --reporter='text-summary' mocha --timeout=3000 --recursive './tests/**/*.spec.js'",
+    "coverage": "nyc mocha --timeout=3000 --recursive './tests/**/*.spec.js'",
     "prettier": "prettier --write \"**/*.js\"",
     "eslint": "eslint \"**/*.js\"",
     "check": "npm run prettier && npm run eslint"
