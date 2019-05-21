@@ -1,0 +1,12 @@
+exports.VALID_EXTENSIONS = [
+  '.js',
+  '.css',
+  '.html',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.webp',
+  '.svg',
+  '.json',
+  '.csv',
+]

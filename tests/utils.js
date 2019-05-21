@@ -20,6 +20,13 @@ const NO_FILES_COMPRESS_PATH = path.resolve(
   './resources/no_files_to_compress'
 )
 
+/**
+ * Clear directory
+ *
+ * @param {string} [target=COMPRESS_PATH]
+ * @param {Array<string>|boolean} extensions delete only extensions from the array or true if all files
+ * @returns
+ */
 async function clearDirectory(target = COMPRESS_PATH, extensions) {
   try {
     const force = typeof extensions === 'boolean' && extensions
