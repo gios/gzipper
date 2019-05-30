@@ -15,6 +15,7 @@ const compressionLog = Symbol('compressionLog')
 const createFolders = Symbol('createFolders')
 const statExists = Symbol('statExists')
 const getOutputPath = Symbol('getOutputPath')
+const getValidExtensions = Symbol('getValidExtensions')
 
 const stat = util.promisify(fs.stat)
 const lstat = util.promisify(fs.lstat)
@@ -50,6 +51,7 @@ class Gzipper {
       : new GzipCompression(this.options, this.logger)
     this.target = path.resolve(process.cwd(), target)
     this.createCompression = this.compressionInstance.getCompression()
+    this.validExtensions = this[getValidExtensions]()
   }
 
   /**
@@ -74,7 +76,7 @@ class Gzipper {
           )
         } else if (isFile) {
           try {
-            if (VALID_EXTENSIONS.includes(path.extname(filePath))) {
+            if (this.validExtensions.includes(path.extname(filePath))) {
               const hrtimeStart = process.hrtime()
               compressedFiles.push(filePath)
               const fileInfo = await this[compressFile](
@@ -279,6 +281,25 @@ class Gzipper {
     }
 
     return `${path.join(target, filename)}`
+  }
+
+  /**
+   * Returns the filtered list of extensions from `options.exclude`.
+   *
+   * @returns{string[]} - filtered list of extensions
+   * @memberof Gzipper
+   */
+  [getValidExtensions]() {
+    const excludeExtensions =
+      this.options.exclude &&
+      this.options.exclude.split(',').map(item => `.${item.trim()}`)
+
+    if (excludeExtensions) {
+      return VALID_EXTENSIONS.filter(
+        extension => !excludeExtensions.includes(extension)
+      )
+    }
+    return VALID_EXTENSIONS
   }
 }
 
