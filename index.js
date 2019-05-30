@@ -21,7 +21,7 @@ program
   .version(version)
   .usage('[options] <path> [outputPath]')
   .option('-v, --verbose', 'detailed level of logs')
-  .option('-e, --exclude', 'exclude file extensions from compression')
+  .option('-e, --exclude [exclude]', 'exclude file extensions from compression')
   .option(
     '-gl, --gzip-level [level]',
     'gzip compression level -1 (default), 0 (no compression) - 9 (best compression)'
