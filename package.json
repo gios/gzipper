@@ -1,6 +1,6 @@
 {
   "name": "gzipper",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
@@ -35,10 +35,10 @@
   "homepage": "https://github.com/gios/gzipper#readme",
   "devDependencies": {
     "@types/commander": "^2.12.2",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^11.13.11",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^11.13.13",
     "@types/semver": "^6.0.0",
-    "@types/sinon": "^7.0.11",
+    "@types/sinon": "^7.0.12",
     "@types/uuid": "^3.4.4",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
@@ -46,7 +46,7 @@
     "mocha": "^6.1.4",
     "nyc": "^14.1.1",
     "prettier": "^1.17.1",
-    "semver": "^6.0.0",
+    "semver": "^6.1.1",
     "sinon": "^7.3.2"
   },
   "engines": {

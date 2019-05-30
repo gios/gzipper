@@ -4,6 +4,7 @@ const zlib = require('zlib')
 const path = require('path')
 
 const Gzipper = require('../src/Gzipper')
+const { VALID_EXTENSIONS } = require('../src/constants')
 const {
   EMPTY_FOLDER_PATH,
   COMPRESS_PATH,
@@ -58,7 +59,9 @@ describe('Gzipper', () => {
     const gzipper = new Gzipper(NO_FILES_COMPRESS_PATH, null)
     const noFilesWarnSpy = sinon.spy(gzipper.logger, 'warn')
     await gzipper.compress()
-    const responseMessage = `we couldn't find any appropriate files. valid extensions are: .js, .css, .html, .png, .jpg, .jpeg, .webp, .svg, .json, .csv`
+    const responseMessage = `we couldn't find any appropriate files. valid extensions are: ${VALID_EXTENSIONS.join(
+      ', '
+    )}`
 
     assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
@@ -74,7 +77,9 @@ describe('Gzipper', () => {
     const gzipper = new Gzipper(EMPTY_FOLDER_PATH, null)
     const noFilesWarnSpy = sinon.spy(gzipper.logger, 'warn')
     await gzipper.compress()
-    const responseMessage = `we couldn't find any appropriate files. valid extensions are: .js, .css, .html, .png, .jpg, .jpeg, .webp, .svg, .json, .csv`
+    const responseMessage = `we couldn't find any appropriate files. valid extensions are: ${VALID_EXTENSIONS.join(
+      ', '
+    )}`
 
     assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true))
     assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
@@ -329,6 +334,38 @@ describe('Gzipper', () => {
         path.join(fullPath, `${filename}-${hash}-55.${ext}`)
       )
     }
+  })
+
+  it('should exclude file extensions from compression jpeg,jpg', async () => {
+    const options = {
+      exclude: 'jpeg,jpg',
+      verbose: true,
+    }
+    const EXCLUDED_FILES_COUNT = 2
+    const beforeFiles = await getFiles(COMPRESS_PATH)
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
+    await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.gz'])
+
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${files.length} files have been compressed.`,
+        true
+      )
+    )
+    assert.strictEqual(
+      loggerInfoSpy.callCount,
+      beforeFiles.length - EXCLUDED_FILES_COUNT + 1
+    )
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      0
+    )
+    assert.strictEqual(Object.keys(gzipper.options).length, 2)
   })
 
   afterEach(async () => {
