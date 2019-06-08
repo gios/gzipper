@@ -7,6 +7,7 @@ const Gzipper = require('./src/Gzipper')
 const {
   GZIPPER_VERBOSE,
   GZIPPER_EXCLUDE,
+  GZIPPER_INCLUDE,
   GZIPPER_GZIP_LEVEL,
   GZIPPER_GZIP_MEMORY_LEVEL,
   GZIPPER_GZIP_STRATEGY,
@@ -22,6 +23,7 @@ program
   .usage('[options] <path> [outputPath]')
   .option('-v, --verbose', 'detailed level of logs')
   .option('-e, --exclude [exclude]', 'exclude file extensions from compression')
+  .option('-i, --include [include]', 'include file extensions for compression')
   .option(
     '-gl, --gzip-level [level]',
     'gzip compression level -1 (default), 0 (no compression) - 9 (best compression)'
@@ -66,6 +68,7 @@ const [target, outputPath] = program.args
 const options = {
   verbose: Boolean(GZIPPER_VERBOSE) || program.verbose,
   exclude: GZIPPER_EXCLUDE || program.exclude,
+  include: GZIPPER_INCLUDE || program.include,
   gzipLevel: +GZIPPER_GZIP_LEVEL || +program.gzipLevel,
   gzipMemoryLevel: +GZIPPER_GZIP_MEMORY_LEVEL || +program.gzipMemoryLevel,
   gzipStrategy: +GZIPPER_GZIP_STRATEGY || +program.gzipStrategy,
