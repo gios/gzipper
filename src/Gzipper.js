@@ -299,6 +299,17 @@ class Gzipper {
         extension => !excludeExtensions.includes(extension)
       )
     }
+
+    const includeExtensions =
+      this.options.include &&
+      this.options.include.split(',').map(item => `.${item.trim()}`)
+
+    if (includeExtensions) {
+      return VALID_EXTENSIONS.filter(extension =>
+        includeExtensions.includes(extension)
+      )
+    }
+
     return VALID_EXTENSIONS
   }
 }
