@@ -1,6 +1,6 @@
 {
   "name": "gzipper",
-  "version": "2.8.0",
+  "version": "2.8.1",
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
