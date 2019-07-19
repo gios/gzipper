@@ -1,5 +1,6 @@
 # Gzipper
 [![Build Status](https://travis-ci.org/gios/gzipper.svg?branch=master)](https://travis-ci.org/gios/gzipper)
+[![npm version](https://badge.fury.io/js/gzipper.svg)](https://badge.fury.io/js/gzipper)
 
 CLI for compressing files.
 - [Gzipper](#gzipper)
