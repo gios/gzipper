@@ -8,6 +8,7 @@ before_script:
   - npm ci
 script:
   - npm test
+  - npm run codecov
 deploy:
   provider: npm
   api_key: $NPM_API_KEY

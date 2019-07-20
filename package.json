@@ -6,6 +6,7 @@
   "scripts": {
     "test": "nyc --check-coverage --reporter='text-summary' mocha --timeout=3000 --recursive './tests/**/*.spec.js'",
     "coverage": "nyc mocha --timeout=3000 --recursive './tests/**/*.spec.js'",
+    "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.js\"",
     "eslint": "eslint \"**/*.js\"",
     "check": "npm run prettier && npm run eslint"
@@ -40,6 +41,7 @@
     "@types/semver": "^6.0.0",
     "@types/sinon": "^7.0.12",
     "@types/uuid": "^3.4.4",
+    "codecov": "^3.5.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-prettier": "^3.1.0",
