@@ -35,6 +35,14 @@ Locally usage.
   }
 ```
 
+- or use with `npx` command if module was installed to dependencies or devDependencies
+
+```
+  "scripts": {
+    "compress": "npx gzipper --verbose ./dist"
+  }
+```
+
 - use gzipper with your build commands (e.g. Angular CLI)
 
 ```
