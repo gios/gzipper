@@ -1,14 +1,15 @@
 # Gzipper
 [![Build Status](https://travis-ci.org/gios/gzipper.svg?branch=master)](https://travis-ci.org/gios/gzipper)
 [![npm version](https://badge.fury.io/js/gzipper.svg)](https://badge.fury.io/js/gzipper)
+[![codecov](https://codecov.io/gh/gios/gzipper/branch/master/graph/badge.svg)](https://codecov.io/gh/gios/gzipper)
 
 CLI for compressing files.
-- [Gzipper](#gzipper)
-  - [Install](#install)
-  - [Run script](#run-script)
-  - [Options](#options)
-  - [Contribution](#contribution)
-  - [Requirements](#requirements)
+- [Gzipper](#Gzipper)
+  - [Install](#Install)
+  - [Run script](#Run-script)
+  - [Options](#Options)
+  - [Contribution](#Contribution)
+  - [Requirements](#Requirements)
 
 ## Install
 
@@ -66,7 +67,7 @@ Locally usage.
 | `-V, --version`                              |                              | output the version number                                                                                                                                                                                                                                                                                                                                      |
 | `-v, --verbose`                              | `GZIPPER_VERBOSE`            | detailed level of logs                                                                                                                                                                                                                                                                                                                                         |
 | `-e, --exclude`                              | `GZIPPER_EXCLUDE`            | exclude file extensions from compression                                                                                                                                                                                                                                                                                                                       |
-| `-i, --include`                              | `GZIPPER_INCLUDE`            | include file extensions for compression                                                                                                                                                                                                                                                                                                                       |
+| `-i, --include`                              | `GZIPPER_INCLUDE`            | include file extensions for compression                                                                                                                                                                                                                                                                                                                        |
 | `-gl, --gzip-level [level]`                  | `GZIPPER_GZIP_LEVEL`         | gzip compression level -1 (default), 0 (no compression) - 9 (best compression)                                                                                                                                                                                                                                                                                 |
 | `-gm, --gzip-memory-level [memoryLevel]`     | `GZIPPER_GZIP_MEMORY_LEVEL`  | amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)                                                                                                                                                                                                                                                  |
 | `-gs, --gzip-strategy [strategy]`            | `GZIPPER_GZIP_STRATEGY`      | compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)                                                                                                                                                                                                                                                                           |
