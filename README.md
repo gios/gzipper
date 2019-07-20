@@ -77,6 +77,8 @@ Locally usage.
 | `--output-file-format [outputFileFormat]`    | `GZIPPER_OUTPUT_FILE_FORMAT` | output file format with default artifacts [filename].[ext].[compressExt], where: filename -> name of your file, ext -> file extension, compressExt -> compress extension (.gz, .br, etc), hash -> uniq uuid/v4 hash. Samples: [filename].[compressExt].[ext], test-[filename]-[hash].[compressExt].[ext], [filename]-[hash]-[filename]-tmp.[ext].[compressExt] |
 | `-h, --help`                                 |                              | output usage information                                                                                                                                                                                                                                                                                                                                       |
 
+> ENV Variables has higher priority over CLI arguments.
+
 ## Contribution
 
 I appreciate every contribution, just fork the repository and send the pull request with your changes.
