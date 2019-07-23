@@ -4,7 +4,8 @@
 [![codecov](https://codecov.io/gh/gios/gzipper/branch/master/graph/badge.svg)](https://codecov.io/gh/gios/gzipper)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e1336defedcb61e5b513/maintainability)](https://codeclimate.com/github/gios/gzipper/maintainability)
 
-CLI for compressing files.
+CLI for compressing files using the popular compress algorithms like Brotli and Gzip. Also this module works great with many CLI UI tools (Angular CLI, Vue CLI, create-react-app) and supports many option flags.
+
 - [Gzipper](#Gzipper)
   - [Install](#Install)
   - [Run script](#Run-script)
