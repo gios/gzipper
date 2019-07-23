@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/gios/gzipper.svg?branch=master)](https://travis-ci.org/gios/gzipper)
 [![npm version](https://badge.fury.io/js/gzipper.svg)](https://badge.fury.io/js/gzipper)
 [![codecov](https://codecov.io/gh/gios/gzipper/branch/master/graph/badge.svg)](https://codecov.io/gh/gios/gzipper)
+[![Maintainability](https://api.codeclimate.com/v1/badges/e1336defedcb61e5b513/maintainability)](https://codeclimate.com/github/gios/gzipper/maintainability)
 
 CLI for compressing files.
 - [Gzipper](#Gzipper)
