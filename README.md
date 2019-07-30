@@ -6,7 +6,9 @@
 
 CLI for compressing files using the popular compress algorithms like Brotli and Gzip. Also this module works great with many CLI UI tools (Angular CLI, Vue CLI, create-react-app) and supports few option flags for each algorithm.
 
-There are a couple of options flags such as `gzip-level`, `gzip-strategy`, `gzip-memory-level`, `brotli-param-mode`, `brotli-quality`, `brotli-size-hint` for extending algorithm flexibility. All flags can be declared via ENV variables (ENV variables have higher priority over CLI arguments). You can enable `verbose` mode for better visual representation which files were compressed and how long it took. Also you can customize your file output using `output-file-format` command with predefined template `[filename]-[hash]-[filename].[ext]`.
+There are a couple of options flags such as `gzip-level`, `gzip-strategy`, `gzip-memory-level`, `brotli-param-mode`, `brotli-quality`, `brotli-size-hint` for extending algorithm flexibility. All flags can be declared via ENV variables (ENV variables have higher priority over CLI arguments).
+
+You can enable `verbose` mode for better visual representation which files were compressed and how long it took. Also you can customize your file output using `output-file-format` command with predefined template `[filename]-[hash]-[filename].[ext]`.
 
 - [Gzipper](#Gzipper)
   - [Install](#Install)
