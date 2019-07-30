@@ -4,7 +4,9 @@
 [![codecov](https://codecov.io/gh/gios/gzipper/branch/master/graph/badge.svg)](https://codecov.io/gh/gios/gzipper)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e1336defedcb61e5b513/maintainability)](https://codeclimate.com/github/gios/gzipper/maintainability)
 
-CLI for compressing files using the popular compress algorithms like Brotli and Gzip. Also this module works great with many CLI UI tools (Angular CLI, Vue CLI, create-react-app) and supports many option flags.
+CLI for compressing files using the popular compress algorithms like Brotli and Gzip. Also this module works great with many CLI UI tools (Angular CLI, Vue CLI, create-react-app) and supports few option flags for each algorithm.
+
+There are a couple of flags such as `gzip-level`, `gzip-strategy`, `gzip-memory-level` for gzip and `brotli-param-mode`, `brotli-quality`, `brotli-size-hint` for brotli. You can enable `verbose` mode for better visual representation which files were compressed and how long it took. `output-file-format` flag allow you to customize your file output `[filename]-[hash]-[filename].[ext]`.
 
 - [Gzipper](#Gzipper)
   - [Install](#Install)
