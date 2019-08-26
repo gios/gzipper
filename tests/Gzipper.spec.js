@@ -302,9 +302,7 @@ describe('Gzipper', () => {
         call.returnValue,
         path.join(
           fullPath,
-          `test-${filename}-55-${filename}.${
-            gzipper.compressionInstance.ext
-          }x.${ext}`
+          `test-${filename}-55-${filename}.${gzipper.compressionInstance.ext}x.${ext}`
         )
       )
     }

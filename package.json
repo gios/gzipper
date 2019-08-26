@@ -1,6 +1,6 @@
 {
   "name": "gzipper",
-  "version": "2.8.1",
+  "version": "2.9.0",
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
@@ -37,25 +37,25 @@
   "devDependencies": {
     "@types/commander": "^2.12.2",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^11.13.13",
-    "@types/semver": "^6.0.0",
-    "@types/sinon": "^7.0.12",
-    "@types/uuid": "^3.4.4",
+    "@types/node": "^12.7.2",
+    "@types/semver": "^6.0.1",
+    "@types/sinon": "^7.0.13",
+    "@types/uuid": "^3.4.5",
     "codecov": "^3.5.0",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^4.3.0",
+    "eslint": "^6.2.2",
+    "eslint-config-prettier": "^6.1.0",
     "eslint-plugin-prettier": "^3.1.0",
-    "mocha": "^6.1.4",
+    "mocha": "^6.2.0",
     "nyc": "^14.1.1",
-    "prettier": "^1.17.1",
-    "semver": "^6.1.1",
-    "sinon": "^7.3.2"
+    "prettier": "^1.18.2",
+    "semver": "^6.3.0",
+    "sinon": "^7.4.1"
   },
   "engines": {
     "node": ">=8"
   },
   "dependencies": {
-    "commander": "^2.20.0",
-    "uuid": "^3.3.2"
+    "commander": "^3.0.0",
+    "uuid": "^3.3.3"
   }
 }

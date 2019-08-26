@@ -130,12 +130,17 @@ class Gzipper {
 
     const compressPromise = new Promise((resolve, reject) => {
       output.once('finish', async () => {
-        if (this.options.verbose) {
-          const beforeSize = (await stat(inputPath)).size / 1024
-          const afterSize = (await stat(outputPath)).size / 1024
-          resolve({ beforeSize, afterSize })
-        } else {
-          resolve()
+        try {
+          if (this.options.verbose) {
+            const beforeSize = (await stat(inputPath)).size / 1024
+            const afterSize = (await stat(outputPath)).size / 1024
+            resolve({ beforeSize, afterSize })
+          } else {
+            resolve()
+          }
+        } catch (error) {
+          this.logger.error(error, true)
+          reject(error)
         }
       })
       output.once('error', error => {
