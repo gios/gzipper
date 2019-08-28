@@ -77,6 +77,11 @@ class Gzipper {
         } else if (isFile) {
           try {
             if (this.validExtensions.includes(path.extname(filePath))) {
+              const { size: fileSize } = await lstat(filePath)
+              if (fileSize < this.options.threshold) {
+                continue
+              }
+
               const hrtimeStart = process.hrtime()
               compressedFiles.push(filePath)
               const fileInfo = await this[compressFile](

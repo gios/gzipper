@@ -8,6 +8,7 @@ const {
   GZIPPER_VERBOSE,
   GZIPPER_EXCLUDE,
   GZIPPER_INCLUDE,
+  GZIPPER_THRESHOLD,
   GZIPPER_GZIP_LEVEL,
   GZIPPER_GZIP_MEMORY_LEVEL,
   GZIPPER_GZIP_STRATEGY,
@@ -24,6 +25,10 @@ program
   .option('-v, --verbose', 'detailed level of logs')
   .option('-e, --exclude [exclude]', 'exclude file extensions from compression')
   .option('-i, --include [include]', 'include file extensions for compression')
+  .option(
+    '-t, --threshold [threshold]',
+    'exclude assets smaller than this byte size. 0 (default)'
+  )
   .option(
     '-gl, --gzip-level [level]',
     'gzip compression level -1 (default), 0 (no compression) - 9 (best compression)'
@@ -69,6 +74,7 @@ const options = {
   verbose: Boolean(GZIPPER_VERBOSE) || program.verbose,
   exclude: GZIPPER_EXCLUDE || program.exclude,
   include: GZIPPER_INCLUDE || program.include,
+  threshold: +GZIPPER_THRESHOLD || +program.threshold || 0,
   gzipLevel: +GZIPPER_GZIP_LEVEL || +program.gzipLevel,
   gzipMemoryLevel: +GZIPPER_GZIP_MEMORY_LEVEL || +program.gzipMemoryLevel,
   gzipStrategy: +GZIPPER_GZIP_STRATEGY || +program.gzipStrategy,

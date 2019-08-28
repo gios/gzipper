@@ -395,6 +395,34 @@ describe('Gzipper', () => {
     assert.strictEqual(Object.keys(gzipper.options).length, 2)
   })
 
+  it('should exclude file sizes smaller than 860 bytes from compression', async () => {
+    const options = {
+      threshold: 860,
+      verbose: true,
+    }
+    const INCLUDED_FILES_COUNT = 4
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options)
+    const loggerSuccessSpy = sinon.spy(gzipper.logger, 'success')
+    const loggerInfoSpy = sinon.spy(gzipper.logger, 'info')
+    await gzipper.compress()
+    const files = await getFiles(COMPRESS_PATH, ['.gz'])
+
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `${files.length} files have been compressed.`,
+        true
+      )
+    )
+    assert.strictEqual(loggerInfoSpy.callCount, INCLUDED_FILES_COUNT + 1)
+    assert.ok(gzipper.createCompression() instanceof zlib.Gzip)
+    assert.strictEqual(gzipper.compressionInstance.ext, 'gz')
+    assert.strictEqual(
+      Object.keys(gzipper.compressionInstance.compressionOptions).length,
+      0
+    )
+    assert.strictEqual(Object.keys(gzipper.options).length, 2)
+  })
+
   afterEach(async () => {
     await clear(EMPTY_FOLDER_PATH, true)
     await clear(COMPRESS_PATH_TARGET, true)
