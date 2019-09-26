@@ -11,11 +11,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [6, 8, 10]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: [8, 10, 12]
+          node-version: ${{ matrix.node }}
       - run: npm ci
       - run: npm test
       - run: npm run codecov
@@ -23,11 +26,14 @@ jobs:
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [6, 8, 10]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: [8, 10, 12]
+          node-version: ${{ matrix.node }}
           registry-url: https://registry.npmjs.org/
       - run: npm publish
         env:
