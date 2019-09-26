@@ -1,8 +1,9 @@
 name: Publish Package
 
 on:
-  tags:
-    - '*'
+  push:
+    tags:
+      - '*'
 
 jobs:
   publish-npm:
