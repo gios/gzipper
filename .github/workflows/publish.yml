@@ -1,6 +1,9 @@
 name: Publish Package
 
-on: release
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build:
@@ -18,9 +21,6 @@ jobs:
   test:
     needs: build
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [8, 10, 12]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
@@ -34,9 +34,6 @@ jobs:
   publish:
     needs: test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [8, 10, 12]
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
