@@ -1,4 +1,4 @@
-name: Build Package
+name: Test Package
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  buildAndTest:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:

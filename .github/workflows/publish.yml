@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 jobs:
-  buildAndTest:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -23,7 +23,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
-    needs: buildAndTest
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
