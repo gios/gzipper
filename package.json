@@ -1,6 +1,6 @@
 {
   "name": "gzipper",
-  "version": "2.10.4",
+  "version": "3.0.0-rc1",
   "description": "CLI for compressing files.",
   "main": "dist/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "coverage": "nyc --reporter='html' mocha",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.ts\"",
-    "eslint": "eslint \"**/*.ts\"",
+    "eslint": "eslint **/*.ts",
     "build": "rimraf dist && tsc"
   },
   "repository": {

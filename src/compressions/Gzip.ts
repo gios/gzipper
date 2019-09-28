@@ -1,7 +1,7 @@
 import zlib from 'zlib';
 
 import { Compression } from './Compression';
-import { IOptions } from '../interfaces';
+import { GlobalOptions } from '../interfaces';
 import { Logger } from '../Logger';
 
 type GzipOptions = {
@@ -19,7 +19,7 @@ export class GzipCompression extends Compression {
   /**
    * Creates an instance of GzipCompression.
    */
-  constructor(options: IOptions, logger: Logger) {
+  constructor(options: GlobalOptions, logger: Logger) {
     super(options, logger);
     this.selectCompression();
   }
@@ -27,7 +27,7 @@ export class GzipCompression extends Compression {
   /**
    * Returns human-readable gzip compression options info.
    */
-  public readableOptions() {
+  public readableOptions(): string {
     let options = '';
 
     for (const [key, value] of Object.entries(this.compressionOptions)) {
@@ -40,14 +40,14 @@ export class GzipCompression extends Compression {
   /**
    * Returns gzip compression instance in closure.
    */
-  public getCompression() {
-    return () => zlib.createGzip(this.compressionOptions);
+  public getCompression(): () => zlib.Gzip {
+    return (): zlib.Gzip => zlib.createGzip(this.compressionOptions);
   }
 
   /**
    * Build gzip options object [compressionOptions].
    */
-  private selectCompression() {
+  private selectCompression(): void {
     const options: GzipOptions = {};
 
     if (this.options.gzipLevel !== undefined) {

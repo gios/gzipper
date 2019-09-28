@@ -26,19 +26,17 @@ export const NO_FILES_COMPRESS_PATH = path.resolve(
   './resources/no_files_to_compress',
 );
 
-function statExists(target: string) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      await stat(target);
-      resolve(true);
-    } catch (error) {
-      if (error && error.code === 'ENOENT') {
-        resolve(false);
-      } else {
-        reject(error);
-      }
+async function statExists(target: string): Promise<boolean> {
+  try {
+    await stat(target);
+    return true;
+  } catch (error) {
+    if (error && error.code === 'ENOENT') {
+      return false;
+    } else {
+      throw error;
     }
-  });
+  }
 }
 
 /**
@@ -47,7 +45,7 @@ function statExists(target: string) {
 export async function clearDirectory(
   target = COMPRESS_PATH,
   extensions: string[] | boolean,
-) {
+): Promise<string[]> {
   try {
     const force = typeof extensions === 'boolean' && extensions;
     const files: string[] = [];
@@ -83,11 +81,14 @@ export async function clearDirectory(
   }
 }
 
-export async function clear(directory: string, extensions: string[] | boolean) {
+export async function clear(
+  directory: string,
+  extensions: string[] | boolean,
+): Promise<void> {
   await clearDirectory(directory, extensions);
 }
 
-export async function createFolder(target: string) {
+export async function createFolder(target: string): Promise<string> {
   const folderPath = path.resolve(__dirname, target);
   const isExists = await statExists(folderPath);
   if (!isExists) {
@@ -99,7 +100,7 @@ export async function createFolder(target: string) {
 export async function getFiles(
   target: string,
   filterByExtensions: string[] = [],
-) {
+): Promise<string[]> {
   try {
     const files: string[] = [];
     const filesList = await readdir(target);

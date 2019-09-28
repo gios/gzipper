@@ -1,4 +1,4 @@
-export interface IOptions {
+export interface GlobalOptions {
   verbose?: boolean;
   exclude?: string;
   include?: string;

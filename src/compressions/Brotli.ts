@@ -2,7 +2,7 @@ import zlib from 'zlib';
 
 import { Compression } from './Compression';
 import { Logger } from '../Logger';
-import { IOptions } from '../interfaces';
+import { GlobalOptions } from '../interfaces';
 
 type BrotliOptions = { [key: number]: number };
 
@@ -15,7 +15,7 @@ export class BrotliCompression extends Compression {
   /**
    * Creates an instance of BrotliCompression
    */
-  constructor(options: IOptions, logger: Logger) {
+  constructor(options: GlobalOptions, logger: Logger) {
     super(options, logger);
     this.availability();
     this.selectCompression();
@@ -24,7 +24,7 @@ export class BrotliCompression extends Compression {
   /**
    * Returns human-readable brotli compression options info.
    */
-  public readableOptions() {
+  public readableOptions(): string {
     let options = '';
 
     for (const [key, value] of Object.entries(this.compressionOptions)) {
@@ -37,8 +37,8 @@ export class BrotliCompression extends Compression {
   /**
    * Returns brotli compression instance in closure.
    */
-  public getCompression() {
-    return () =>
+  public getCompression(): () => zlib.BrotliCompress {
+    return (): zlib.BrotliCompress =>
       zlib.createBrotliCompress({
         params: this.compressionOptions,
       });
@@ -47,7 +47,7 @@ export class BrotliCompression extends Compression {
   /**
    * Build brotli options object [compressionOptions].
    */
-  private selectCompression() {
+  private selectCompression(): void {
     const options: BrotliOptions = {};
 
     if (this.options.brotliParamMode !== undefined) {
@@ -89,7 +89,9 @@ export class BrotliCompression extends Compression {
   /**
    * Returns human-readable brotli option name.
    */
-  private getBrotliOptionName(index: number) {
+  private getBrotliOptionName(
+    index: number,
+  ): 'brotliParamMode' | 'brotliQuality' | 'brotliSizeHint' | 'unknown' {
     switch (index) {
       case zlib.constants.BROTLI_PARAM_MODE:
         return 'brotliParamMode';
@@ -108,7 +110,7 @@ export class BrotliCompression extends Compression {
   /**
    * Check if brotli compression is exists on current Node.js version.
    */
-  private availability() {
+  private availability(): void {
     if (typeof zlib.createBrotliCompress !== 'function') {
       const message = `Can't use brotli compression, Node.js >= v11.7.0 required.`;
       this.logger.error(message, true);

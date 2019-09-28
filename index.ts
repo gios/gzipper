@@ -2,7 +2,7 @@
 import program from 'commander';
 
 import { Gzipper } from './src/Gzipper';
-import { IOptions } from './src/interfaces';
+import { GlobalOptions } from './src/interfaces';
 const version = require('./package.json').version;
 
 const {
@@ -81,32 +81,36 @@ type VarType = typeof Number | typeof Boolean | typeof String;
 function getVariable(
   variable: string | undefined,
   type: VarType = String,
-): any {
+): ReturnType<VarType> | undefined {
   return variable && type(variable);
 }
 
 const [target, outputPath] = program.args;
-const options: IOptions & { [key: string]: any } = {
+const options: GlobalOptions & { [key: string]: unknown } = {
   verbose: getVariable(GZIPPER_VERBOSE, Boolean) || program.verbose,
   exclude: getVariable(GZIPPER_EXCLUDE) || program.exclude,
   include: getVariable(GZIPPER_INCLUDE) || program.include,
   threshold:
-    getVariable(GZIPPER_THRESHOLD, Number) || Number(program.threshold) || 0,
+    (getVariable(GZIPPER_THRESHOLD, Number) as number) ||
+    Number(program.threshold) ||
+    0,
   gzipLevel:
-    getVariable(GZIPPER_GZIP_LEVEL, Number) || Number(program.gzipLevel),
+    (getVariable(GZIPPER_GZIP_LEVEL, Number) as number) ||
+    Number(program.gzipLevel),
   gzipMemoryLevel:
-    getVariable(GZIPPER_GZIP_MEMORY_LEVEL, Number) ||
+    (getVariable(GZIPPER_GZIP_MEMORY_LEVEL, Number) as number) ||
     Number(program.gzipMemoryLevel),
   gzipStrategy:
-    getVariable(GZIPPER_GZIP_STRATEGY, Number) || Number(program.gzipStrategy),
+    (getVariable(GZIPPER_GZIP_STRATEGY, Number) as number) ||
+    Number(program.gzipStrategy),
   brotli: getVariable(GZIPPER_BROTLI, Boolean) || program.brotli,
   brotliParamMode:
     getVariable(GZIPPER_BROTLI_PARAM_MODE) || program.brotliParamMode,
   brotliQuality:
-    getVariable(GZIPPER_BROTLI_QUALITY, Number) ||
+    (getVariable(GZIPPER_BROTLI_QUALITY, Number) as number) ||
     Number(program.brotliQuality),
   brotliSizeHint:
-    getVariable(GZIPPER_BROTLI_SIZE_HINT, Number) ||
+    (getVariable(GZIPPER_BROTLI_SIZE_HINT, Number) as number) ||
     Number(program.brotliSizeHint),
   outputFileFormat:
     getVariable(GZIPPER_OUTPUT_FILE_FORMAT) || program.outputFileFormat,

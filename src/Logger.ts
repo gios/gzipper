@@ -13,35 +13,37 @@ export class Logger {
   /**
    * Info logger.
    */
-  public info(message: string, force?: boolean) {
+  public info(message: string, force?: boolean): void {
     return this.logger('info')(message, force);
   }
 
   /**
    * Error logger.
    */
-  public error(message: string, force?: boolean) {
+  public error(message: string, force?: boolean): void {
     return this.logger('error')(message, force);
   }
 
   /**
    * Success logger.
    */
-  public success(message: string, force?: boolean) {
+  public success(message: string, force?: boolean): void {
     return this.logger('success')(message, force);
   }
 
   /**
    * Warn logger.
    */
-  public warn(message: string, force?: boolean) {
+  public warn(message: string, force?: boolean): void {
     return this.logger('warning')(message, force);
   }
 
   /**
    * Colorize messages depends on the level and return a wrapper.
    */
-  private logger(level: 'info' | 'error' | 'warning' | 'success') {
+  private logger(
+    level: 'info' | 'error' | 'warning' | 'success',
+  ): (message: string, force?: boolean) => void {
     let colorfulMessage: string;
     const prefix = 'gzipper: ';
 
@@ -63,7 +65,10 @@ export class Logger {
         break;
     }
 
-    return (message: string, force?: boolean) =>
-      (this.verbose || force) && console.log(colorfulMessage, message);
+    return (message: string, force?: boolean): void => {
+      if (this.verbose || force) {
+        console.log(colorfulMessage, message);
+      }
+    };
   }
 }

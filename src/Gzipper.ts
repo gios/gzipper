@@ -7,7 +7,7 @@ import { Logger } from './Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
 import { VALID_EXTENSIONS } from './constants';
-import { IOptions } from './interfaces';
+import { GlobalOptions } from './interfaces';
 
 const OUTPUT_FILE_FORMAT_REGEXP = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;
 const stat = util.promisify(fs.stat);
@@ -20,7 +20,7 @@ const mkdir = util.promisify(fs.mkdir);
  */
 export class Gzipper {
   private logger: Logger;
-  private options: IOptions;
+  private options: GlobalOptions;
   private outputPath: string | undefined;
   private compressionInstance: BrotliCompression | GzipCompression;
   private target: string;
@@ -34,7 +34,7 @@ export class Gzipper {
   constructor(
     target: string | undefined | null,
     outputPath: string | undefined | null,
-    options: IOptions = {} as any,
+    options: GlobalOptions = {} as never,
   ) {
     this.logger = new Logger(options.verbose as boolean);
     if (!target) {
@@ -57,7 +57,7 @@ export class Gzipper {
   /**
    * Start compressing files.
    */
-  public async compress() {
+  public async compress(): Promise<void> {
     let files;
     try {
       if (this.outputPath) {
@@ -91,7 +91,7 @@ export class Gzipper {
   /**
    * Compile files in folder recursively.
    */
-  private async compileFolderRecursively(target: string) {
+  private async compileFolderRecursively(target: string): Promise<string[]> {
     try {
       const compressedFiles: string[] = [];
       const filesList = await readdir(target);
@@ -150,7 +150,7 @@ export class Gzipper {
     filename: string,
     target: string,
     outputDir: string | undefined,
-  ) {
+  ): Promise<{ beforeSize: number; afterSize: number } | undefined> {
     const inputPath = path.join(target, filename);
     if (outputDir) {
       target = path.join(outputDir, path.relative(this.target, target));
@@ -166,7 +166,7 @@ export class Gzipper {
 
     const compressPromise = new Promise<
       { beforeSize: number; afterSize: number } | undefined
-    >((resolve, reject) => {
+    >((resolve, reject): void => {
       output.once('finish', async () => {
         try {
           if (this.options.verbose) {
@@ -193,7 +193,7 @@ export class Gzipper {
   /**
    * Show message with compression params.
    */
-  private compressionLog() {
+  private compressionLog(): void {
     const options = this.compressionInstance.readableOptions();
     this.logger.warn(options, true);
 
@@ -209,7 +209,7 @@ export class Gzipper {
    *
    * @todo when Node.js >= 8 support will be removed, rewrite this to mkdir(path, { recursive: true })
    */
-  private async createFolders(target: string) {
+  private async createFolders(target: string): Promise<void> {
     const initDir = path.isAbsolute(target) ? path.sep : '';
 
     await target
@@ -229,25 +229,23 @@ export class Gzipper {
   /**
    * Returns if the file or folder exists.
    */
-  private statExists(target: string) {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        await stat(target);
-        resolve(true);
-      } catch (error) {
-        if (error && error.code === 'ENOENT') {
-          resolve(false);
-        } else {
-          reject(error);
-        }
+  private async statExists(target: string): Promise<boolean> {
+    try {
+      await stat(target);
+      return true;
+    } catch (error) {
+      if (error && error.code === 'ENOENT') {
+        return false;
+      } else {
+        throw error;
       }
-    });
+    }
   }
 
   /**
    * Get output path which is based on [outputFileFormat].
    */
-  private getOutputPath(target: string, file: string) {
+  private getOutputPath(target: string, file: string): string {
     const artifactsMap = new Map<string, string | null>([
       ['[filename]', path.parse(file).name],
       ['[ext]', path.extname(file).slice(1)],
@@ -282,7 +280,7 @@ export class Gzipper {
   /**
    * Returns the filtered list of extensions from `options.exclude`.
    */
-  private getValidExtensions() {
+  private getValidExtensions(): string[] {
     const excludeExtensions =
       this.options.exclude &&
       this.options.exclude.split(',').map(item => `.${item.trim()}`);

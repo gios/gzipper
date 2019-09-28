@@ -14,7 +14,7 @@ import {
   createFolder,
   clear,
 } from './utils';
-import { IOptions } from '../src/interfaces';
+import { GlobalOptions } from '../src/interfaces';
 
 describe('Gzipper', () => {
   beforeEach(async () => {
@@ -254,7 +254,7 @@ describe('Gzipper', () => {
   });
 
   async function validateOutputFileFormat(
-    options: IOptions,
+    options: GlobalOptions,
     outputFileFormat: string,
   ): Promise<[Gzipper, sinon.SinonSpy]> {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
