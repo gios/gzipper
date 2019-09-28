@@ -61,3 +61,5 @@ typings/
 *.gz
 *.br
 .vscode
+tsconfig.tsbuildinfo
+dist

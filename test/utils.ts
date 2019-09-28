@@ -26,6 +26,21 @@ export const NO_FILES_COMPRESS_PATH = path.resolve(
   './resources/no_files_to_compress',
 );
 
+function statExists(target: string) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await stat(target);
+      resolve(true);
+    } catch (error) {
+      if (error && error.code === 'ENOENT') {
+        resolve(false);
+      } else {
+        reject(error);
+      }
+    }
+  });
+}
+
 /**
  * Clear directory, extensions = true (delete all files), extensions = [.js, .ts] (only specific files)
  */
@@ -109,19 +124,4 @@ export async function getFiles(
   } catch (error) {
     throw new Error(error);
   }
-}
-
-function statExists(target: string) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      await stat(target);
-      resolve(true);
-    } catch (error) {
-      if (error && error.code === 'ENOENT') {
-        resolve(false);
-      } else {
-        reject(error);
-      }
-    }
-  });
 }

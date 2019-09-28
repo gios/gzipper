@@ -7,9 +7,9 @@
     "test": "nyc --check-coverage --reporter='text-summary' mocha",
     "coverage": "nyc --reporter='html' mocha",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
-    "prettier": "prettier --write \"**/*.js\"",
-    "eslint": "eslint \"**/*.js\"",
-    "check": "npm run prettier && npm run eslint"
+    "prettier": "prettier --write \"**/*.ts\"",
+    "eslint": "eslint \"**/*.ts\"",
+    "build": "rimraf dist && tsc"
   },
   "repository": {
     "type": "git",
@@ -50,6 +50,7 @@
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
     "prettier": "^1.18.2",
+    "rimraf": "^3.0.0",
     "semver": "^6.3.0",
     "sinon": "^7.4.1",
     "source-map-support": "^0.5.13",

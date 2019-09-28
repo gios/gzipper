@@ -2,7 +2,7 @@ import assert from 'assert';
 import sinon from 'sinon';
 import zlib from 'zlib';
 
-import { disableBrotli } from '../../helpers';
+import { disableBrotli } from '../helpers';
 import { Gzipper } from '../../src/Gzipper';
 import { COMPRESS_PATH, getFiles, clear } from '../utils';
 

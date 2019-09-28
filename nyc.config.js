@@ -1,11 +1,14 @@
-// const { disableBrotli } = require('./helpers')
-// const exclude = disableBrotli ? ['src/compressions/Brotli.js'] : []
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const semver = require('semver');
+const exclude = semver.lt(process.version, 'v11.7.0')
+  ? ['src/compressions/Brotli.js']
+  : [];
 
 module.exports = {
   all: true,
   include: ['src/**'],
   extension: ['.ts'],
-  // exclude: exclude,
+  exclude: exclude,
   reporter: ['text-summary'],
   branches: 85,
   lines: 90,
