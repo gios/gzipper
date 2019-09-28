@@ -31,7 +31,11 @@ export class Gzipper {
   /**
    * Creates an instance of Gzipper.
    */
-  constructor(target: string, outputPath: string, options: IOptions) {
+  constructor(
+    target: string | undefined | null,
+    outputPath: string | undefined | null,
+    options: IOptions = {} as any,
+  ) {
     this.logger = new Logger(options.verbose as boolean);
     if (!target) {
       const message = `Can't find a path.`;

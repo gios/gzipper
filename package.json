@@ -4,8 +4,8 @@
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --check-coverage --reporter='text-summary' mocha --timeout=3000 --recursive './tests/**/*.spec.js'",
-    "coverage": "nyc mocha --timeout=3000 --recursive './tests/**/*.spec.js'",
+    "test": "nyc --check-coverage --reporter='text-summary' mocha",
+    "coverage": "nyc --reporter='html' mocha",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.js\"",
     "eslint": "eslint \"**/*.js\"",
@@ -52,6 +52,8 @@
     "prettier": "^1.18.2",
     "semver": "^6.3.0",
     "sinon": "^7.4.1",
+    "source-map-support": "^0.5.13",
+    "ts-node": "^8.4.1",
     "typescript": "^3.6.3"
   },
   "engines": {

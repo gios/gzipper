@@ -76,25 +76,45 @@ program
   .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
   .parse(process.argv);
 
+type VarType = typeof Number | typeof Boolean | typeof String;
+
+function getVariable(
+  variable: string | undefined,
+  type: VarType = String,
+): any {
+  return variable && type(variable);
+}
+
 const [target, outputPath] = program.args;
-const options: IOptions = {
-  verbose: Boolean(GZIPPER_VERBOSE) || program.verbose,
-  exclude: GZIPPER_EXCLUDE || program.exclude,
-  include: GZIPPER_INCLUDE || program.include,
-  threshold: +GZIPPER_THRESHOLD || +program.threshold || 0,
-  gzipLevel: +GZIPPER_GZIP_LEVEL || +program.gzipLevel,
-  gzipMemoryLevel: +GZIPPER_GZIP_MEMORY_LEVEL || +program.gzipMemoryLevel,
-  gzipStrategy: +GZIPPER_GZIP_STRATEGY || +program.gzipStrategy,
-  brotli: Boolean(GZIPPER_BROTLI) || program.brotli,
-  brotliParamMode: GZIPPER_BROTLI_PARAM_MODE || program.brotliParamMode,
-  brotliQuality: +GZIPPER_BROTLI_QUALITY || +program.brotliQuality,
-  brotliSizeHint: +GZIPPER_BROTLI_SIZE_HINT || +program.brotliSizeHint,
-  outputFileFormat: GZIPPER_OUTPUT_FILE_FORMAT || program.outputFileFormat,
+const options: IOptions & { [key: string]: any } = {
+  verbose: getVariable(GZIPPER_VERBOSE, Boolean) || program.verbose,
+  exclude: getVariable(GZIPPER_EXCLUDE) || program.exclude,
+  include: getVariable(GZIPPER_INCLUDE) || program.include,
+  threshold:
+    getVariable(GZIPPER_THRESHOLD, Number) || Number(program.threshold) || 0,
+  gzipLevel:
+    getVariable(GZIPPER_GZIP_LEVEL, Number) || Number(program.gzipLevel),
+  gzipMemoryLevel:
+    getVariable(GZIPPER_GZIP_MEMORY_LEVEL, Number) ||
+    Number(program.gzipMemoryLevel),
+  gzipStrategy:
+    getVariable(GZIPPER_GZIP_STRATEGY, Number) || Number(program.gzipStrategy),
+  brotli: getVariable(GZIPPER_BROTLI, Boolean) || program.brotli,
+  brotliParamMode:
+    getVariable(GZIPPER_BROTLI_PARAM_MODE) || program.brotliParamMode,
+  brotliQuality:
+    getVariable(GZIPPER_BROTLI_QUALITY, Number) ||
+    Number(program.brotliQuality),
+  brotliSizeHint:
+    getVariable(GZIPPER_BROTLI_SIZE_HINT, Number) ||
+    Number(program.brotliSizeHint),
+  outputFileFormat:
+    getVariable(GZIPPER_OUTPUT_FILE_FORMAT) || program.outputFileFormat,
 };
 
-// Delete undefined and NaN options.
+// Delete undefined options.
 Object.keys(options).forEach(key => {
-  if (options[key] === undefined || options[key] !== options[key]) {
+  if (options[key] === undefined) {
     delete options[key];
   }
 });
