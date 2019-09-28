@@ -2,7 +2,7 @@
   "name": "gzipper",
   "version": "2.10.4",
   "description": "CLI for compressing files.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "nyc --check-coverage --reporter='text-summary' mocha",
     "coverage": "nyc --reporter='html' mocha",
@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/gios/gzipper.git"
   },
-  "bin": "./index.js",
+  "bin": "./dist/index.js",
   "keywords": [
     "tool",
     "cli",
@@ -37,14 +37,14 @@
   "devDependencies": {
     "@types/commander": "^2.12.2",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.7.2",
-    "@types/semver": "^6.0.1",
+    "@types/node": "^12.7.8",
+    "@types/semver": "^6.0.2",
     "@types/sinon": "^7.0.13",
     "@types/uuid": "^3.4.5",
     "@typescript-eslint/eslint-plugin": "^2.3.1",
     "@typescript-eslint/parser": "^2.3.1",
-    "codecov": "^3.5.0",
-    "eslint": "^6.2.2",
+    "codecov": "^3.6.1",
+    "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-prettier": "^3.1.1",
     "mocha": "^6.2.0",
@@ -52,7 +52,7 @@
     "prettier": "^1.18.2",
     "rimraf": "^3.0.0",
     "semver": "^6.3.0",
-    "sinon": "^7.4.1",
+    "sinon": "^7.5.0",
     "source-map-support": "^0.5.13",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.3"
@@ -61,7 +61,7 @@
     "node": ">=8"
   },
   "dependencies": {
-    "commander": "^3.0.0",
+    "commander": "^3.0.2",
     "uuid": "^3.3.3"
   }
 }
