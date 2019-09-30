@@ -56,7 +56,7 @@ describe('Methods Gzipper', () => {
 
   //   it("should ignore entity if it's not a file", async () => {
   //     const gzipper = new Gzipper(COMPRESS_PATH, null);
-  //     sinonSandbox.stub((gzipper as any).fsPromise, 'readdir').resolves(1);
+  //     sinonSandbox.stub((gzipper as any).nativeFs, 'readdir').resolves(1);
   //     await (gzipper as any).compileFolderRecursively();
   //   });
   // });
