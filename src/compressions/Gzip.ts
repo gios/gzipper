@@ -14,7 +14,7 @@ type GzipOptions = {
  * Gzip
  */
 export class GzipCompression extends Compression {
-  public ext = 'gz';
+  public readonly ext = 'gz';
   private compressionOptions: GzipOptions = {};
   /**
    * Creates an instance of GzipCompression.

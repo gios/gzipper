@@ -41,4 +41,23 @@ describe('Methods Gzipper', () => {
       assert.strictEqual(message, '1 file has been compressed.');
     });
   });
+
+  // describe('compileFolderRecursively', () => {
+  //   let sinonSandbox: sinon.SinonSandbox;
+
+  //   beforeEach(() => {
+  //     sinonSandbox = sinon.createSandbox();
+  //   });
+
+  //   afterEach(() => {
+  //     sinonSandbox.restore();
+  //     sinon.restore();
+  //   });
+
+  //   it("should ignore entity if it's not a file", async () => {
+  //     const gzipper = new Gzipper(COMPRESS_PATH, null);
+  //     sinonSandbox.stub((gzipper as any).fsPromise, 'readdir').resolves(1);
+  //     await (gzipper as any).compileFolderRecursively();
+  //   });
+  // });
 });

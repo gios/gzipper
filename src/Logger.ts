@@ -2,7 +2,7 @@
  * Custom logger.
  */
 export class Logger {
-  private verbose: boolean;
+  private readonly verbose: boolean;
   /**
    * Creates an instance of Logger.
    */

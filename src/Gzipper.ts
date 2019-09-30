@@ -10,24 +10,26 @@ import { VALID_EXTENSIONS } from './constants';
 import { GlobalOptions } from './interfaces';
 
 const OUTPUT_FILE_FORMAT_REGEXP = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;
-const stat = util.promisify(fs.stat);
-const lstat = util.promisify(fs.lstat);
-const readdir = util.promisify(fs.readdir);
-const mkdir = util.promisify(fs.mkdir);
 
 /**
  * Compressing files.
  */
 export class Gzipper {
-  private logger: Logger;
-  private options: GlobalOptions;
-  private outputPath: string | undefined;
-  private compressionInstance: BrotliCompression | GzipCompression;
-  private target: string;
-  private createCompression:
+  private readonly nativeFs = {
+    stat: util.promisify(fs.stat),
+    lstat: util.promisify(fs.lstat),
+    readdir: util.promisify(fs.readdir),
+    mkdir: util.promisify(fs.mkdir),
+  };
+  private readonly logger: Logger;
+  private readonly options: GlobalOptions;
+  private readonly outputPath: string | undefined;
+  private readonly compressionInstance: BrotliCompression | GzipCompression;
+  private readonly target: string;
+  private readonly createCompression:
     | ReturnType<BrotliCompression['getCompression']>
     | ReturnType<GzipCompression['getCompression']>;
-  private validExtensions: string[];
+  private readonly validExtensions: string[];
   /**
    * Creates an instance of Gzipper.
    */
@@ -94,12 +96,12 @@ export class Gzipper {
   private async compileFolderRecursively(target: string): Promise<string[]> {
     try {
       const compressedFiles: string[] = [];
-      const filesList = await readdir(target);
+      const filesList = await this.nativeFs.readdir(target);
 
       for (const file of filesList) {
         const filePath = path.resolve(target, file);
-        const isFile = (await lstat(filePath)).isFile();
-        const isDirectory = (await lstat(filePath)).isDirectory();
+        const isFile = (await this.nativeFs.lstat(filePath)).isFile();
+        const isDirectory = (await this.nativeFs.lstat(filePath)).isDirectory();
 
         if (isDirectory) {
           compressedFiles.push(
@@ -108,7 +110,7 @@ export class Gzipper {
         } else if (isFile) {
           try {
             if (this.validExtensions.includes(path.extname(filePath))) {
-              const { size: fileSize } = await lstat(filePath);
+              const { size: fileSize } = await this.nativeFs.lstat(filePath);
               if (fileSize < this.options.threshold) {
                 continue;
               }
@@ -170,8 +172,10 @@ export class Gzipper {
       output.once('finish', async () => {
         try {
           if (this.options.verbose) {
-            const beforeSize = (await stat(inputPath)).size / 1024;
-            const afterSize = (await stat(outputPath)).size / 1024;
+            const beforeSize =
+              (await this.nativeFs.stat(inputPath)).size / 1024;
+            const afterSize =
+              (await this.nativeFs.stat(outputPath)).size / 1024;
             resolve({ beforeSize, afterSize });
           } else {
             resolve();
@@ -220,7 +224,7 @@ export class Gzipper {
         const childDir = await childDirPromise;
         const folderPath = path.resolve(parentDir, childDir);
         if (!(await this.statExists(folderPath))) {
-          await mkdir(folderPath);
+          await this.nativeFs.mkdir(folderPath);
         }
         return Promise.resolve(folderPath);
       }, Promise.resolve(initDir));
@@ -231,7 +235,7 @@ export class Gzipper {
    */
   private async statExists(target: string): Promise<boolean> {
     try {
-      await stat(target);
+      await this.nativeFs.stat(target);
       return true;
     } catch (error) {
       if (error && error.code === 'ENOENT') {

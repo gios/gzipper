@@ -4,8 +4,8 @@ import { GlobalOptions } from '../interfaces';
 import { Logger } from '../Logger';
 
 export abstract class Compression {
-  protected options: GlobalOptions;
-  protected logger: Logger;
+  protected readonly options: GlobalOptions;
+  protected readonly logger: Logger;
   /**
    * Creates an instance of Compression.
    */

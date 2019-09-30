@@ -10,7 +10,7 @@ type BrotliOptions = { [key: number]: number };
  * Brotli
  */
 export class BrotliCompression extends Compression {
-  public ext = 'br';
+  public readonly ext = 'br';
   private compressionOptions: BrotliOptions = {};
   /**
    * Creates an instance of BrotliCompression
