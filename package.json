@@ -8,7 +8,7 @@
     "coverage": "nyc --reporter='html' mocha",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.ts\"",
-    "eslint": "eslint **/*.ts",
+    "eslint": "eslint \"**/*.ts\"",
     "build": "rimraf dist && tsc"
   },
   "repository": {
