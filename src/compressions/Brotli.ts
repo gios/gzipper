@@ -91,7 +91,7 @@ export class BrotliCompression extends Compression {
    */
   private getBrotliOptionName(
     index: number,
-  ): 'brotliParamMode' | 'brotliQuality' | 'brotliSizeHint' | 'unknown' {
+  ): 'brotliParamMode' | 'brotliQuality' | 'brotliSizeHint' | undefined {
     switch (index) {
       case zlib.constants.BROTLI_PARAM_MODE:
         return 'brotliParamMode';
@@ -101,9 +101,6 @@ export class BrotliCompression extends Compression {
 
       case zlib.constants.BROTLI_PARAM_SIZE_HINT:
         return 'brotliSizeHint';
-
-      default:
-        return 'unknown';
     }
   }
 

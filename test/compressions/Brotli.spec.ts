@@ -29,38 +29,6 @@ describeTest('Gzipper -> Brotli compression', () => {
     zlib.createBrotliCompress = createBrotliCompress;
   });
 
-  it("should not update options for zlib.constants.BROTLI_PARAM_MODE when --brotli-param-mode isn't valid", async () => {
-    const options = {
-      brotli: true,
-      threshold: 0,
-    };
-    if (typeof zlib.createBrotliCompress !== 'function') {
-      return;
-    }
-
-    const gzipper = new Gzipper(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
-    await gzipper.compress();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
-    assert.ok(
-      loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
-        true,
-      ),
-    );
-    assert.ok(
-      (gzipper as any).createCompression() instanceof
-        (zlib as any).BrotliCompress,
-    );
-    assert.strictEqual((gzipper as any).compressionInstance.ext, 'br');
-    assert.strictEqual(
-      Object.keys((gzipper as any).compressionInstance.compressionOptions)
-        .length,
-      0,
-    );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 2);
-  });
-
   it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
     const options = {
       brotli: true,
