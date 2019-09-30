@@ -2,13 +2,13 @@ import assert from 'assert';
 import sinon from 'sinon';
 import zlib from 'zlib';
 
-import { disableBrotli } from '../helpers';
-import { Gzipper } from '../../src/Gzipper';
-import { COMPRESS_PATH, getFiles, clear } from '../utils';
+import { disableBrotli } from '../../helpers';
+import { Gzipper } from '../../../src/Gzipper';
+import { COMPRESS_PATH, getFiles, clear } from '../../utils';
 
 const describeTest = disableBrotli ? describe.skip : describe;
 
-describeTest('Gzipper -> Brotli compression', () => {
+describeTest('CLI Gzipper -> Brotli compression', () => {
   beforeEach(async () => {
     await clear(COMPRESS_PATH, ['.gz', '.br']);
   });

@@ -2,10 +2,10 @@ import assert from 'assert';
 import sinon from 'sinon';
 import zlib from 'zlib';
 
-import { Gzipper } from '../../src/Gzipper';
-import { COMPRESS_PATH, getFiles, clear } from '../utils';
+import { Gzipper } from '../../../src/Gzipper';
+import { COMPRESS_PATH, getFiles, clear } from '../../utils';
 
-describe('Gzipper -> Gzip compression', () => {
+describe('CLI Gzipper -> Gzip compression', () => {
   beforeEach(async () => {
     await clear(COMPRESS_PATH, ['.gz', '.br']);
   });

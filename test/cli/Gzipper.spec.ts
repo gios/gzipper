@@ -3,8 +3,8 @@ import sinon from 'sinon';
 import zlib from 'zlib';
 import path from 'path';
 
-import { Gzipper } from '../src/Gzipper';
-import { VALID_EXTENSIONS } from '../src/constants';
+import { Gzipper } from '../../src/Gzipper';
+import { VALID_EXTENSIONS } from '../../src/constants';
 import {
   EMPTY_FOLDER_PATH,
   COMPRESS_PATH,
@@ -13,14 +13,25 @@ import {
   getFiles,
   createFolder,
   clear,
-} from './utils';
-import { GlobalOptions } from '../src/interfaces';
+} from '../utils';
+import { GlobalOptions } from '../../src/interfaces';
 
-describe('Gzipper', () => {
+describe('CLI Gzipper', () => {
+  let sinonSandbox: sinon.SinonSandbox;
+
   beforeEach(async () => {
     await createFolder(EMPTY_FOLDER_PATH);
     await createFolder(COMPRESS_PATH_TARGET);
     await clear(COMPRESS_PATH, ['.gz', '.br']);
+    sinonSandbox = sinon.createSandbox();
+  });
+
+  afterEach(async () => {
+    await clear(EMPTY_FOLDER_PATH, true);
+    await clear(COMPRESS_PATH_TARGET, true);
+    await clear(COMPRESS_PATH, ['.gz', '.br']);
+    sinonSandbox.restore();
+    sinon.restore();
   });
 
   it('should throw an error if no path found', () => {
@@ -39,7 +50,7 @@ describe('Gzipper', () => {
       'compileFolderRecursively' as any,
     );
     const errorSpy = sinon.spy((gzipper as any).logger, 'error');
-    sinon
+    sinonSandbox
       .stub(gzipper, 'compressFile' as any)
       .rejects(new Error('Compressing error.'));
 
@@ -448,11 +459,5 @@ describe('Gzipper', () => {
       0,
     );
     assert.strictEqual(Object.keys((gzipper as any).options).length, 2);
-  });
-
-  afterEach(async () => {
-    await clear(EMPTY_FOLDER_PATH, true);
-    await clear(COMPRESS_PATH_TARGET, true);
-    await clear(COMPRESS_PATH, ['.gz', '.br']);
   });
 });
