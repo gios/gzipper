@@ -1,1 +1,1 @@
-console.log('Hello Gzipper!')
+const a = () => null;

@@ -9,6 +9,8 @@ const stat = util.promisify(fs.stat);
 const readdir = util.promisify(fs.readdir);
 const rmdir = util.promisify(fs.rmdir);
 
+export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, './resources');
+
 export const EMPTY_FOLDER_PATH = path.resolve(
   __dirname,
   './resources/empty_folder',

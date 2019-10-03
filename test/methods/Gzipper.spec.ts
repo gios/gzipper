@@ -1,7 +1,13 @@
 import sinon from 'sinon';
 import assert from 'assert';
+import path from 'path';
+import fs from 'fs';
+import { promisify } from 'util';
 
-import { COMPRESS_PATH } from '../utils';
+const fsWriteFile = promisify(fs.writeFile);
+const fsUnlink = promisify(fs.unlink);
+
+import { COMPRESS_PATH, RESOURCES_FOLDER_PATH } from '../utils';
 import { Gzipper } from '../../src/Gzipper';
 
 describe('Methods Gzipper', () => {
@@ -94,6 +100,49 @@ describe('Methods Gzipper', () => {
       assert.ok(infoSpy.calledTwice);
       const [message] = infoSpy.args[0];
       assert.ok(MESSAGE_VALIDATION.test(message));
+    });
+  });
+
+  describe('compileFolderRecursively', () => {
+    let sinonSandbox: sinon.SinonSandbox;
+
+    beforeEach(() => {
+      sinonSandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sinonSandbox.restore();
+      sinon.restore();
+    });
+
+    it("should throw an error if a file can't be compressed because of size calculation on verbose mode", async () => {
+      const filename = 'one.js';
+      const errName = 'FAKE_COMPRESSION_ERROR';
+      const tmpInputFilePath = path.join(RESOURCES_FOLDER_PATH, filename);
+      const tmpOutputFilePath = path.join(
+        RESOURCES_FOLDER_PATH,
+        `${filename}.gz`,
+      );
+      await fsWriteFile(tmpInputFilePath, 'const a = () => null');
+
+      const gzipper = new Gzipper(COMPRESS_PATH, null, {
+        verbose: true,
+        threshold: 0,
+      });
+      sinonSandbox
+        .stub(gzipper, 'getOutputPath' as any)
+        .returns(tmpOutputFilePath);
+      sinonSandbox.stub((gzipper as any).nativeFs, 'stat').rejects(errName);
+
+      try {
+        await (gzipper as any).compressFile(filename, RESOURCES_FOLDER_PATH);
+      } catch (err) {
+        assert.ok(err instanceof Error);
+        assert.strictEqual(err.name, errName);
+      } finally {
+        await fsUnlink(tmpInputFilePath);
+        await fsUnlink(tmpOutputFilePath);
+      }
     });
   });
 });
