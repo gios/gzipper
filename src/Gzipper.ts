@@ -162,13 +162,13 @@ export class Gzipper {
     const input = fs.createReadStream(inputPath);
     const output = fs.createWriteStream(outputPath);
 
-    output.once('open', () =>
-      input.pipe(this.createCompression()).pipe(output),
-    );
-
     const compressPromise = new Promise<
       { beforeSize: number; afterSize: number } | undefined
     >((resolve, reject): void => {
+      output.once('open', () => {
+        input.pipe(this.createCompression()).pipe(output);
+      });
+
       output.once('finish', async () => {
         try {
           if (this.options.verbose) {
@@ -185,7 +185,8 @@ export class Gzipper {
           reject(error);
         }
       });
-      output.once('error', error => {
+
+      output.on('error', error => {
         this.logger.error(error, true);
         reject(error);
       });

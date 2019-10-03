@@ -104,24 +104,27 @@ describe('Methods Gzipper', () => {
   });
 
   describe('compileFolderRecursively', () => {
+    const tmpFilename = 'one.js';
     let sinonSandbox: sinon.SinonSandbox;
+    let tmpInputFilePath: string;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       sinonSandbox = sinon.createSandbox();
+      tmpInputFilePath = path.join(RESOURCES_FOLDER_PATH, tmpFilename);
+      await fsWriteFile(tmpInputFilePath, 'const a = () => null');
     });
 
-    afterEach(() => {
+    afterEach(async () => {
       sinonSandbox.restore();
       sinon.restore();
+      await fsUnlink(tmpInputFilePath);
     });
 
     it("should throw an error if a file can't be compressed because of size calculation on verbose mode", async () => {
-      const filename = 'one.js';
       const errName = 'FAKE_COMPRESSION_ERROR';
-      const tmpInputFilePath = path.join(RESOURCES_FOLDER_PATH, filename);
       const tmpOutputFilePath = path.join(
         RESOURCES_FOLDER_PATH,
-        `${filename}.gz`,
+        `${tmpFilename}.gz`,
       );
       await fsWriteFile(tmpInputFilePath, 'const a = () => null');
 
@@ -135,13 +138,26 @@ describe('Methods Gzipper', () => {
       sinonSandbox.stub((gzipper as any).nativeFs, 'stat').rejects(errName);
 
       try {
-        await (gzipper as any).compressFile(filename, RESOURCES_FOLDER_PATH);
+        await (gzipper as any).compressFile(tmpFilename, RESOURCES_FOLDER_PATH);
       } catch (err) {
         assert.ok(err instanceof Error);
         assert.strictEqual(err.name, errName);
       } finally {
-        await fsUnlink(tmpInputFilePath);
         await fsUnlink(tmpOutputFilePath);
+      }
+    });
+
+    it("should throw an error if a file can't be compressed because of EISDIR exception", async () => {
+      const gzipper = new Gzipper(COMPRESS_PATH, null);
+      sinonSandbox
+        .stub(gzipper, 'getOutputPath' as any)
+        .returns(RESOURCES_FOLDER_PATH);
+
+      try {
+        await (gzipper as any).compressFile(tmpFilename, RESOURCES_FOLDER_PATH);
+      } catch (err) {
+        assert.ok(err instanceof Error);
+        assert.strictEqual(err.code, 'EISDIR');
       }
     });
   });
