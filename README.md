@@ -94,54 +94,54 @@ Locally usage.
 #### --output-file-format
 
 Example of folder structure:
-
-+ img
-  - rabbit.jpg
-  - cat.jpg
-+ js
-  - main.js
-  - modules.js
-+ xml
-  - main.xml
-+ index.js
-
+```
+img
+  rabbit.jpg
+  cat.jpg
+js
+  main.js
+  modules.js
+xml
+  main.xml
+index.js
+```
 
 1. `--output-file-format [filename].[compressExt].[ext]`
-
-+ img
-  - rabbit.gz.jpg
-  - cat.gz.jpg
-+ js
-  - main.gz.js
-  - modules.gz.js
-+ xml
-  - main.gz.xml
-+ index.gz.js
-
+```
+img
+  rabbit.gz.jpg
+  cat.gz.jpg
+js
+  main.gz.js
+  modules.gz.js
+xml
+  main.gz.xml
+index.gz.js
+```
 2. `--output-file-format test-[filename]-[hash].[compressExt].[ext]`
-
-+ img
-  - test-rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4.gz.jpg
-  - test-cat-739c7d7d-53ca-4f8e-912c-bad3b2b515a9.gz.jpg
-+ js
-  - test-main-4cc35dbd-36f7-4889-9f41-4d93e7a25bef.gz.js
-  - test-modules-bce90cbd-5bf2-43c2-8b61-33aa1599b704.gz.js
-+ xml
-  - test-main-a90fa10e-f7a4-4af9-af67-f887bb96f98b.gz.xml
-+ test-index-067c1e2d-0e12-4b57-980b-97c880c24d57.gz.js
-
+```
+img
+  test-rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4.gz.jpg
+  test-cat-739c7d7d-53ca-4f8e-912c-bad3b2b515a9.gz.jpg
+js
+  test-main-4cc35dbd-36f7-4889-9f41-4d93e7a25bef.gz.js
+  test-modules-bce90cbd-5bf2-43c2-8b61-33aa1599b704.gz.js
+xml
+  test-main-a90fa10e-f7a4-4af9-af67-f887bb96f98b.gz.xml
+test-index-067c1e2d-0e12-4b57-980b-97c880c24d57.gz.js
+```
 3. `--output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt]`
-
-+ img
-  - rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4-rabbit-tmp.jpg.gz
-  - cat-739c7d7d-53ca-4f8e-912c-bad3b2b515a9cat-tmp.jpg.gz
-+ js
-  - main-4cc35dbd-36f7-4889-9f41-4d93e7a25bef-main-tmp.js.gz
-  - modules-bce90cbd-5bf2-43c2-8b61-33aa1599b704-modules-tmp.js.gz
-+ xml
-  - main-a90fa10e-f7a4-4af9-af67-f887bb96f98b-main-tmp.xml.gz
-+ index-067c1e2d-0e12-4b57-980b-97c880c24d57-index-tmp.js.gz
-
+```
+img
+  rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4-rabbit-tmp.jpg.gz
+  cat-739c7d7d-53ca-4f8e-912c-bad3b2b515a9cat-tmp.jpg.gz
+js
+  main-4cc35dbd-36f7-4889-9f41-4d93e7a25bef-main-tmp.js.gz
+  modules-bce90cbd-5bf2-43c2-8b61-33aa1599b704-modules-tmp.js.gz
+xml
+  main-a90fa10e-f7a4-4af9-af67-f887bb96f98b-main-tmp.xml.gz
+index-067c1e2d-0e12-4b57-980b-97c880c24d57-index-tmp.js.gz
+```
 ## Contribution
 
 I appreciate every contribution, just fork the repository and send the pull request with your changes.
