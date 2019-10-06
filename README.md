@@ -15,7 +15,7 @@ You can enable `verbose` mode for better visual representation which files were 
   - [Run script](#run-script)
   - [Options](#options)
     - [Option Examples](#option-examples)
-      - [--output-file-format](#output-file-format)
+      - [output-file-format](#output-file-format)
   - [Contribution](#contribution)
   - [Requirements](#requirements)
 
@@ -91,7 +91,7 @@ Locally usage.
 
 ### Option Examples
 
-#### --output-file-format
+#### output-file-format
 
 Example of folder structure:
 ```
