@@ -1,4 +1,4 @@
-exports.VALID_EXTENSIONS = [
+export const VALID_EXTENSIONS = [
   '.js',
   '.css',
   '.html',
@@ -9,4 +9,4 @@ exports.VALID_EXTENSIONS = [
   '.svg',
   '.json',
   '.csv',
-]
+];

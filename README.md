@@ -14,6 +14,8 @@ You can enable `verbose` mode for better visual representation which files were 
   - [Install](#install)
   - [Run script](#run-script)
   - [Options](#options)
+    - [Option Examples](#option-examples)
+      - [--output-file-format](#output-file-format)
   - [Contribution](#contribution)
   - [Requirements](#requirements)
 
@@ -68,25 +70,78 @@ Locally usage.
 
 ## Options
 
-| Option                                       | ENV                          | Description                                                                                                                                                                                                                                                                                                                                                    |
-| -------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-V, --version`                              |                              | output the version number                                                                                                                                                                                                                                                                                                                                      |
-| `-v, --verbose`                              | `GZIPPER_VERBOSE`            | detailed level of logs                                                                                                                                                                                                                                                                                                                                         |
-| `-e, --exclude`                              | `GZIPPER_EXCLUDE`            | exclude file extensions from compression                                                                                                                                                                                                                                                                                                                       |
-| `-i, --include`                              | `GZIPPER_INCLUDE`            | include file extensions for compression                                                                                                                                                                                                                                                                                                                        |
-| `-gl, --gzip-level [level]`                  | `GZIPPER_GZIP_LEVEL`         | gzip compression level -1 (default), 0 (no compression) - 9 (best compression)                                                                                                                                                                                                                                                                                 |
-| `-gm, --gzip-memory-level [memoryLevel]`     | `GZIPPER_GZIP_MEMORY_LEVEL`  | amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)                                                                                                                                                                                                                                                  |
-| `-gs, --gzip-strategy [strategy]`            | `GZIPPER_GZIP_STRATEGY`      | compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)                                                                                                                                                                                                                                                                           |
-| `--brotli`                                   | `GZIPPER_BROTLI`             | enable brotli compression, Node.js >= v11.7.0                                                                                                                                                                                                                                                                                                                  |
-| `-bp, --brotli-param-mode [brotliParamMode]` | `GZIPPER_BROTLI_PARAM_MODE`  | default, text (for UTF-8 text), font (for WOFF 2.0 fonts)                                                                                                                                                                                                                                                                                                      |
-| `-bq, --brotli-quality [brotliQuality]`      | `GZIPPER_BROTLI_QUALITY`     | brotli compression quality 11 (default), 0 - 11                                                                                                                                                                                                                                                                                                                |
-| `-bs, --brotli-size-hint [brotliSizeHint]`   | `GZIPPER_BROTLI_SIZE_HINT`   | expected input size 0 (default)                                                                                                                                                                                                                                                                                                                                |
-| `-t, --threshold [threshold]`                | `GZIPPER_THRESHOLD`          | exclude assets smaller than this byte size. 0 (default)                                                                                                                                                                                                                                                                                                        |
-| `--output-file-format [outputFileFormat]`    | `GZIPPER_OUTPUT_FILE_FORMAT` | output file format with default artifacts [filename].[ext].[compressExt], where: filename -> name of your file, ext -> file extension, compressExt -> compress extension (.gz, .br, etc), hash -> uniq uuid/v4 hash. Samples: [filename].[compressExt].[ext], test-[filename]-[hash].[compressExt].[ext], [filename]-[hash]-[filename]-tmp.[ext].[compressExt] |
-| `-h, --help`                                 |                              | output usage information                                                                                                                                                                                                                                                                                                                                       |
+| Option                                       | ENV                          | Description                                                                                                                                                                                                                                                                  |
+| -------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-V, --version`                              |                              | output the version number                                                                                                                                                                                                                                                    |
+| `-v, --verbose`                              | `GZIPPER_VERBOSE`            | detailed level of logs                                                                                                                                                                                                                                                       |
+| `-e, --exclude`                              | `GZIPPER_EXCLUDE`            | exclude file extensions from compression, example: jpeg,jpg...                                                                                                                                                                                                               |
+| `-i, --include`                              | `GZIPPER_INCLUDE`            | include file extensions for compression, example: js,css,html...                                                                                                                                                                                                             |
+| `-gl, --gzip-level [level]`                  | `GZIPPER_GZIP_LEVEL`         | gzip compression level -1 (default), 0 (no compression) - 9 (best compression)                                                                                                                                                                                               |
+| `-gm, --gzip-memory-level [memoryLevel]`     | `GZIPPER_GZIP_MEMORY_LEVEL`  | amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)                                                                                                                                                                |
+| `-gs, --gzip-strategy [strategy]`            | `GZIPPER_GZIP_STRATEGY`      | compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)                                                                                                                                                                                         |
+| `--brotli`                                   | `GZIPPER_BROTLI`             | enable brotli compression, Node.js >= v11.7.0                                                                                                                                                                                                                                |
+| `-bp, --brotli-param-mode [brotliParamMode]` | `GZIPPER_BROTLI_PARAM_MODE`  | default, text (for UTF-8 text), font (for WOFF 2.0 fonts)                                                                                                                                                                                                                    |
+| `-bq, --brotli-quality [brotliQuality]`      | `GZIPPER_BROTLI_QUALITY`     | brotli compression quality 11 (default), 0 - 11                                                                                                                                                                                                                              |
+| `-bs, --brotli-size-hint [brotliSizeHint]`   | `GZIPPER_BROTLI_SIZE_HINT`   | expected input size 0 (default)                                                                                                                                                                                                                                              |
+| `-t, --threshold [threshold]`                | `GZIPPER_THRESHOLD`          | exclude assets smaller than this byte size. 0 (default)                                                                                                                                                                                                                      |
+| `--output-file-format [outputFileFormat]`    | `GZIPPER_OUTPUT_FILE_FORMAT` | output file format with artifacts, default format: `[filename].[ext].[compressExt]`. Where: `filename` -> name of your file, `ext` -> file extension, `compressExt` -> compress extension (.gz, .br, etc), `hash` -> uniq uuid/v4 hash. [More examples](#output-file-format) |
+| `-h, --help`                                 |                              | output usage information                                                                                                                                                                                                                                                     |
 
 > ENV Variables have higher priority over CLI arguments.
 
+### Option Examples
+
+#### --output-file-format
+
+Example of folder structure:
+```
+img
+  rabbit.jpg
+  cat.jpg
+js
+  main.js
+  modules.js
+xml
+  main.xml
+index.js
+```
+
+1. `--output-file-format [filename].[compressExt].[ext]`
+```
+img
+  rabbit.gz.jpg
+  cat.gz.jpg
+js
+  main.gz.js
+  modules.gz.js
+xml
+  main.gz.xml
+index.gz.js
+```
+2. `--output-file-format test-[filename]-[hash].[compressExt].[ext]`
+```
+img
+  test-rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4.gz.jpg
+  test-cat-739c7d7d-53ca-4f8e-912c-bad3b2b515a9.gz.jpg
+js
+  test-main-4cc35dbd-36f7-4889-9f41-4d93e7a25bef.gz.js
+  test-modules-bce90cbd-5bf2-43c2-8b61-33aa1599b704.gz.js
+xml
+  test-main-a90fa10e-f7a4-4af9-af67-f887bb96f98b.gz.xml
+test-index-067c1e2d-0e12-4b57-980b-97c880c24d57.gz.js
+```
+3. `--output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt]`
+```
+img
+  rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4-rabbit-tmp.jpg.gz
+  cat-739c7d7d-53ca-4f8e-912c-bad3b2b515a9cat-tmp.jpg.gz
+js
+  main-4cc35dbd-36f7-4889-9f41-4d93e7a25bef-main-tmp.js.gz
+  modules-bce90cbd-5bf2-43c2-8b61-33aa1599b704-modules-tmp.js.gz
+xml
+  main-a90fa10e-f7a4-4af9-af67-f887bb96f98b-main-tmp.xml.gz
+index-067c1e2d-0e12-4b57-980b-97c880c24d57-index-tmp.js.gz
+```
 ## Contribution
 
 I appreciate every contribution, just fork the repository and send the pull request with your changes.

@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm ci
+      - run: npm run eslint
       - run: npm test
 
   publish:
@@ -28,6 +29,8 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm build
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
