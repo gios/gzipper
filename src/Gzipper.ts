@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import util from 'util';
 import uuid from 'uuid/v4';
+import stream from 'stream';
 
 import { Logger } from './Logger';
 import { BrotliCompression } from './compressions/Brotli';
@@ -20,6 +21,9 @@ export class Gzipper {
     lstat: util.promisify(fs.lstat),
     readdir: util.promisify(fs.readdir),
     mkdir: util.promisify(fs.mkdir),
+  };
+  private readonly nativeStream = {
+    pipeline: util.promisify(stream.pipeline),
   };
   private readonly logger: Logger;
   private readonly options: GlobalOptions;
@@ -159,40 +163,18 @@ export class Gzipper {
       await this.createFolders(target);
     }
     const outputPath = this.getOutputPath(target, filename);
-    const input = fs.createReadStream(inputPath);
-    const output = fs.createWriteStream(outputPath);
 
-    const compressPromise = new Promise<
-      { beforeSize: number; afterSize: number } | undefined
-    >((resolve, reject): void => {
-      output.once('open', () => {
-        input.pipe(this.createCompression()).pipe(output);
-      });
+    await this.nativeStream.pipeline(
+      fs.createReadStream(inputPath),
+      this.createCompression(),
+      fs.createWriteStream(outputPath),
+    );
 
-      output.once('finish', async () => {
-        try {
-          if (this.options.verbose) {
-            const beforeSize =
-              (await this.nativeFs.stat(inputPath)).size / 1024;
-            const afterSize =
-              (await this.nativeFs.stat(outputPath)).size / 1024;
-            resolve({ beforeSize, afterSize });
-          } else {
-            resolve();
-          }
-        } catch (error) {
-          this.logger.error(error, true);
-          reject(error);
-        }
-      });
-
-      output.on('error', error => {
-        this.logger.error(error, true);
-        reject(error);
-      });
-    });
-
-    return compressPromise;
+    if (this.options.verbose) {
+      const beforeSize = (await this.nativeFs.stat(inputPath)).size / 1024;
+      const afterSize = (await this.nativeFs.stat(outputPath)).size / 1024;
+      return { beforeSize, afterSize };
+    }
   }
 
   /**
@@ -211,40 +193,9 @@ export class Gzipper {
 
   /**
    * Create folders by path.
-   *
-   * @todo when Node.js >= 8 support will be removed, rewrite this to mkdir(path, { recursive: true })
    */
   private async createFolders(target: string): Promise<void> {
-    const initDir = path.isAbsolute(target) ? path.sep : '';
-
-    await target
-      .split(path.sep)
-      .map(item => Promise.resolve(item))
-      .reduce(async (parentDirPromise, childDirPromise) => {
-        const parentDir = await parentDirPromise;
-        const childDir = await childDirPromise;
-        const folderPath = path.resolve(parentDir, childDir);
-        if (!(await this.statExists(folderPath))) {
-          await this.nativeFs.mkdir(folderPath);
-        }
-        return Promise.resolve(folderPath);
-      }, Promise.resolve(initDir));
-  }
-
-  /**
-   * Returns if the file or folder exists.
-   */
-  private async statExists(target: string): Promise<boolean> {
-    try {
-      await this.nativeFs.stat(target);
-      return true;
-    } catch (error) {
-      if (error && error.code === 'ENOENT') {
-        return false;
-      } else {
-        throw error;
-      }
-    }
+    await this.nativeFs.mkdir(target, { recursive: true });
   }
 
   /**
