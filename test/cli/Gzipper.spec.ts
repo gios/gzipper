@@ -367,7 +367,7 @@ describe('CLI Gzipper', () => {
       verbose: true,
       threshold: 0,
     };
-    const INCLUDED_FILES_COUNT = 9;
+    const INCLUDED_FILES_COUNT = 10;
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     const loggerInfoSpy = sinon.spy((gzipper as any).logger, 'info');
@@ -435,7 +435,7 @@ describe('CLI Gzipper', () => {
       threshold: 860,
       verbose: true,
     };
-    const INCLUDED_FILES_COUNT = 4;
+    const INCLUDED_FILES_COUNT = 5;
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     const loggerInfoSpy = sinon.spy((gzipper as any).logger, 'info');
