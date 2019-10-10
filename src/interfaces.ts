@@ -1,7 +1,7 @@
 export interface GlobalOptions {
   verbose?: boolean;
-  exclude?: string;
-  include?: string;
+  exclude?: string[];
+  include?: string[];
   threshold: number;
   gzipLevel?: number;
   gzipMemoryLevel?: number;

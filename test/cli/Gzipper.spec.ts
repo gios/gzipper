@@ -363,7 +363,7 @@ describe('CLI Gzipper', () => {
 
   it('should include only specific file extensions for compression', async () => {
     const options = {
-      include: 'js,css,html',
+      include: ['.js', '.css', '.html'],
       verbose: true,
       threshold: 0,
     };
@@ -396,7 +396,7 @@ describe('CLI Gzipper', () => {
 
   it('should exclude file extensions from compression jpeg,jpg', async () => {
     const options = {
-      exclude: 'jpeg,jpg',
+      exclude: ['.jpeg', '.jpg'],
       verbose: true,
       threshold: 0,
     };
