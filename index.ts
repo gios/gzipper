@@ -24,12 +24,7 @@ export class Index {
   private target: string | undefined;
   private outputPath: string | undefined;
   private options: GlobalOptions | undefined;
-
-  constructor(target?: string, outputPath?: string, options?: GlobalOptions) {
-    this.target = target;
-    this.outputPath = outputPath;
-    this.options = options;
-  }
+  private argv: string[] = process.argv;
 
   public getOptions(): this {
     program
@@ -112,7 +107,8 @@ export class Index {
       .option('', '[filename].[compressExt].[ext]')
       .option('', 'test-[filename]-[hash].[compressExt].[ext]')
       .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
-      .parse(process.argv);
+      .parse(this.argv)
+      .removeAllListeners();
 
     const [target, outputPath] = program.args;
     const options: GlobalOptions = {
