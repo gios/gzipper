@@ -51,7 +51,8 @@ describe('Index CLI', () => {
     const result: any = index.getOptions();
     assert.strictEqual(result.target, 'folder_to_compress');
     assert.strictEqual(result.outputPath, 'folder_to_compress_out');
-    assert.deepStrictEqual(result.options, {
+
+    const response: any = {
       verbose: true,
       exclude: ['.png', '.jpg', '.js'],
       include: ['.png', '.wav'],
@@ -64,7 +65,11 @@ describe('Index CLI', () => {
       brotliQuality: 5,
       brotliSizeHint: 77,
       outputFileFormat: 'test-[filename].[ext].[compressExt]',
-    });
+    };
+
+    for (const [key, val] of result.options) {
+      assert.ok(response[key] === val);
+    }
   });
 
   it('filterOptions() should filter unused options', () => {
@@ -96,7 +101,8 @@ describe('Index CLI', () => {
     const result: any = index.getOptions().filterOptions();
     assert.strictEqual(result.target, 'folder_to_compress');
     assert.strictEqual(result.outputPath, 'folder_to_compress_out');
-    assert.strictEqual(result.options, {
+
+    const response: any = {
       verbose: true,
       exclude: ['.png', '.jpg', '.js'],
       include: ['.png', '.wav'],
@@ -105,6 +111,10 @@ describe('Index CLI', () => {
       gzipMemoryLevel: 1,
       gzipStrategy: 3,
       outputFileFormat: 'test-[filename].[ext].[compressExt]',
-    });
+    };
+
+    for (const [key, val] of result.options) {
+      assert.ok(response[key] === val);
+    }
   });
 });
