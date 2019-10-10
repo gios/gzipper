@@ -4,7 +4,7 @@
   "description": "CLI for compressing files.",
   "main": "dist/index.js",
   "scripts": {
-    "test": "nyc --check-coverage --reporter='text-summary' mocha",
+    "test": "cross-env NODE_ENV=testing nyc --check-coverage --reporter='text-summary' mocha",
     "coverage": "nyc --reporter='html' mocha",
     "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.ts\"",
@@ -45,6 +45,7 @@
     "@typescript-eslint/parser": "^2.3.1",
     "codecov": "^3.6.1",
     "copyfiles": "^2.1.1",
+    "cross-env": "^6.0.3",
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-prettier": "^3.1.1",

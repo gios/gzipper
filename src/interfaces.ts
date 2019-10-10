@@ -11,4 +11,5 @@ export interface GlobalOptions {
   brotliQuality?: number;
   brotliSizeHint?: number;
   outputFileFormat?: string;
+  [key: string]: unknown;
 }
