@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=testing nyc --check-coverage --reporter='text-summary' mocha",
-    "coverage": "nyc --reporter='html' mocha",
-    "codecov": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "coverage": "cross-env NODE_ENV=testing nyc --reporter='html' mocha",
+    "codecov": "cross-env NODE_ENV=testing nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.ts\"",
     "eslint": "eslint \"**/*.ts\"",
     "build": "rimraf dist && tsc && copyfiles package.json dist/"
