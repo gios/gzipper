@@ -106,7 +106,7 @@ xml
 index.js
 ```
 
-1. `--output-file-format [filename].[compressExt].[ext]`
+- `--output-file-format [filename].[compressExt].[ext]`
 ```
 img
   rabbit.gz.jpg
@@ -118,7 +118,7 @@ xml
   main.gz.xml
 index.gz.js
 ```
-2. `--output-file-format test-[filename]-[hash].[compressExt].[ext]`
+- `--output-file-format test-[filename]-[hash].[compressExt].[ext]`
 ```
 img
   test-rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4.gz.jpg
@@ -130,7 +130,7 @@ xml
   test-main-a90fa10e-f7a4-4af9-af67-f887bb96f98b.gz.xml
 test-index-067c1e2d-0e12-4b57-980b-97c880c24d57.gz.js
 ```
-3. `--output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt]`
+- `--output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt]`
 ```
 img
   rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4-rabbit-tmp.jpg.gz
