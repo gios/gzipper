@@ -80,19 +80,19 @@ describe('Index CLI', () => {
       'folder_to_compress_out',
       '--verbose',
       '--exclude',
-      'png,jpg,js',
+      'php,cc',
       '--include',
-      'png,wav',
+      'css',
       '--threshold',
-      '500',
+      '800',
       '--gzip-level',
-      '7',
+      '4',
       '--gzip-memory-level',
-      '1',
+      '2',
       '--gzip-strategy',
-      '3',
+      '4',
       '--output-file-format',
-      'test-[filename].[ext].[compressExt]',
+      'test-[filename]-out.[ext].[compressExt]',
     ];
 
     const index = new Index();
@@ -104,13 +104,13 @@ describe('Index CLI', () => {
 
     const response: any = {
       verbose: true,
-      exclude: ['.png', '.jpg', '.js'],
-      include: ['.png', '.wav'],
-      threshold: 500,
-      gzipLevel: 7,
-      gzipMemoryLevel: 1,
-      gzipStrategy: 3,
-      outputFileFormat: 'test-[filename].[ext].[compressExt]',
+      exclude: ['.php', '.cc'],
+      include: ['.css'],
+      threshold: 800,
+      gzipLevel: 4,
+      gzipMemoryLevel: 2,
+      gzipStrategy: 4,
+      outputFileFormat: 'test-[filename]-out.[ext].[compressExt]',
     };
 
     for (const [key, val] of result.options) {
