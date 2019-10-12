@@ -148,4 +148,4 @@ I appreciate every contribution, just fork the repository and send the pull requ
 
 ## Requirements
 
-- Node.js >= 8
+- Node.js >= 10
