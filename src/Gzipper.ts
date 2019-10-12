@@ -237,19 +237,14 @@ export class Gzipper {
    * Returns the filtered list of extensions from `options.exclude`.
    */
   private getValidExtensions(): string[] {
-    const excludeExtensions =
-      this.options.exclude &&
-      this.options.exclude.split(',').map(item => `.${item.trim()}`);
+    const excludeExtensions = this.options.exclude;
+    const includeExtensions = this.options.include;
 
     if (excludeExtensions) {
       return VALID_EXTENSIONS.filter(
         extension => !excludeExtensions.includes(extension),
       );
     }
-
-    const includeExtensions =
-      this.options.include &&
-      this.options.include.split(',').map(item => `.${item.trim()}`);
 
     if (includeExtensions) {
       return VALID_EXTENSIONS.filter(extension =>
