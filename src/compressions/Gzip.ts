@@ -41,7 +41,11 @@ export class GzipCompression extends Compression {
    * Returns gzip compression instance in closure.
    */
   public getCompression(): () => zlib.Gzip {
-    return (): zlib.Gzip => zlib.createGzip(this.compressionOptions);
+    return (): zlib.Gzip => zlib.createGzip({
+      level: this.compressionOptions.gzipLevel,
+      memLevel: this.compressionOptions.gzipMemoryLevel,
+      strategy: this.compressionOptions.gzipStrategy
+    });
   }
 
   /**
