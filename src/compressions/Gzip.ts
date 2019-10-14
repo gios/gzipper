@@ -41,12 +41,7 @@ export class GzipCompression extends Compression {
    * Returns gzip compression instance in closure.
    */
   public getCompression(): () => zlib.Gzip {
-    return (): zlib.Gzip =>
-      zlib.createGzip({
-        level: this.compressionOptions.gzipLevel,
-        memLevel: this.compressionOptions.gzipMemoryLevel,
-        strategy: this.compressionOptions.gzipStrategy,
-      });
+    return (): zlib.Gzip => zlib.createGzip(this.compressionOptions);
   }
 
   /**
@@ -56,16 +51,17 @@ export class GzipCompression extends Compression {
     const options: GzipOptions = {};
 
     if (this.options.gzipLevel !== undefined) {
-      options.gzipLevel = this.options.gzipLevel;
+      options.level = this.options.gzipLevel;
     }
 
     if (this.options.gzipMemoryLevel !== undefined) {
-      options.gzipMemoryLevel = this.options.gzipMemoryLevel;
+      options.memLevel = this.options.gzipMemoryLevel;
     }
 
     if (this.options.gzipStrategy !== undefined) {
-      options.gzipStrategy = this.options.gzipStrategy;
+      options.strategy = this.options.gzipStrategy;
     }
+
     this.compressionOptions = options;
   }
 }
