@@ -33,32 +33,32 @@ export class Index {
         value => parseInt(value),
       )
       .option(
-        '-gl, --gzip-level <number>',
+        '--gzip-level <number>',
         'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
         value => parseInt(value),
       )
       .option(
-        '-gm, --gzip-memory-level <number>',
+        '--gzip-memory-level <number>',
         'amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
         value => parseInt(value),
       )
       .option(
-        '-gs, --gzip-strategy <number>',
+        '--gzip-strategy <number>',
         'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
         value => parseInt(value),
       )
       .option('--brotli', 'enable brotli compression, Node.js >= v11.7.0')
       .option(
-        '-bp, --brotli-param-mode <value>',
+        '--brotli-param-mode <value>',
         'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)',
       )
       .option(
-        '-bq, --brotli-quality <number>',
+        '--brotli-quality <number>',
         'brotli compression quality 11 (default), 0 - 11',
         value => parseInt(value),
       )
       .option(
-        '-bs, --brotli-size-hint <number>',
+        '--brotli-size-hint <number>',
         'expected input size 0 (default)',
         value => parseInt(value),
       )

@@ -39,15 +39,15 @@ describe('CLI Gzipper -> Gzip compression', () => {
     );
     assert.strictEqual(Object.keys((gzipper as any).options).length, 4);
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions.gzipLevel,
+      (gzipper as any).compressionInstance.compressionOptions.level,
       6,
     );
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions.gzipMemoryLevel,
+      (gzipper as any).compressionInstance.compressionOptions.memLevel,
       4,
     );
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions.gzipStrategy,
+      (gzipper as any).compressionInstance.compressionOptions.strategy,
       2,
     );
   });
