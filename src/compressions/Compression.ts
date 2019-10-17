@@ -28,9 +28,22 @@ export abstract class Compression {
   public abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip;
 
   /**
+   * Returns human-readable compression options info.
+   */
+  public readableOptions(): string {
+    let options = '';
+
+    for (const [key, value] of Object.entries(this.compressionOptions)) {
+      options += `${this.keyTransformWrapper(key)}: ${value}, `;
+    }
+
+    return `${this.compressionName} -> ${options.slice(0, -2)}`;
+  }
+
+  /**
    * Build compression options object [compressionOptions].
    */
-  public selectCompression(): void {
+  protected selectCompression(): void {
     const options: CompressionOptions = {};
 
     if (this.options.gzipLevel !== undefined) {
@@ -46,19 +59,6 @@ export abstract class Compression {
     }
 
     this.compressionOptions = options;
-  }
-
-  /**
-   * Returns human-readable compression options info.
-   */
-  public readableOptions(): string {
-    let options = '';
-
-    for (const [key, value] of Object.entries(this.compressionOptions)) {
-      options += `${this.keyTransformWrapper(key)}: ${value}, `;
-    }
-
-    return `${this.compressionName} -> ${options.slice(0, -2)}`;
   }
 
   /**

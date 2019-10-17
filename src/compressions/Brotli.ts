@@ -31,7 +31,7 @@ export class BrotliCompression extends Compression {
   /**
    * Build brotli options object [compressionOptions].
    */
-  public selectCompression(): void {
+  protected selectCompression(): void {
     const options: BrotliOptions = {};
 
     if (this.options.brotliParamMode !== undefined) {
