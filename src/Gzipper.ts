@@ -9,6 +9,7 @@ import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
 import { VALID_EXTENSIONS } from './constants';
 import { GlobalOptions } from './interfaces';
+import { DeflateCompression } from './compressions/Deflate';
 
 const OUTPUT_FILE_FORMAT_REGEXP = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;
 
@@ -28,11 +29,15 @@ export class Gzipper {
   private readonly logger: Logger;
   private readonly options: GlobalOptions;
   private readonly outputPath: string | undefined;
-  private readonly compressionInstance: BrotliCompression | GzipCompression;
+  private readonly compressionInstance:
+    | BrotliCompression
+    | GzipCompression
+    | DeflateCompression;
   private readonly target: string;
   private readonly createCompression:
     | ReturnType<BrotliCompression['getCompression']>
-    | ReturnType<GzipCompression['getCompression']>;
+    | ReturnType<GzipCompression['getCompression']>
+    | ReturnType<DeflateCompression['getCompression']>;
   private readonly validExtensions: string[];
   /**
    * Creates an instance of Gzipper.
