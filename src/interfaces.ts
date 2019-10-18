@@ -8,6 +8,7 @@ export interface GlobalOptions {
   level?: number;
   memoryLevel?: number;
   strategy?: number;
+  deflate?: boolean;
   brotli?: boolean;
   brotliParamMode?: string;
   brotliQuality?: number;

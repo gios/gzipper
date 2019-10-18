@@ -126,7 +126,10 @@ export class Index {
         program.gzipMemoryLevel,
       // @deprecated GZIPPER_GZIP_STRATEGY, gzipStrategy
       strategy:
-        parseInt(this.env.GZIPPER_STRATEGY as string) || program.strategy,
+        parseInt(this.env.GZIPPER_STRATEGY as string) ||
+        program.strategy ||
+        parseInt(this.env.GZIPPER_GZIP_STRATEGY as string) ||
+        program.gzipStrategy,
       brotli: this.env.GZIPPER_BROTLI
         ? !!parseInt(this.env.GZIPPER_BROTLI as string)
         : program.brotli,

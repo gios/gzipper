@@ -30,11 +30,15 @@ export abstract class Compression {
   /**
    * Returns human-readable compression options info.
    */
-  public readableOptions(): string {
+  public readableOptions(
+    keyWrapper: (key: string) => string | undefined = (
+      key: string,
+    ): string | undefined => key,
+  ): string {
     let options = '';
 
     for (const [key, value] of Object.entries(this.compressionOptions)) {
-      options += `${this.keyTransformWrapper(key)}: ${value}, `;
+      options += `${keyWrapper(key)}: ${value}, `;
     }
 
     return `${this.compressionName} -> ${options.slice(0, -2)}`;
@@ -46,25 +50,18 @@ export abstract class Compression {
   protected selectCompression(): void {
     const options: CompressionOptions = {};
 
-    if (this.options.gzipLevel !== undefined) {
+    if (this.options.level !== undefined) {
       options.level = this.options.level;
     }
 
-    if (this.options.gzipMemoryLevel !== undefined) {
+    if (this.options.memoryLevel !== undefined) {
       options.memLevel = this.options.memoryLevel;
     }
 
-    if (this.options.gzipStrategy !== undefined) {
+    if (this.options.strategy !== undefined) {
       options.strategy = this.options.strategy;
     }
 
     this.compressionOptions = options;
-  }
-
-  /**
-   * Function which transforms key for [readableOptions] into readable string.
-   */
-  protected keyTransformWrapper(key: string): string | undefined {
-    return key;
   }
 }

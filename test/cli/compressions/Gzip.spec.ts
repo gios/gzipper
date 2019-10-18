@@ -12,9 +12,9 @@ describe('CLI Gzipper -> Gzip compression', () => {
 
   it('--gzip-level, --gzip-memory-level, --gzip-strategy should change gzip configuration', async () => {
     const options = {
-      gzipLevel: 6,
-      gzipMemoryLevel: 4,
-      gzipStrategy: 2,
+      level: 6,
+      memoryLevel: 4,
+      strategy: 2,
       threshold: 0,
     };
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);

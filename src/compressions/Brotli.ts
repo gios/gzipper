@@ -29,6 +29,13 @@ export class BrotliCompression extends Compression {
   }
 
   /**
+   * Returns human-readable brotli compression options info.
+   */
+  public readableOptions(): string {
+    return super.readableOptions(this.getBrotliOptionName.bind(this));
+  }
+
+  /**
    * Build brotli options object [compressionOptions].
    */
   protected selectCompression(): void {
@@ -73,7 +80,7 @@ export class BrotliCompression extends Compression {
   /**
    * Returns human-readable brotli option name.
    */
-  protected keyTransformWrapper(index: string): string | undefined {
+  protected getBrotliOptionName(index: string): string | undefined {
     switch (parseInt(index)) {
       case zlib.constants.BROTLI_PARAM_MODE:
         return 'brotliParamMode';

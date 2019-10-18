@@ -46,6 +46,7 @@ describe('Index CLI', () => {
       '--gzip-strategy',
       '3',
       '--brotli',
+      '--deflate',
       '--brotli-param-mode',
       'text',
       '--brotli-quality',
@@ -68,10 +69,11 @@ describe('Index CLI', () => {
       exclude: ['.png', '.jpg', '.js'],
       include: ['.png', '.wav'],
       threshold: 500,
-      gzipLevel: 7,
-      gzipMemoryLevel: 1,
-      gzipStrategy: 3,
+      level: 7,
+      memoryLevel: 1,
+      strategy: 3,
       brotli: true,
+      deflate: true,
       brotliParamMode: 'text',
       brotliQuality: 5,
       brotliSizeHint: 77,
@@ -118,11 +120,16 @@ describe('Index CLI', () => {
       exclude: ['.php', '.cc'],
       include: ['.css'],
       threshold: 800,
-      gzipLevel: 4,
-      gzipMemoryLevel: 2,
-      gzipStrategy: 4,
+      level: 4,
+      memoryLevel: 2,
+      strategy: 4,
       outputFileFormat: 'test-[filename]-out.[ext].[compressExt]',
     };
+
+    for (const value of Object.values(result.options)) {
+      assert.notStrictEqual(value, NaN);
+      assert.notStrictEqual(value, undefined);
+    }
 
     for (const [key, val] of Object.entries(response)) {
       assert.ok(compareValues(result.options[key], val));
@@ -139,6 +146,7 @@ describe('Index CLI', () => {
       GZIPPER_GZIP_MEMORY_LEVEL: '2',
       GZIPPER_GZIP_STRATEGY: '4',
       GZIPPER_BROTLI: '0',
+      GZIPPER_DEFLATE: '0',
       GZIPPER_BROTLI_PARAM_MODE: 'font',
       GZIPPER_BROTLI_QUALITY: '3',
       GZIPPER_BROTLI_SIZE_HINT: '10',
@@ -163,6 +171,7 @@ describe('Index CLI', () => {
       '--gzip-strategy',
       '3',
       '--brotli',
+      '--deflate',
       '--brotli-param-mode',
       'text',
       '--brotli-quality',
@@ -186,10 +195,11 @@ describe('Index CLI', () => {
       exclude: ['.py', '.c'],
       include: ['.r', '.rs'],
       threshold: 800,
-      gzipLevel: 2,
-      gzipMemoryLevel: 2,
-      gzipStrategy: 4,
+      level: 2,
+      memoryLevel: 2,
+      strategy: 4,
       brotli: false,
+      deflate: false,
       brotliParamMode: 'font',
       brotliQuality: 3,
       brotliSizeHint: 10,

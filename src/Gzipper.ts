@@ -57,9 +57,7 @@ export class Gzipper {
     if (outputPath) {
       this.outputPath = path.resolve(process.cwd(), outputPath);
     }
-    this.compressionInstance = this.options.brotli
-      ? new BrotliCompression(this.options, this.logger)
-      : new GzipCompression(this.options, this.logger);
+    this.compressionInstance = this.getCompressionInstance();
     this.target = path.resolve(process.cwd(), target);
     this.createCompression = this.compressionInstance.getCompression();
     this.validExtensions = this.getValidExtensions();
@@ -96,6 +94,22 @@ export class Gzipper {
         )}`,
         true,
       );
+    }
+  }
+
+  /**
+   * Return compression instance.
+   */
+  private getCompressionInstance():
+    | BrotliCompression
+    | DeflateCompression
+    | GzipCompression {
+    if (this.options.brotli) {
+      return new BrotliCompression(this.options, this.logger);
+    } else if (this.options.deflate) {
+      return new DeflateCompression(this.options, this.logger);
+    } else {
+      return new GzipCompression(this.options, this.logger);
     }
   }
 
