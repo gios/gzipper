@@ -39,11 +39,11 @@ describe('Index CLI', () => {
       'png,wav',
       '--threshold',
       '500',
-      '--gzip-level',
+      '--level',
       '7',
-      '--gzip-memory-level',
+      '--memory-level',
       '1',
-      '--gzip-strategy',
+      '--strategy',
       '3',
       '--brotli',
       '--deflate',
@@ -98,11 +98,11 @@ describe('Index CLI', () => {
       'css',
       '--threshold',
       '800',
-      '--gzip-level',
+      '--level',
       '4',
-      '--gzip-memory-level',
+      '--memory-level',
       '2',
-      '--gzip-strategy',
+      '--strategy',
       '4',
       '--output-file-format',
       'test-[filename]-out.[ext].[compressExt]',
@@ -142,9 +142,9 @@ describe('Index CLI', () => {
       GZIPPER_EXCLUDE: 'py,c',
       GZIPPER_INCLUDE: 'r,rs',
       GZIPPER_THRESHOLD: '800',
-      GZIPPER_GZIP_LEVEL: '2',
-      GZIPPER_GZIP_MEMORY_LEVEL: '2',
-      GZIPPER_GZIP_STRATEGY: '4',
+      GZIPPER_LEVEL: '2',
+      GZIPPER_MEMORY_LEVEL: '2',
+      GZIPPER_STRATEGY: '4',
       GZIPPER_BROTLI: '0',
       GZIPPER_DEFLATE: '0',
       GZIPPER_BROTLI_PARAM_MODE: 'font',
@@ -164,11 +164,11 @@ describe('Index CLI', () => {
       'png,wav',
       '--threshold',
       '500',
-      '--gzip-level',
+      '--level',
       '7',
-      '--gzip-memory-level',
+      '--memory-level',
       '1',
-      '--gzip-strategy',
+      '--strategy',
       '3',
       '--brotli',
       '--deflate',
@@ -210,4 +210,22 @@ describe('Index CLI', () => {
       assert.ok(compareValues(result.options[key], val));
     }
   });
+
+  /*
+   * @deprecated
+   * TODO: Remove
+   * --gzip-level
+   * --gzip-memory-level
+   * --gzip-strategy
+   */
+  it('--gzip-level, --gzip-memory-level, --gzip-strategy should update options', () => {});
+
+  /*
+   * @deprecated
+   * TODO: Remove
+   * GZIPPER_GZIP_LEVEL
+   * GZIPPER_GZIP_MEMORY_LEVEL
+   * GZIPPER_GZIP_STRATEGY
+   */
+  it('GZIPPER_GZIP_LEVEL, GZIPPER_GZIP_MEMORY_LEVEL, GZIPPER_GZIP_STRATEGY should overwrite options', () => {});
 });

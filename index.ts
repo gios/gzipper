@@ -32,7 +32,7 @@ export class Index {
         'exclude assets smaller than this byte size. 0 (default)',
         value => parseInt(value),
       )
-      // @deprecated --gzip-level
+      // TODO: Remove @deprecated --gzip-level
       .option(
         '--gzip-level <number> (deprecated)',
         'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
@@ -43,7 +43,7 @@ export class Index {
         'compression level 6 (default), 0 (no compression) - 9 (best compression)',
         value => parseInt(value),
       )
-      // @deprecated --gzip-memory-level
+      // TODO: Remove @deprecated --gzip-memory-level
       .option(
         '--gzip-memory-level <number> (deprecated)',
         'amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
@@ -54,7 +54,7 @@ export class Index {
         'amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
         value => parseInt(value),
       )
-      // @deprecated --gzip-strategy
+      // TODO: Remove @deprecated --gzip-strategy
       .option(
         '--gzip-strategy <number> (deprecated)',
         'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
@@ -112,19 +112,19 @@ export class Index {
         parseInt(this.env.GZIPPER_THRESHOLD as string) ||
         program.threshold ||
         0,
-      // @deprecated GZIPPER_GZIP_LEVEL, gzipLevel
+      // TODO: Remove @deprecated GZIPPER_GZIP_LEVEL, gzipLevel
       level:
         parseInt(this.env.GZIPPER_LEVEL as string) ||
         program.level ||
         parseInt(this.env.GZIPPER_GZIP_LEVEL as string) ||
         program.gzipLevel,
-      // @deprecated GZIPPER_GZIP_MEMORY_LEVEL, gzipMemoryLevel
+      // TODO: Remove @deprecated GZIPPER_GZIP_MEMORY_LEVEL, gzipMemoryLevel
       memoryLevel:
         parseInt(this.env.GZIPPER_MEMORY_LEVEL as string) ||
         program.memoryLevel ||
         parseInt(this.env.GZIPPER_GZIP_MEMORY_LEVEL as string) ||
         program.gzipMemoryLevel,
-      // @deprecated GZIPPER_GZIP_STRATEGY, gzipStrategy
+      // TODO: Remove @deprecated GZIPPER_GZIP_STRATEGY, gzipStrategy
       strategy:
         parseInt(this.env.GZIPPER_STRATEGY as string) ||
         program.strategy ||
