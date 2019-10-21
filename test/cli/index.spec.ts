@@ -26,6 +26,100 @@ describe('Index CLI', () => {
     sinon.restore();
   });
 
+  /*
+   * @deprecated
+   * TODO: Remove
+   * --gzip-level
+   * --gzip-memory-level
+   * --gzip-strategy
+   */
+  it('--gzip-level, --gzip-memory-level, --gzip-strategy should update options', () => {
+    const cliArguments = [
+      'node.exe',
+      'index.js',
+      'folder_to_compress',
+      'folder_to_compress_out',
+      '--gzip-level',
+      '1',
+      '--gzip-memory-level',
+      '3',
+      '--gzip-strategy',
+      '5',
+    ];
+
+    const index = new Index();
+    (index as any).argv = cliArguments;
+    sinonSandbox.stub(index, 'start' as any).returns(null);
+    const result: any = index.getOptions().filterOptions();
+    assert.strictEqual(result.target, 'folder_to_compress');
+    assert.strictEqual(result.outputPath, 'folder_to_compress_out');
+
+    const response: any = {
+      level: 1,
+      memoryLevel: 3,
+      strategy: 5,
+    };
+
+    for (const value of Object.values(result.options)) {
+      assert.notStrictEqual(value, NaN);
+      assert.notStrictEqual(value, undefined);
+    }
+
+    for (const [key, val] of Object.entries(response)) {
+      assert.ok(compareValues(result.options[key], val));
+    }
+  });
+
+  /*
+   * @deprecated
+   * TODO: Remove
+   * GZIPPER_GZIP_LEVEL
+   * GZIPPER_GZIP_MEMORY_LEVEL
+   * GZIPPER_GZIP_STRATEGY
+   */
+  it('GZIPPER_GZIP_LEVEL, GZIPPER_GZIP_MEMORY_LEVEL, GZIPPER_GZIP_STRATEGY should overwrite options', () => {
+    const envArguments = {
+      GZIPPER_GZIP_LEVEL: '5',
+      GZIPPER_GZIP_MEMORY_LEVEL: '5',
+      GZIPPER_GZIP_STRATEGY: '6',
+    };
+    const cliArguments = [
+      'node.exe',
+      'index.js',
+      'folder_to_compress',
+      'folder_to_compress_out',
+      '--gzip-level',
+      '1',
+      '--gzip-memory-level',
+      '3',
+      '--gzip-strategy',
+      '5',
+    ];
+
+    const index = new Index();
+    (index as any).argv = cliArguments;
+    (index as any).env = envArguments;
+    sinonSandbox.stub(index, 'start' as any).returns(null);
+    const result: any = index.getOptions().filterOptions();
+    assert.strictEqual(result.target, 'folder_to_compress');
+    assert.strictEqual(result.outputPath, 'folder_to_compress_out');
+
+    const response: any = {
+      level: 5,
+      memoryLevel: 5,
+      strategy: 6,
+    };
+
+    for (const value of Object.values(result.options)) {
+      assert.notStrictEqual(value, NaN);
+      assert.notStrictEqual(value, undefined);
+    }
+
+    for (const [key, val] of Object.entries(response)) {
+      assert.ok(compareValues(result.options[key], val));
+    }
+  });
+
   it('getOptions() should return target, outputPath and all options', () => {
     const cliArguments = [
       'node.exe',
@@ -210,22 +304,4 @@ describe('Index CLI', () => {
       assert.ok(compareValues(result.options[key], val));
     }
   });
-
-  /*
-   * @deprecated
-   * TODO: Remove
-   * --gzip-level
-   * --gzip-memory-level
-   * --gzip-strategy
-   */
-  it('--gzip-level, --gzip-memory-level, --gzip-strategy should update options', () => {});
-
-  /*
-   * @deprecated
-   * TODO: Remove
-   * GZIPPER_GZIP_LEVEL
-   * GZIPPER_GZIP_MEMORY_LEVEL
-   * GZIPPER_GZIP_STRATEGY
-   */
-  it('GZIPPER_GZIP_LEVEL, GZIPPER_GZIP_MEMORY_LEVEL, GZIPPER_GZIP_STRATEGY should overwrite options', () => {});
 });

@@ -39,7 +39,7 @@ export class Index {
         value => parseInt(value),
       )
       .option(
-        '-level <number>',
+        '--level <number>',
         'compression level 6 (default), 0 (no compression) - 9 (best compression)',
         value => parseInt(value),
       )
