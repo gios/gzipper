@@ -21,6 +21,7 @@ describe('CLI Gzipper -> Deflate compression', () => {
 
   it('--level, --memory-level, --strategy should change gzip configuration', async () => {
     const options = {
+      deflate: true,
       level: 6,
       memoryLevel: 4,
       strategy: 2,
@@ -46,7 +47,7 @@ describe('CLI Gzipper -> Deflate compression', () => {
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 4);
+    assert.strictEqual(Object.keys((gzipper as any).options).length, 5);
     assert.strictEqual(
       (gzipper as any).compressionInstance.compressionOptions.level,
       6,
