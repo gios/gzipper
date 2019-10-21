@@ -28,6 +28,8 @@ export const NO_FILES_COMPRESS_PATH = path.resolve(
   './resources/no_files_to_compress',
 );
 
+export const COMPRESSION_EXTENSIONS = ['.gz', '.br', '.zz'];
+
 async function statExists(target: string): Promise<boolean> {
   try {
     await stat(target);
