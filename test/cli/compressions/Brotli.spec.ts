@@ -4,13 +4,22 @@ import zlib from 'zlib';
 
 import { disableBrotli } from '../../helpers';
 import { Gzipper } from '../../../src/Gzipper';
-import { COMPRESS_PATH, getFiles, clear } from '../../utils';
+import {
+  COMPRESS_PATH,
+  getFiles,
+  clear,
+  COMPRESSION_EXTENSIONS,
+} from '../../utils';
 
 const describeTest = disableBrotli ? describe.skip : describe;
 
 describeTest('CLI Gzipper -> Brotli compression', () => {
   beforeEach(async () => {
-    await clear(COMPRESS_PATH, ['.gz', '.br']);
+    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+  });
+
+  afterEach(async () => {
+    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
   });
 
   it('--brotli should emit error on compress error', () => {
@@ -197,9 +206,5 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
       ],
       zlib.constants.BROTLI_MODE_FONT,
     );
-  });
-
-  afterEach(async () => {
-    await clear(COMPRESS_PATH, ['.gz', '.br']);
   });
 });

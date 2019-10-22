@@ -60,6 +60,7 @@ typings/
 # Project
 *.gz
 *.br
+*.zz
 .vscode
 tsconfig.tsbuildinfo
 dist

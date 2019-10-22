@@ -13,6 +13,7 @@ import {
   getFiles,
   createFolder,
   clear,
+  COMPRESSION_EXTENSIONS,
 } from '../utils';
 import { GlobalOptions } from '../../src/interfaces';
 
@@ -22,14 +23,14 @@ describe('CLI Gzipper', () => {
   beforeEach(async () => {
     await createFolder(EMPTY_FOLDER_PATH);
     await createFolder(COMPRESS_PATH_TARGET);
-    await clear(COMPRESS_PATH, ['.gz', '.br']);
+    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
     sinonSandbox = sinon.createSandbox();
   });
 
   afterEach(async () => {
     await clear(EMPTY_FOLDER_PATH, true);
     await clear(COMPRESS_PATH_TARGET, true);
-    await clear(COMPRESS_PATH, ['.gz', '.br']);
+    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
     sinonSandbox.restore();
     sinon.restore();
   });

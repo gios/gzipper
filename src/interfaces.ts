@@ -1,11 +1,14 @@
+import zlib from 'zlib';
+
 export interface GlobalOptions {
   verbose?: boolean;
   exclude?: string[];
   include?: string[];
   threshold: number;
-  gzipLevel?: number;
-  gzipMemoryLevel?: number;
-  gzipStrategy?: number;
+  level?: number;
+  memoryLevel?: number;
+  strategy?: number;
+  deflate?: boolean;
   brotli?: boolean;
   brotliParamMode?: string;
   brotliQuality?: number;
@@ -13,3 +16,11 @@ export interface GlobalOptions {
   outputFileFormat?: string;
   [key: string]: unknown;
 }
+
+export type CompressionOptions = {
+  level?: number;
+  memoryLevel?: number;
+  strategy?: number;
+} & zlib.ZlibOptions;
+
+export type BrotliOptions = { [key: number]: number };

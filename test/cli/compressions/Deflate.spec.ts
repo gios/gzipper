@@ -10,7 +10,7 @@ import {
   COMPRESSION_EXTENSIONS,
 } from '../../utils';
 
-describe('CLI Gzipper -> Gzip compression', () => {
+describe('CLI Gzipper -> Deflate compression', () => {
   beforeEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
   });
@@ -21,6 +21,7 @@ describe('CLI Gzipper -> Gzip compression', () => {
 
   it('--level, --memory-level, --strategy should change gzip configuration', async () => {
     const options = {
+      deflate: true,
       level: 6,
       memoryLevel: 4,
       strategy: 2,
@@ -29,7 +30,7 @@ describe('CLI Gzipper -> Gzip compression', () => {
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     await gzipper.compress();
-    const files = await getFiles(COMPRESS_PATH, ['.gz']);
+    const files = await getFiles(COMPRESS_PATH, ['.zz']);
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
@@ -38,15 +39,15 @@ describe('CLI Gzipper -> Gzip compression', () => {
       ),
     );
     assert.ok(
-      (gzipper as any).createCompression() instanceof (zlib as any).Gzip,
+      (gzipper as any).createCompression() instanceof (zlib as any).Deflate,
     );
-    assert.strictEqual((gzipper as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((gzipper as any).compressionInstance.ext, 'zz');
     assert.strictEqual(
       Object.keys((gzipper as any).compressionInstance.compressionOptions)
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 4);
+    assert.strictEqual(Object.keys((gzipper as any).options).length, 5);
     assert.strictEqual(
       (gzipper as any).compressionInstance.compressionOptions.level,
       6,

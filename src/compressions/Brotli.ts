@@ -2,36 +2,20 @@ import zlib from 'zlib';
 
 import { Compression } from './Compression';
 import { Logger } from '../Logger';
-import { GlobalOptions } from '../interfaces';
-
-type BrotliOptions = { [key: number]: number };
+import { GlobalOptions, BrotliOptions } from '../interfaces';
 
 /**
- * Brotli
+ * Brotli compression
  */
 export class BrotliCompression extends Compression {
+  public readonly compressionName = 'BROTLI';
   public readonly ext = 'br';
-  private compressionOptions: BrotliOptions = {};
   /**
    * Creates an instance of BrotliCompression
    */
   constructor(options: GlobalOptions, logger: Logger) {
     super(options, logger);
     this.availability();
-    this.selectCompression();
-  }
-
-  /**
-   * Returns human-readable brotli compression options info.
-   */
-  public readableOptions(): string {
-    let options = '';
-
-    for (const [key, value] of Object.entries(this.compressionOptions)) {
-      options += `${this.getBrotliOptionName(parseInt(key))}: ${value}, `;
-    }
-
-    return `BROTLI -> ${options.slice(0, -2)}`;
   }
 
   /**
@@ -45,9 +29,16 @@ export class BrotliCompression extends Compression {
   }
 
   /**
+   * Returns human-readable brotli compression options info.
+   */
+  public readableOptions(): string {
+    return super.readableOptions(this.getBrotliOptionName.bind(this));
+  }
+
+  /**
    * Build brotli options object [compressionOptions].
    */
-  private selectCompression(): void {
+  protected selectCompression(): void {
     const options: BrotliOptions = {};
 
     if (this.options.brotliParamMode !== undefined) {
@@ -89,10 +80,8 @@ export class BrotliCompression extends Compression {
   /**
    * Returns human-readable brotli option name.
    */
-  private getBrotliOptionName(
-    index: number,
-  ): 'brotliParamMode' | 'brotliQuality' | 'brotliSizeHint' | undefined {
-    switch (index) {
+  protected getBrotliOptionName(index: string): string | undefined {
+    switch (parseInt(index)) {
       case zlib.constants.BROTLI_PARAM_MODE:
         return 'brotliParamMode';
 

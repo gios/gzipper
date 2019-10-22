@@ -32,21 +32,40 @@ export class Index {
         'exclude assets smaller than this byte size. 0 (default)',
         value => parseInt(value),
       )
+      // TODO: Remove @deprecated --gzip-level
       .option(
-        '--gzip-level <number>',
+        '--gzip-level <number> (deprecated)',
         'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
         value => parseInt(value),
       )
       .option(
-        '--gzip-memory-level <number>',
+        '--level <number>',
+        'compression level 6 (default), 0 (no compression) - 9 (best compression)',
+        value => parseInt(value),
+      )
+      // TODO: Remove @deprecated --gzip-memory-level
+      .option(
+        '--gzip-memory-level <number> (deprecated)',
         'amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
         value => parseInt(value),
       )
       .option(
-        '--gzip-strategy <number>',
+        '--memory-level <number>',
+        'amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
+        value => parseInt(value),
+      )
+      // TODO: Remove @deprecated --gzip-strategy
+      .option(
+        '--gzip-strategy <number> (deprecated)',
         'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
         value => parseInt(value),
       )
+      .option(
+        '--strategy <number>',
+        'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
+        value => parseInt(value),
+      )
+      .option('--deflate', 'enable deflate compression')
       .option('--brotli', 'enable brotli compression, Node.js >= v11.7.0')
       .option(
         '--brotli-param-mode <value>',
@@ -93,17 +112,30 @@ export class Index {
         parseInt(this.env.GZIPPER_THRESHOLD as string) ||
         program.threshold ||
         0,
-      gzipLevel:
-        parseInt(this.env.GZIPPER_GZIP_LEVEL as string) || program.gzipLevel,
-      gzipMemoryLevel:
+      // TODO: Remove @deprecated GZIPPER_GZIP_LEVEL, gzipLevel
+      level:
+        parseInt(this.env.GZIPPER_LEVEL as string) ||
+        program.level ||
+        parseInt(this.env.GZIPPER_GZIP_LEVEL as string) ||
+        program.gzipLevel,
+      // TODO: Remove @deprecated GZIPPER_GZIP_MEMORY_LEVEL, gzipMemoryLevel
+      memoryLevel:
+        parseInt(this.env.GZIPPER_MEMORY_LEVEL as string) ||
+        program.memoryLevel ||
         parseInt(this.env.GZIPPER_GZIP_MEMORY_LEVEL as string) ||
         program.gzipMemoryLevel,
-      gzipStrategy:
+      // TODO: Remove @deprecated GZIPPER_GZIP_STRATEGY, gzipStrategy
+      strategy:
+        parseInt(this.env.GZIPPER_STRATEGY as string) ||
+        program.strategy ||
         parseInt(this.env.GZIPPER_GZIP_STRATEGY as string) ||
         program.gzipStrategy,
       brotli: this.env.GZIPPER_BROTLI
         ? !!parseInt(this.env.GZIPPER_BROTLI as string)
         : program.brotli,
+      deflate: this.env.GZIPPER_DEFLATE
+        ? !!parseInt(this.env.GZIPPER_DEFLATE as string)
+        : program.deflate,
       brotliParamMode:
         this.env.GZIPPER_BROTLI_PARAM_MODE || program.brotliParamMode,
       brotliQuality:
