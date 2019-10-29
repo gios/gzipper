@@ -266,9 +266,7 @@ export class Gzipper {
     }
 
     if (includeExtensions) {
-      return VALID_EXTENSIONS.filter(extension =>
-        includeExtensions.includes(extension),
-      );
+      return includeExtensions;
     }
 
     return VALID_EXTENSIONS;

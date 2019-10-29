@@ -43,6 +43,15 @@ async function statExists(target: string): Promise<boolean> {
   }
 }
 
+function filterByExtension(extensions: string[], ext: string): boolean {
+  return !!extensions.find(fileExtension => {
+    if (fileExtension.startsWith('!')) {
+      return fileExtension.slice(1) !== ext;
+    }
+    return fileExtension === ext;
+  });
+}
+
 /**
  * Clear directory, extensions = true (delete all files), extensions = [.js, .ts] (only specific files)
  */
@@ -103,7 +112,7 @@ export async function createFolder(target: string): Promise<string> {
 
 export async function getFiles(
   target: string,
-  filterByExtensions: string[] = [],
+  extensions: string[] = [],
 ): Promise<string[]> {
   try {
     const files: string[] = [];
@@ -115,10 +124,10 @@ export async function getFiles(
       const isDirectory = (await lstat(filePath)).isDirectory();
 
       if (isDirectory) {
-        files.push(...(await getFiles(filePath, filterByExtensions)));
+        files.push(...(await getFiles(filePath, extensions)));
       } else if (isFile) {
-        if (filterByExtensions.length) {
-          filterByExtensions.includes(path.extname(filePath)) &&
+        if (extensions.length) {
+          filterByExtension(extensions, path.extname(filePath)) &&
             files.push(filePath);
         } else {
           files.push(filePath);

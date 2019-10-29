@@ -9,4 +9,7 @@ export const VALID_EXTENSIONS = [
   '.svg',
   '.json',
   '.csv',
+  '.txt',
+  '.xml',
+  '.ico',
 ];
