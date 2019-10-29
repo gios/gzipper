@@ -161,4 +161,31 @@ describe('Methods Gzipper', () => {
       }
     });
   });
+
+  describe('getOutputPath', () => {
+    it('should returns finalized output path with prefixes', async () => {
+      const gzipper = new Gzipper(COMPRESS_PATH, null, {
+        outputFileFormat: 'iron-[hash]-[filename].[compressExt].[ext]',
+        threshold: 0,
+      });
+      const response = (gzipper as any).getOutputPath(
+        path.resolve(process.cwd(), 'amigo'),
+        'test.js',
+      );
+      assert.ok(/iron-.+-test\.gz\.js/g.test(response));
+    });
+
+    it("should returns default text if artifact wasn't found", async () => {
+      const gzipper = new Gzipper(COMPRESS_PATH, null, {
+        outputFileFormat: 'iron-[hash]-[filename].[compressExt].[ext].[wrong]',
+        threshold: 0,
+      });
+      (gzipper as any).outputFileFormatRegexp = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)|(\[wrong\]*)/g;
+      const response = (gzipper as any).getOutputPath(
+        path.resolve(process.cwd(), 'amigo'),
+        'test.js',
+      );
+      assert.ok(/iron-.+-test\.gz\.js.\[wrong\]/g.test(response));
+    });
+  });
 });
