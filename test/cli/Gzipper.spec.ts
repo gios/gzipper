@@ -140,7 +140,7 @@ describe('CLI Gzipper', () => {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     await gzipper.compress();
-    const files = await getFiles(COMPRESS_PATH);
+    const files = await getFiles(COMPRESS_PATH, ['!.sunny']);
     const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
 
     const filesRelative = files.map(file => path.relative(COMPRESS_PATH, file));
@@ -364,11 +364,11 @@ describe('CLI Gzipper', () => {
 
   it('should include only specific file extensions for compression', async () => {
     const options = {
-      include: ['.js', '.css', '.html'],
+      include: ['.js', '.css', '.html', '.sunny'],
       verbose: true,
       threshold: 0,
     };
-    const INCLUDED_FILES_COUNT = 10;
+    const INCLUDED_FILES_COUNT = 11;
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     const loggerInfoSpy = sinon.spy((gzipper as any).logger, 'info');
@@ -401,7 +401,7 @@ describe('CLI Gzipper', () => {
       verbose: true,
       threshold: 0,
     };
-    const EXCLUDED_FILES_COUNT = 2;
+    const EXCLUDED_FILES_COUNT = 3;
     const beforeFiles = await getFiles(COMPRESS_PATH);
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
@@ -436,7 +436,7 @@ describe('CLI Gzipper', () => {
       threshold: 860,
       verbose: true,
     };
-    const INCLUDED_FILES_COUNT = 5;
+    const INCLUDED_FILES_COUNT = 6;
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     const loggerInfoSpy = sinon.spy((gzipper as any).logger, 'info');

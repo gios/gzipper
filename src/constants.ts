@@ -9,4 +9,9 @@ export const VALID_EXTENSIONS = [
   '.svg',
   '.json',
   '.csv',
+  '.txt',
+  '.xml',
+  '.ico',
 ];
+
+export const OUTPUT_FILE_FORMAT_REGEXP = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;

@@ -7,16 +7,15 @@ import stream from 'stream';
 import { Logger } from './Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
-import { VALID_EXTENSIONS } from './constants';
+import { VALID_EXTENSIONS, OUTPUT_FILE_FORMAT_REGEXP } from './constants';
 import { GlobalOptions } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
-
-const OUTPUT_FILE_FORMAT_REGEXP = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;
 
 /**
  * Compressing files.
  */
 export class Gzipper {
+  private readonly outputFileFormatRegexp = OUTPUT_FILE_FORMAT_REGEXP;
   private readonly nativeFs = {
     stat: util.promisify(fs.stat),
     lstat: util.promisify(fs.lstat),
@@ -234,7 +233,7 @@ export class Gzipper {
       artifactsMap.set('[hash]', null);
 
       filename = this.options.outputFileFormat.replace(
-        OUTPUT_FILE_FORMAT_REGEXP,
+        this.outputFileFormatRegexp,
         artifact => {
           if (artifactsMap.has(artifact)) {
             // Need to generate hash only if we have appropriate param
@@ -266,9 +265,7 @@ export class Gzipper {
     }
 
     if (includeExtensions) {
-      return VALID_EXTENSIONS.filter(extension =>
-        includeExtensions.includes(extension),
-      );
+      return includeExtensions;
     }
 
     return VALID_EXTENSIONS;
