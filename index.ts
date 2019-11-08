@@ -1,3 +1,1 @@
-import { Gzipper } from './src/Gzipper';
-
-module.exports = Gzipper;
+export * from './src/Gzipper';
