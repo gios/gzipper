@@ -12,7 +12,8 @@ You can enable `verbose` mode for better visual representation which files were 
 
 - [Gzipper](#gzipper)
   - [Install](#install)
-  - [Run script](#run-script)
+  - [Run as CLI](#run-as-cli)
+  - [Run as module](#run-as-module)
   - [Options](#options)
     - [Option Examples](#option-examples)
       - [output-file-format](#output-file-format)
@@ -27,7 +28,7 @@ or locally to devDependencies
 
 `npm i gzipper -D`
 
-## Run script
+## Run as CLI
 
 Globally usage.
 
@@ -66,6 +67,13 @@ Locally usage.
   "scripts": {
     "build": "ng build && gzipper --verbose ./dist ./gzipped"
   }
+```
+
+## Run as module
+```javascript
+const { Gzipper } = require('gzipper');
+const gzipper = new Gzipper(target, outputPath, options?);
+await gzipper.compress();
 ```
 
 ## Options
