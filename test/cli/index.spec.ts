@@ -1,7 +1,7 @@
 import sinon from 'sinon';
 import assert from 'assert';
 
-import { Index } from '../../index';
+import { Index } from '../../bin/index';
 
 describe('Index CLI', () => {
   let sinonSandbox: sinon.SinonSandbox;

@@ -1,6 +1,6 @@
 {
   "name": "gzipper",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "CLI for compressing files.",
   "main": "dist/index.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/gios/gzipper.git"
   },
-  "bin": "./dist/index.js",
+  "bin": "./dist/bin/index.js",
   "keywords": [
     "tool",
     "cli",
