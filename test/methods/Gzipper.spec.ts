@@ -82,6 +82,8 @@ describe('Methods Gzipper', () => {
       sinonSandbox.stub((gzipper as any).nativeFs, 'readdir').resolves(files);
       sinonSandbox
         .stub((gzipper as any).nativeFs, 'lstat')
+        .onFirstCall()
+        .resolves({ isFile: () => false, isDirectory: () => true })
         .resolves({ isFile: () => true, isDirectory: () => false });
 
       const compressFileStub = sinonSandbox
