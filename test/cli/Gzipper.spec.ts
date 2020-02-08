@@ -136,6 +136,32 @@ describe('CLI Gzipper', () => {
     assert.strictEqual(Object.keys((gzipper as any).options).length, 2);
   });
 
+  it('should compress a single file to a certain folder', async () => {
+    const file = `${COMPRESS_PATH}${path.sep}index.txt`;
+    const gzipper = new Gzipper(file, COMPRESS_PATH_TARGET);
+    const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
+    await gzipper.compress();
+    const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
+
+    assert.ok(
+      loggerSuccessSpy.calledOnceWithExactly(
+        `1 file has been compressed.`,
+        true,
+      ),
+    );
+    assert.strictEqual(compressedFiles.length, 1);
+    assert.ok(
+      (gzipper as any).createCompression() instanceof (zlib as any).Gzip,
+    );
+    assert.strictEqual((gzipper as any).compressionInstance.ext, 'gz');
+    assert.strictEqual(
+      Object.keys((gzipper as any).compressionInstance.compressionOptions)
+        .length,
+      0,
+    );
+    assert.strictEqual(Object.keys((gzipper as any).options).length, 0);
+  });
+
   it('should compress files to a certain folder with existing folder structure', async () => {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
@@ -235,7 +261,7 @@ describe('CLI Gzipper', () => {
     );
     assert.ok(
       loggerInfoSpy.calledWithExactly(
-        `Use default output file format [filename].[ext].[compressExt]`,
+        `Default output file format: [filename].[ext].[compressExt]`,
       ),
     );
     assert.strictEqual(loggerInfoSpy.callCount, files.length + 1);
@@ -284,7 +310,7 @@ describe('CLI Gzipper', () => {
     );
     assert.ok(
       loggerInfoSpy.neverCalledWithMatch(
-        `Use default output file format [filename].[ext].[compressExt]`,
+        `Default output file format: [filename].[ext].[compressExt]`,
       ),
     );
     assert.strictEqual(getOutputPathSpy.callCount, files.length);

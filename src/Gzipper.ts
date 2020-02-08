@@ -118,7 +118,16 @@ export class Gzipper {
   private async compileFolderRecursively(target: string): Promise<string[]> {
     try {
       const compressedFiles: string[] = [];
-      const filesList = await this.nativeFs.readdir(target);
+      const isFileTarget = (await this.nativeFs.lstat(target)).isFile();
+      let filesList: string[];
+
+      if (isFileTarget) {
+        const targetParsed = path.parse(target);
+        target = targetParsed.dir;
+        filesList = [targetParsed.base];
+      } else {
+        filesList = await this.nativeFs.readdir(target);
+      }
 
       for (const file of filesList) {
         const filePath = path.resolve(target, file);
@@ -177,7 +186,10 @@ export class Gzipper {
   ): Promise<{ beforeSize: number; afterSize: number } | undefined> {
     const inputPath = path.join(target, filename);
     if (outputDir) {
-      target = path.join(outputDir, path.relative(this.target, target));
+      const isFileTarget = (await this.nativeFs.lstat(this.target)).isFile();
+      target = isFileTarget
+        ? outputDir
+        : path.join(outputDir, path.relative(this.target, target));
       await this.createFolders(target);
     }
     const outputPath = this.getOutputPath(target, filename);
@@ -204,7 +216,7 @@ export class Gzipper {
 
     if (!this.options.outputFileFormat) {
       this.logger.info(
-        'Use default output file format [filename].[ext].[compressExt]',
+        'Default output file format: [filename].[ext].[compressExt]',
       );
     }
   }

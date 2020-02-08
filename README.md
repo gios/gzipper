@@ -61,7 +61,7 @@ Locally usage.
   }
 ```
 
-- compress files to a certain directory `./gzipped`
+- compress files to a certain directory `./gzipped` (folders structure inside `dist` will be saved)
 
 ```
   "scripts": {
@@ -69,7 +69,24 @@ Locally usage.
   }
 ```
 
+- even compress files to a very deep folder `./very/deep/folder` (all folders will be automatically created if not exist)
+
+```
+  "scripts": {
+    "build": "ng build && gzipper --verbose ./dist ./very/deep/folder"
+  }
+```
+
+- compress a single file
+
+```
+  "scripts": {
+    "build": "ng build && gzipper --verbose ./dist/awesomeness.txt"
+  }
+```
+
 ## Run as module
+
 ```javascript
 const { Gzipper } = require('gzipper');
 const gzipper = new Gzipper(target, outputPath, options?);
@@ -103,6 +120,7 @@ await gzipper.compress();
 #### output-file-format
 
 Example of folder structure:
+
 ```
 img
   rabbit.jpg
@@ -116,6 +134,7 @@ index.js
 ```
 
 - `--output-file-format [filename].[compressExt].[ext]`
+
 ```
 img
   rabbit.gz.jpg
@@ -127,7 +146,9 @@ xml
   main.gz.xml
 index.gz.js
 ```
+
 - `--output-file-format test-[filename]-[hash].[compressExt].[ext]`
+
 ```
 img
   test-rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4.gz.jpg
@@ -139,7 +160,9 @@ xml
   test-main-a90fa10e-f7a4-4af9-af67-f887bb96f98b.gz.xml
 test-index-067c1e2d-0e12-4b57-980b-97c880c24d57.gz.js
 ```
+
 - `--output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt]`
+
 ```
 img
   rabbit-b4564011-ba7c-4bd6-834d-bf6c7791b7d4-rabbit-tmp.jpg.gz
@@ -151,6 +174,7 @@ xml
   main-a90fa10e-f7a4-4af9-af67-f887bb96f98b-main-tmp.xml.gz
 index-067c1e2d-0e12-4b57-980b-97c880c24d57-index-tmp.js.gz
 ```
+
 ## Contribution
 
 I appreciate every contribution, just fork the repository and send the pull request with your changes.
