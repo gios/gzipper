@@ -3,7 +3,6 @@ import program from 'commander';
 
 import { Gzipper } from '../src/Gzipper';
 import { GlobalOptions } from '../src/interfaces';
-const version = require('../package.json').version;
 
 export class Index {
   private target: string | undefined;
@@ -12,9 +11,21 @@ export class Index {
   private readonly argv: string[] = process.argv;
   private readonly env: NodeJS.ProcessEnv = process.env;
 
+  private getVersion(): string {
+    try {
+      return require('../package.json').version;
+    } catch (err) {
+      if (err.code === 'MODULE_NOT_FOUND') {
+        return require('../../package.json').version;
+      } else {
+        return `Can't detect module version.`;
+      }
+    }
+  }
+
   public getOptions(): this {
     program
-      .version(version)
+      .version(this.getVersion())
       .usage('[options] <path> [outputPath]')
       .option('-v, --verbose', 'detailed level of logs')
       .option(

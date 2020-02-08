@@ -1,4 +1,3 @@
-test/
-src/
-bin/
-.github/
+*
+!dist/**/*
+dist/tsconfig.tsbuildinfo

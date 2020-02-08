@@ -1,6 +1,6 @@
 {
   "name": "gzipper",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "description": "CLI for compressing files.",
   "main": "dist/index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "codecov": "cross-env NODE_ENV=testing nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.ts\"",
     "eslint": "eslint \"**/*.ts\"",
-    "build": "rimraf dist && tsc && copyfiles package.json dist/"
+    "build": "rimraf dist && tsc"
   },
   "repository": {
     "type": "git",
@@ -44,7 +44,6 @@
     "@typescript-eslint/eslint-plugin": "^2.19.0",
     "@typescript-eslint/parser": "^2.19.0",
     "codecov": "^3.6.5",
-    "copyfiles": "^2.2.0",
     "cross-env": "^6.0.3",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.0",
