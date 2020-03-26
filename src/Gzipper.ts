@@ -43,7 +43,7 @@ export class Gzipper {
    */
   constructor(
     target: string | undefined | null,
-    outputPath: string | undefined | null,
+    outputPath?: string | undefined | null,
     options: GlobalOptions = {} as never,
   ) {
     this.logger = new Logger(options.verbose as boolean);

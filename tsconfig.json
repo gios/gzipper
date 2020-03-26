@@ -10,6 +10,7 @@
     "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "inlineSourceMap": true
   },
   "include": ["**/*.ts"],
