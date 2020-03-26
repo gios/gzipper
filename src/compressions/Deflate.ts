@@ -1,13 +1,13 @@
 import zlib from 'zlib';
 
 import { Compression } from './Compression';
-import { GlobalOptions } from '../interfaces';
+import { GlobalOptions, CompressionOptions } from '../interfaces';
 import { Logger } from '../Logger';
 
 /**
  * Deflate compression
  */
-export class DeflateCompression extends Compression {
+export class DeflateCompression extends Compression<CompressionOptions> {
   public readonly compressionName = 'DEFLATE';
   public readonly ext = 'zz';
   /**

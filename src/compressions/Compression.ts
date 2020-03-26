@@ -1,18 +1,14 @@
 import zlib from 'zlib';
 
-import {
-  GlobalOptions,
-  CompressionOptions,
-  BrotliOptions,
-} from '../interfaces';
+import { GlobalOptions, CompressionOptions } from '../interfaces';
 import { Logger } from '../Logger';
 
-export abstract class Compression {
+export abstract class Compression<T extends CompressionOptions> {
   public abstract ext: string;
   public abstract compressionName: string;
   protected readonly options: GlobalOptions;
   protected readonly logger: Logger;
-  protected compressionOptions: CompressionOptions | BrotliOptions = {};
+  protected compressionOptions: T = {} as T;
   /**
    * Creates an instance of Compression.
    */
@@ -48,7 +44,7 @@ export abstract class Compression {
    * Build compression options object [compressionOptions].
    */
   protected selectCompression(): void {
-    const options: CompressionOptions = {};
+    const options: T = {} as T;
 
     if (this.options.level !== undefined) {
       options.level = this.options.level;
