@@ -65,7 +65,7 @@ export class Gzipper {
   /**
    * Start compressing files.
    */
-  public async compress(): Promise<void> {
+  public async compress(): Promise<string[]> {
     let files;
     try {
       if (this.outputPath) {
@@ -94,6 +94,8 @@ export class Gzipper {
         true,
       );
     }
+
+    return files;
   }
 
   /**
