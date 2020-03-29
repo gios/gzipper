@@ -43,7 +43,7 @@ export class Gzipper {
    */
   constructor(
     target: string | undefined | null,
-    outputPath: string | undefined | null,
+    outputPath?: string | undefined | null,
     options: GlobalOptions = {} as never,
   ) {
     this.logger = new Logger(options.verbose as boolean);
@@ -65,7 +65,7 @@ export class Gzipper {
   /**
    * Start compressing files.
    */
-  public async compress(): Promise<void> {
+  public async compress(): Promise<string[]> {
     let files;
     try {
       if (this.outputPath) {
@@ -88,12 +88,14 @@ export class Gzipper {
       );
     } else {
       this.logger.warn(
-        `we couldn't find any appropriate files. valid extensions are: ${VALID_EXTENSIONS.join(
+        `we couldn't find any appropriate files. valid extensions are: ${this.getValidExtensions().join(
           ', ',
         )}`,
         true,
       );
     }
+
+    return files;
   }
 
   /**
@@ -267,19 +269,20 @@ export class Gzipper {
    * Returns the filtered list of extensions from `options.exclude`.
    */
   private getValidExtensions(): string[] {
+    let extensions: string[] = VALID_EXTENSIONS;
     const excludeExtensions = this.options.exclude;
     const includeExtensions = this.options.include;
 
     if (excludeExtensions) {
-      return VALID_EXTENSIONS.filter(
+      extensions = extensions.filter(
         extension => !excludeExtensions.includes(extension),
       );
     }
 
     if (includeExtensions) {
-      return includeExtensions;
+      return [...extensions, ...includeExtensions];
     }
 
-    return VALID_EXTENSIONS;
+    return extensions;
   }
 }

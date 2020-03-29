@@ -1,21 +1,21 @@
 {
   "name": "gzipper",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "CLI for compressing files.",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=testing nyc --check-coverage --reporter='text-summary' mocha",
     "coverage": "cross-env NODE_ENV=testing nyc --reporter='html' mocha",
     "codecov": "cross-env NODE_ENV=testing nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.ts\"",
     "eslint": "eslint \"**/*.ts\"",
-    "build": "rimraf dist && tsc && copyfiles package.json dist/"
+    "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE dist/"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gios/gzipper.git"
   },
-  "bin": "./dist/bin/index.js",
+  "bin": "./bin/index.js",
   "keywords": [
     "tool",
     "cli",
@@ -37,27 +37,27 @@
   "devDependencies": {
     "@types/commander": "^2.12.2",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.26",
+    "@types/node": "^12.12.31",
     "@types/semver": "^6.2.1",
-    "@types/sinon": "^7.5.1",
-    "@types/uuid": "^3.4.7",
-    "@typescript-eslint/eslint-plugin": "^2.19.0",
-    "@typescript-eslint/parser": "^2.19.0",
+    "@types/sinon": "^7.5.2",
+    "@types/uuid": "^3.4.8",
+    "@typescript-eslint/eslint-plugin": "^2.25.0",
+    "@typescript-eslint/parser": "^2.25.0",
     "codecov": "^3.6.5",
     "copyfiles": "^2.2.0",
     "cross-env": "^6.0.3",
     "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.0",
+    "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.2",
-    "mocha": "^6.2.2",
-    "nyc": "^14.1.1",
+    "mocha": "^6.2.3",
+    "nyc": "^15.0.0",
     "prettier": "^1.19.1",
-    "rimraf": "^3.0.1",
+    "rimraf": "^3.0.2",
     "semver": "^6.3.0",
     "sinon": "^7.5.0",
     "source-map-support": "^0.5.16",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.7.5"
+    "ts-node": "^8.8.1",
+    "typescript": "^3.8.3"
   },
   "engines": {
     "node": ">=10"

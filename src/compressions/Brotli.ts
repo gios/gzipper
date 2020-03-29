@@ -7,7 +7,7 @@ import { GlobalOptions, BrotliOptions } from '../interfaces';
 /**
  * Brotli compression
  */
-export class BrotliCompression extends Compression {
+export class BrotliCompression extends Compression<BrotliOptions> {
   public readonly compressionName = 'BROTLI';
   public readonly ext = 'br';
   /**

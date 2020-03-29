@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "target": "es5",
     "module": "commonjs",
     "outDir": "dist",
@@ -10,6 +9,7 @@
     "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "inlineSourceMap": true
   },
   "include": ["**/*.ts"],
