@@ -19,10 +19,11 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm ci
-      - run: npm run build
-      - run: npm run eslint
-      - run: npm test
+      - run: |
+          npm ci
+          npm run build
+          npm run eslint
+          npm test
       - run: npm run codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

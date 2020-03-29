@@ -16,9 +16,10 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: npm ci
-      - run: npm run eslint
-      - run: npm test
+      - run: |
+          npm ci
+          npm run eslint
+          npm test
 
   publish:
     needs: test
@@ -29,9 +30,9 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm run build
-      - run: cd dist
-      - run: npm publish
+      - run: |
+          npm ci
+          npm run build
+      - run: cd dist && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
