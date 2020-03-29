@@ -388,13 +388,13 @@ describe('CLI Gzipper', () => {
     }
   });
 
-  it('should include only specific file extensions for compression', async () => {
+  it('should include specific file extensions for compression', async () => {
     const options = {
-      include: ['.js', '.css', '.html', '.sunny'],
+      include: ['.sunny'],
       verbose: true,
       threshold: 0,
     };
-    const INCLUDED_FILES_COUNT = 11;
+    const beforeFiles = await getFiles(COMPRESS_PATH, []);
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     const loggerInfoSpy = sinon.spy((gzipper as any).logger, 'info');
@@ -407,8 +407,8 @@ describe('CLI Gzipper', () => {
         true,
       ),
     );
-
-    assert.strictEqual(loggerInfoSpy.callCount, INCLUDED_FILES_COUNT + 1);
+    assert.equal(beforeFiles.length, files.length);
+    assert.strictEqual(loggerInfoSpy.callCount, beforeFiles.length + 1);
     assert.ok(
       (gzipper as any).createCompression() instanceof (zlib as any).Gzip,
     );
@@ -427,8 +427,10 @@ describe('CLI Gzipper', () => {
       verbose: true,
       threshold: 0,
     };
-    const EXCLUDED_FILES_COUNT = 3;
-    const beforeFiles = await getFiles(COMPRESS_PATH);
+    const beforeFiles = (await getFiles(COMPRESS_PATH)).filter(file => {
+      const ext = path.extname(file);
+      return !(ext === '.jpeg' || ext === '.jpg' || ext === '.sunny');
+    });
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     const loggerInfoSpy = sinon.spy((gzipper as any).logger, 'info');
@@ -441,10 +443,8 @@ describe('CLI Gzipper', () => {
         true,
       ),
     );
-    assert.strictEqual(
-      loggerInfoSpy.callCount,
-      beforeFiles.length - EXCLUDED_FILES_COUNT + 1,
-    );
+    assert.equal(beforeFiles.length, files.length);
+    assert.strictEqual(loggerInfoSpy.callCount, beforeFiles.length + 1);
     assert.ok(
       (gzipper as any).createCompression() instanceof (zlib as any).Gzip,
     );
