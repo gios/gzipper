@@ -90,7 +90,7 @@ Locally usage.
 ```javascript
 const { Gzipper } = require('gzipper');
 const gzipper = new Gzipper(target, outputPath, options?);
-await gzipper.compress();
+await gzipper.compress().catch(err => console.error(err));
 ```
 
 ## Options
