@@ -141,34 +141,30 @@ export class Gzipper {
             ...(await this.compileFolderRecursively(filePath)),
           );
         } else if (isFile) {
-          try {
-            if (this.validExtensions.includes(path.extname(filePath))) {
-              const { size: fileSize } = await this.nativeFs.lstat(filePath);
-              if (fileSize < this.options.threshold) {
-                continue;
-              }
-
-              const hrtimeStart = process.hrtime();
-              compressedFiles.push(filePath);
-              const fileInfo = await this.compressFile(
-                file,
-                target,
-                this.outputPath,
-              );
-
-              if (fileInfo) {
-                const [seconds, nanoseconds] = process.hrtime(hrtimeStart);
-                this.logger.info(
-                  `File ${file} has been compressed ${fileInfo.beforeSize.toFixed(
-                    4,
-                  )}Kb -> ${fileInfo.afterSize.toFixed(4)}Kb (${
-                    seconds ? seconds + 's ' : ''
-                  }${nanoseconds / 1e6}ms)`,
-                );
-              }
+          if (this.validExtensions.includes(path.extname(filePath))) {
+            const { size: fileSize } = await this.nativeFs.lstat(filePath);
+            if (fileSize < this.options.threshold) {
+              continue;
             }
-          } catch (error) {
-            throw error;
+
+            const hrtimeStart = process.hrtime();
+            compressedFiles.push(filePath);
+            const fileInfo = await this.compressFile(
+              file,
+              target,
+              this.outputPath,
+            );
+
+            if (fileInfo) {
+              const [seconds, nanoseconds] = process.hrtime(hrtimeStart);
+              this.logger.info(
+                `File ${file} has been compressed ${fileInfo.beforeSize.toFixed(
+                  4,
+                )}Kb -> ${fileInfo.afterSize.toFixed(4)}Kb (${
+                  seconds ? seconds + 's ' : ''
+                }${nanoseconds / 1e6}ms)`,
+              );
+            }
           }
         }
       }
