@@ -276,7 +276,7 @@ export class Gzipper {
     }
 
     if (includeExtensions) {
-      return [...extensions, ...includeExtensions];
+      return includeExtensions;
     }
 
     return extensions;
