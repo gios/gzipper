@@ -13,5 +13,5 @@
     "inlineSourceMap": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["test"]
+  "exclude": ["test", "dist"]
 }

@@ -62,5 +62,6 @@ typings/
 *.br
 *.zz
 .vscode
+.idea
 tsconfig.tsbuildinfo
 dist

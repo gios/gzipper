@@ -394,7 +394,6 @@ describe('CLI Gzipper', () => {
       verbose: true,
       threshold: 0,
     };
-    const beforeFiles = await getFiles(COMPRESS_PATH, []);
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     const loggerInfoSpy = sinon.spy((gzipper as any).logger, 'info');
@@ -403,12 +402,12 @@ describe('CLI Gzipper', () => {
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
+        `${files.length} file has been compressed.`,
         true,
       ),
     );
-    assert.equal(beforeFiles.length, files.length);
-    assert.strictEqual(loggerInfoSpy.callCount, beforeFiles.length + 1);
+    assert.equal(files.length, 1);
+    assert.strictEqual(loggerInfoSpy.callCount, files.length + 1);
     assert.ok(
       (gzipper as any).createCompression() instanceof (zlib as any).Gzip,
     );
