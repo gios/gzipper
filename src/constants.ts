@@ -13,6 +13,7 @@ export const VALID_EXTENSIONS = [
   '.xml',
   '.ico',
   '.md',
+  '.gif',
 ];
 
 export const OUTPUT_FILE_FORMAT_REGEXP = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;
