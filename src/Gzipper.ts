@@ -7,7 +7,7 @@ import stream from 'stream';
 import { Logger } from './Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
-import { VALID_EXTENSIONS, OUTPUT_FILE_FORMAT_REGEXP } from './constants';
+import { OUTPUT_FILE_FORMAT_REGEXP, NO_FILES_MESSAGE } from './constants';
 import { GlobalOptions } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 
@@ -37,7 +37,6 @@ export class Gzipper {
     | ReturnType<BrotliCompression['getCompression']>
     | ReturnType<GzipCompression['getCompression']>
     | ReturnType<DeflateCompression['getCompression']>;
-  private readonly validExtensions: string[];
   /**
    * Creates an instance of Gzipper.
    */
@@ -59,7 +58,6 @@ export class Gzipper {
     this.compressionInstance = this.getCompressionInstance();
     this.target = path.resolve(process.cwd(), target);
     this.createCompression = this.compressionInstance.getCompression();
-    this.validExtensions = this.getValidExtensions();
   }
 
   /**
@@ -87,12 +85,7 @@ export class Gzipper {
         true,
       );
     } else {
-      this.logger.warn(
-        `we couldn't find any appropriate files. valid extensions are: ${this.getValidExtensions().join(
-          ', ',
-        )}`,
-        true,
-      );
+      this.logger.warn(NO_FILES_MESSAGE, true);
     }
 
     return files;
@@ -142,7 +135,7 @@ export class Gzipper {
           );
         } else if (
           isFile &&
-          this.validExtensions.includes(path.extname(filePath))
+          this.isValidFileExtensions(path.extname(filePath).slice(1))
         ) {
           const { size: fileSize } = await this.nativeFs.lstat(filePath);
           if (fileSize < this.options.threshold) {
@@ -263,23 +256,20 @@ export class Gzipper {
   }
 
   /**
-   * Returns the filtered list of extensions from `options.exclude`.
+   * Returns if the file extension is valid.
    */
-  private getValidExtensions(): string[] {
-    let extensions: string[] = VALID_EXTENSIONS;
+  private isValidFileExtensions(ext: string): boolean {
     const excludeExtensions = this.options.exclude;
     const includeExtensions = this.options.include;
 
-    if (excludeExtensions) {
-      extensions = extensions.filter(
-        extension => !excludeExtensions.includes(extension),
-      );
+    if (includeExtensions && includeExtensions.length) {
+      return includeExtensions.includes(ext);
     }
 
-    if (includeExtensions) {
-      return includeExtensions;
+    if (excludeExtensions && excludeExtensions.length) {
+      return !excludeExtensions.includes(ext);
     }
 
-    return extensions;
+    return true;
   }
 }

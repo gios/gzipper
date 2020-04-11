@@ -58,9 +58,6 @@ typings/
 .env
 
 # Project
-*.gz
-*.br
-*.zz
 .vscode
 .idea
 tsconfig.tsbuildinfo

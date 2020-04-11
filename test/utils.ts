@@ -23,10 +23,6 @@ export const COMPRESS_PATH_TARGET = path.resolve(
   __dirname,
   './resources/compress_target',
 );
-export const NO_FILES_COMPRESS_PATH = path.resolve(
-  __dirname,
-  './resources/no_files_to_compress',
-);
 
 export const COMPRESSION_EXTENSIONS = ['.gz', '.br', '.zz'];
 
