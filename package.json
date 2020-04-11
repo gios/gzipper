@@ -9,7 +9,7 @@
     "codecov": "cross-env NODE_ENV=testing nyc report --reporter=text-lcov > coverage.lcov && codecov",
     "prettier": "prettier --write \"**/*.ts\"",
     "eslint": "eslint \"**/*.ts\"",
-    "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE dist/"
+    "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE CHANGELOG.md dist/"
   },
   "repository": {
     "type": "git",
