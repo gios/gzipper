@@ -89,6 +89,7 @@ describe('CLI Gzipper', () => {
         'ico',
         'md',
         'gif',
+        'sunny',
       ],
     };
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
@@ -105,7 +106,7 @@ describe('CLI Gzipper', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 0);
+    assert.strictEqual(Object.keys((gzipper as any).options).length, 2);
   });
 
   it('should print message about empty folder', async () => {
