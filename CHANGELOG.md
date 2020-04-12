@@ -9,4 +9,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- By default gzipper compress all the files in directory except (.gz, .br, .zz).
+- By default, gzipper compress all the files in the directory.
