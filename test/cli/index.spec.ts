@@ -160,8 +160,8 @@ describe('Index CLI', () => {
 
     const response: any = {
       verbose: true,
-      exclude: ['.png', '.jpg', '.js'],
-      include: ['.png', '.wav'],
+      exclude: ['png', 'jpg', 'js'],
+      include: ['png', 'wav'],
       threshold: 500,
       level: 7,
       memoryLevel: 1,
@@ -211,8 +211,8 @@ describe('Index CLI', () => {
 
     const response: any = {
       verbose: true,
-      exclude: ['.php', '.cc'],
-      include: ['.css'],
+      exclude: ['php', 'cc'],
+      include: ['css'],
       threshold: 800,
       level: 4,
       memoryLevel: 2,
@@ -286,8 +286,8 @@ describe('Index CLI', () => {
 
     const response: any = {
       verbose: false,
-      exclude: ['.py', '.c'],
-      include: ['.r', '.rs'],
+      exclude: ['py', 'c'],
+      include: ['r', 'rs'],
       threshold: 800,
       level: 2,
       memoryLevel: 2,

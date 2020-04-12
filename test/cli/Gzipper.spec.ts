@@ -2,13 +2,13 @@ import assert from 'assert';
 import sinon from 'sinon';
 import zlib from 'zlib';
 import path from 'path';
+import util from 'util';
+import fs from 'fs';
 
 import { Gzipper } from '../../src/Gzipper';
-import { VALID_EXTENSIONS } from '../../src/constants';
 import {
   EMPTY_FOLDER_PATH,
   COMPRESS_PATH,
-  NO_FILES_COMPRESS_PATH,
   COMPRESS_PATH_TARGET,
   getFiles,
   createFolder,
@@ -16,6 +16,9 @@ import {
   COMPRESSION_EXTENSIONS,
 } from '../utils';
 import { GlobalOptions } from '../../src/interfaces';
+import { NO_FILES_MESSAGE } from '../../src/constants';
+
+const lstat = util.promisify(fs.lstat);
 
 describe('CLI Gzipper', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -68,14 +71,32 @@ describe('CLI Gzipper', () => {
   });
 
   it('should print message about appropriate files', async () => {
-    const gzipper = new Gzipper(NO_FILES_COMPRESS_PATH, null);
+    const options = {
+      threshold: 0,
+      exclude: [
+        'js',
+        'css',
+        'html',
+        'png',
+        'jpg',
+        'jpeg',
+        'webp',
+        'svg',
+        'json',
+        'csv',
+        'txt',
+        'xml',
+        'ico',
+        'md',
+        'gif',
+        'sunny',
+      ],
+    };
+    const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const noFilesWarnSpy = sinon.spy((gzipper as any).logger, 'warn');
     await gzipper.compress();
-    const responseMessage = `we couldn't find any appropriate files. valid extensions are: ${VALID_EXTENSIONS.join(
-      ', ',
-    )}`;
 
-    assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true));
+    assert.ok(noFilesWarnSpy.calledWithExactly(NO_FILES_MESSAGE, true));
     assert.ok(
       (gzipper as any).createCompression() instanceof (zlib as any).Gzip,
     );
@@ -85,18 +106,15 @@ describe('CLI Gzipper', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 0);
+    assert.strictEqual(Object.keys((gzipper as any).options).length, 2);
   });
 
   it('should print message about empty folder', async () => {
     const gzipper = new Gzipper(EMPTY_FOLDER_PATH, null);
     const noFilesWarnSpy = sinon.spy((gzipper as any).logger, 'warn');
     await gzipper.compress();
-    const responseMessage = `we couldn't find any appropriate files. valid extensions are: ${VALID_EXTENSIONS.join(
-      ', ',
-    )}`;
 
-    assert.ok(noFilesWarnSpy.calledWithExactly(responseMessage, true));
+    assert.ok(noFilesWarnSpy.calledWithExactly(NO_FILES_MESSAGE, true));
     assert.ok(
       (gzipper as any).createCompression() instanceof (zlib as any).Gzip,
     );
@@ -166,7 +184,7 @@ describe('CLI Gzipper', () => {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     await gzipper.compress();
-    const files = await getFiles(COMPRESS_PATH, ['!.sunny']);
+    const files = await getFiles(COMPRESS_PATH);
     const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
 
     const filesRelative = files.map(file => path.relative(COMPRESS_PATH, file));
@@ -388,9 +406,9 @@ describe('CLI Gzipper', () => {
     }
   });
 
-  it('should include specific file extensions for compression', async () => {
+  it('should include specific file extensions for compression (also exclude others)', async () => {
     const options = {
-      include: ['.sunny'],
+      include: ['sunny'],
       verbose: true,
       threshold: 0,
     };
@@ -422,13 +440,13 @@ describe('CLI Gzipper', () => {
 
   it('should exclude file extensions from compression jpeg,jpg', async () => {
     const options = {
-      exclude: ['.jpeg', '.jpg'],
+      exclude: ['jpeg', 'jpg'],
       verbose: true,
       threshold: 0,
     };
     const beforeFiles = (await getFiles(COMPRESS_PATH)).filter(file => {
       const ext = path.extname(file);
-      return !(ext === '.jpeg' || ext === '.jpg' || ext === '.sunny');
+      return !(ext === '.jpeg' || ext === '.jpg');
     });
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
@@ -457,24 +475,33 @@ describe('CLI Gzipper', () => {
   });
 
   it('should exclude file sizes smaller than 860 bytes from compression', async () => {
+    const THRESHOLD = 860;
     const options = {
-      threshold: 860,
+      threshold: THRESHOLD,
       verbose: true,
     };
-    const INCLUDED_FILES_COUNT = 6;
+    let includedFiles = 0;
+    const files = await getFiles(COMPRESS_PATH);
+    for (const filePath of files) {
+      const { size: fileSize } = await lstat(filePath);
+      if (fileSize < THRESHOLD) {
+        continue;
+      }
+      ++includedFiles;
+    }
     const gzipper = new Gzipper(COMPRESS_PATH, null, options);
     const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
     const loggerInfoSpy = sinon.spy((gzipper as any).logger, 'info');
     await gzipper.compress();
-    const files = await getFiles(COMPRESS_PATH, ['.gz']);
+    const filesGzipped = await getFiles(COMPRESS_PATH, ['.gz']);
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
+        `${filesGzipped.length} files have been compressed.`,
         true,
       ),
     );
-    assert.strictEqual(loggerInfoSpy.callCount, INCLUDED_FILES_COUNT + 1);
+    assert.strictEqual(loggerInfoSpy.callCount, includedFiles + 1);
     assert.ok(
       (gzipper as any).createCompression() instanceof (zlib as any).Gzip,
     );

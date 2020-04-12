@@ -179,7 +179,7 @@ export class Index {
 
   private optionToArray(value: string): string[] | string {
     if (value) {
-      return value.split(',').map(item => `.${item.trim()}`);
+      return value.split(',').map(item => item.trim());
     }
 
     return value;
