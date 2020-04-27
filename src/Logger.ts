@@ -13,28 +13,28 @@ export class Logger {
   /**
    * Info logger.
    */
-  public info(message: string, force?: boolean): void {
+  info(message: string, force?: boolean): void {
     return this.logger('info')(message, force);
   }
 
   /**
    * Error logger.
    */
-  public error(message: string, force?: boolean): void {
+  error(message: string, force?: boolean): void {
     return this.logger('error')(message, force);
   }
 
   /**
    * Success logger.
    */
-  public success(message: string, force?: boolean): void {
+  success(message: string, force?: boolean): void {
     return this.logger('success')(message, force);
   }
 
   /**
    * Warn logger.
    */
-  public warn(message: string, force?: boolean): void {
+  warn(message: string, force?: boolean): void {
     return this.logger('warning')(message, force);
   }
 

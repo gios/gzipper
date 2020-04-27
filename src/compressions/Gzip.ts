@@ -8,8 +8,8 @@ import { Logger } from '../Logger';
  * Gzip compression
  */
 export class GzipCompression extends Compression<CompressionOptions> {
-  public readonly compressionName = 'GZIP';
-  public readonly ext = 'gz';
+  readonly compressionName = 'GZIP';
+  readonly ext = 'gz';
   /**
    * Creates an instance of GzipCompression.
    */
@@ -20,7 +20,7 @@ export class GzipCompression extends Compression<CompressionOptions> {
   /**
    * Returns gzip compression instance in closure.
    */
-  public getCompression(): () => zlib.Gzip {
+  getCompression(): () => zlib.Gzip {
     return (): zlib.Gzip => zlib.createGzip(this.compressionOptions);
   }
 }

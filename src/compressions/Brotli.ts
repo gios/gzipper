@@ -8,8 +8,8 @@ import { GlobalOptions, BrotliOptions } from '../interfaces';
  * Brotli compression
  */
 export class BrotliCompression extends Compression<BrotliOptions> {
-  public readonly compressionName = 'BROTLI';
-  public readonly ext = 'br';
+  readonly compressionName = 'BROTLI';
+  readonly ext = 'br';
   /**
    * Creates an instance of BrotliCompression
    */
@@ -21,7 +21,7 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   /**
    * Returns brotli compression instance in closure.
    */
-  public getCompression(): () => zlib.BrotliCompress {
+  getCompression(): () => zlib.BrotliCompress {
     return (): zlib.BrotliCompress =>
       zlib.createBrotliCompress({
         params: this.compressionOptions,
@@ -31,7 +31,7 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   /**
    * Returns human-readable brotli compression options info.
    */
-  public readableOptions(): string {
+  readableOptions(): string {
     return super.readableOptions(this.getBrotliOptionName.bind(this));
   }
 

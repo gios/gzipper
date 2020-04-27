@@ -4,8 +4,8 @@ import { GlobalOptions, CompressionOptions } from '../interfaces';
 import { Logger } from '../Logger';
 
 export abstract class Compression<T extends CompressionOptions> {
-  public abstract ext: string;
-  public abstract compressionName: string;
+  abstract ext: string;
+  abstract compressionName: string;
   protected readonly options: GlobalOptions;
   protected readonly logger: Logger;
   protected compressionOptions: T = {} as T;
@@ -21,12 +21,12 @@ export abstract class Compression<T extends CompressionOptions> {
   /**
    * Returns a compression instance in closure.
    */
-  public abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip;
+  abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip;
 
   /**
    * Returns human-readable compression options info.
    */
-  public readableOptions(
+  readableOptions(
     keyWrapper: (key: string) => string | undefined = (
       key: string,
     ): string | undefined => key,

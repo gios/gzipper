@@ -11,7 +11,7 @@ export class Index {
   private readonly argv: string[] = process.argv;
   private readonly env: NodeJS.ProcessEnv = process.env;
 
-  public getOptions(): this {
+  getOptions(): this {
     program
       .version(pack.version)
       .usage('[options] <path> [outputPath]')
@@ -124,7 +124,7 @@ export class Index {
   }
 
   // Delete undefined and NaN options.
-  public filterOptions(): this {
+  filterOptions(): this {
     Object.keys(this.options as GlobalOptions).forEach(key => {
       if (
         (this.options as GlobalOptions)[key] === undefined ||
@@ -138,7 +138,7 @@ export class Index {
     return this;
   }
 
-  public start(): void {
+  start(): void {
     const gzipper = new Gzipper(
       this.target,
       this.outputPath,

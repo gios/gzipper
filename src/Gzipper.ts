@@ -4,6 +4,7 @@ import util from 'util';
 import uuid from 'uuid/v4';
 import stream from 'stream';
 
+import { Helpers } from './helpers';
 import { Logger } from './Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
@@ -17,10 +18,8 @@ import { DeflateCompression } from './compressions/Deflate';
 export class Gzipper {
   private readonly outputFileFormatRegexp = OUTPUT_FILE_FORMAT_REGEXP;
   private readonly nativeFs = {
-    stat: util.promisify(fs.stat),
     lstat: util.promisify(fs.lstat),
     readdir: util.promisify(fs.readdir),
-    mkdir: util.promisify(fs.mkdir),
   };
   private readonly nativeStream = {
     pipeline: util.promisify(stream.pipeline),
@@ -63,11 +62,11 @@ export class Gzipper {
   /**
    * Start compressing files.
    */
-  public async compress(): Promise<string[]> {
+  async compress(): Promise<string[]> {
     let files;
     try {
       if (this.outputPath) {
-        await this.createFolders(this.outputPath);
+        await Helpers.createFolders(this.outputPath);
       }
       this.compressionLog();
       files = await this.compileFolderRecursively(this.target);
@@ -182,9 +181,11 @@ export class Gzipper {
       target = isFileTarget
         ? outputDir
         : path.join(outputDir, path.relative(this.target, target));
-      await this.createFolders(target);
+      await Helpers.createFolders(target);
     }
     const outputPath = this.getOutputPath(target, filename);
+    // const checksum = await this.getFileChecksum(inputPath);
+    // console.log('checksum', checksum);
 
     await this.nativeStream.pipeline(
       fs.createReadStream(inputPath),
@@ -193,8 +194,8 @@ export class Gzipper {
     );
 
     if (this.options.verbose) {
-      const beforeSize = (await this.nativeFs.stat(inputPath)).size / 1024;
-      const afterSize = (await this.nativeFs.stat(outputPath)).size / 1024;
+      const beforeSize = (await this.nativeFs.lstat(inputPath)).size / 1024;
+      const afterSize = (await this.nativeFs.lstat(outputPath)).size / 1024;
       return { beforeSize, afterSize };
     }
   }
@@ -211,13 +212,6 @@ export class Gzipper {
         'Default output file format: [filename].[ext].[compressExt]',
       );
     }
-  }
-
-  /**
-   * Create folders by path.
-   */
-  private async createFolders(target: string): Promise<void> {
-    await this.nativeFs.mkdir(target, { recursive: true });
   }
 
   /**

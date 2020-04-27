@@ -8,8 +8,8 @@ import { Logger } from '../Logger';
  * Deflate compression
  */
 export class DeflateCompression extends Compression<CompressionOptions> {
-  public readonly compressionName = 'DEFLATE';
-  public readonly ext = 'zz';
+  readonly compressionName = 'DEFLATE';
+  readonly ext = 'zz';
   /**
    * Creates an instance of GzipCompression.
    */
@@ -20,7 +20,7 @@ export class DeflateCompression extends Compression<CompressionOptions> {
   /**
    * Returns deflate compression instance in closure.
    */
-  public getCompression(): () => zlib.Deflate {
+  getCompression(): () => zlib.Deflate {
     return (): zlib.Deflate => zlib.createDeflate(this.compressionOptions);
   }
 }
