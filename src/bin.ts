@@ -16,6 +16,7 @@ export class Index {
       .version(pack.version)
       .usage('[options] <path> [outputPath]')
       .option('-v, --verbose', 'detailed level of logs')
+      .option('--incremental', '(beta) incremental compression')
       .option(
         '-e, --exclude <extensions>',
         'exclude file extensions from compression, example: jpeg,jpg...',
@@ -83,6 +84,9 @@ export class Index {
       verbose: this.env.GZIPPER_VERBOSE
         ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
         : program.verbose,
+      incremental: this.env.GZIPPER_INCREMENTAL
+        ? !!parseInt(this.env.GZIPPER_INCREMENTAL as string)
+        : program.incremental,
       exclude:
         this.optionToArray(this.env.GZIPPER_EXCLUDE as string) ||
         program.exclude,

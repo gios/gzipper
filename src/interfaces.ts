@@ -2,6 +2,7 @@ import zlib from 'zlib';
 
 export interface GlobalOptions {
   verbose?: boolean;
+  incremental?: boolean;
   exclude?: string[];
   include?: string[];
   threshold: number;

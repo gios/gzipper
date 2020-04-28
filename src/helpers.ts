@@ -12,4 +12,14 @@ export class Helpers {
   static async createFolders(target: string): Promise<void> {
     await this.nativeFs.mkdir(target, { recursive: true });
   }
+
+  /**
+   * Convert Map to JSON.
+   */
+  static mapToJSON<K extends string, V>(map: Map<K, V>): Record<K, V> {
+    return Array.from(map).reduce((obj, [key, value]) => {
+      obj[key] = value;
+      return obj;
+    }, {} as Record<K, V>);
+  }
 }

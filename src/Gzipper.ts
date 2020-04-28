@@ -8,23 +8,29 @@ import { Helpers } from './helpers';
 import { Logger } from './Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
-import { OUTPUT_FILE_FORMAT_REGEXP, NO_FILES_MESSAGE } from './constants';
+import {
+  OUTPUT_FILE_FORMAT_REGEXP,
+  NO_FILES_MESSAGE,
+  CACHE_FOLDER,
+} from './constants';
 import { GlobalOptions } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
+import { Incremental } from './Incremental';
 
 /**
  * Compressing files.
  */
 export class Gzipper {
-  private readonly outputFileFormatRegexp = OUTPUT_FILE_FORMAT_REGEXP;
   private readonly nativeFs = {
     lstat: util.promisify(fs.lstat),
     readdir: util.promisify(fs.readdir),
+    exists: util.promisify(fs.exists),
   };
   private readonly nativeStream = {
     pipeline: util.promisify(stream.pipeline),
   };
   private readonly logger: Logger;
+  private readonly incremental!: Incremental;
   private readonly options: GlobalOptions;
   private readonly outputPath: string | undefined;
   private readonly compressionInstance:
@@ -51,12 +57,15 @@ export class Gzipper {
       throw new Error(message);
     }
     this.options = options;
+    this.target = path.resolve(process.cwd(), target);
+    this.compressionInstance = this.getCompressionInstance();
+    this.createCompression = this.compressionInstance.getCompression();
     if (outputPath) {
       this.outputPath = path.resolve(process.cwd(), outputPath);
     }
-    this.compressionInstance = this.getCompressionInstance();
-    this.target = path.resolve(process.cwd(), target);
-    this.createCompression = this.compressionInstance.getCompression();
+    if (options.incremental) {
+      this.incremental = new Incremental(this.target);
+    }
   }
 
   /**
@@ -68,8 +77,15 @@ export class Gzipper {
       if (this.outputPath) {
         await Helpers.createFolders(this.outputPath);
       }
+      if (this.options.incremental) {
+        await this.incremental.initCacheFolder();
+        await this.incremental.readCacheConfig();
+      }
       this.compressionLog();
       files = await this.compileFolderRecursively(this.target);
+      if (this.options.incremental) {
+        await this.incremental.initCacheConfig();
+      }
     } catch (error) {
       this.logger.error(error, true);
       throw new Error(error.message);
@@ -184,14 +200,42 @@ export class Gzipper {
       await Helpers.createFolders(target);
     }
     const outputPath = this.getOutputPath(target, filename);
-    // const checksum = await this.getFileChecksum(inputPath);
-    // console.log('checksum', checksum);
 
-    await this.nativeStream.pipeline(
-      fs.createReadStream(inputPath),
-      this.createCompression(),
-      fs.createWriteStream(outputPath),
-    );
+    if (this.options.incremental) {
+      const { isChanged, fileId } = await this.incremental.setFileChecksum(
+        inputPath,
+      );
+      const cachedFile = path.resolve(
+        this.target,
+        '..',
+        CACHE_FOLDER,
+        fileId as string,
+      );
+
+      if (isChanged) {
+        await this.nativeStream.pipeline(
+          fs.createReadStream(inputPath),
+          this.createCompression(),
+          fs.createWriteStream(outputPath),
+        );
+
+        await this.nativeStream.pipeline(
+          fs.createReadStream(outputPath),
+          fs.createWriteStream(cachedFile),
+        );
+      } else {
+        await this.nativeStream.pipeline(
+          fs.createReadStream(cachedFile),
+          fs.createWriteStream(outputPath),
+        );
+      }
+    } else {
+      await this.nativeStream.pipeline(
+        fs.createReadStream(inputPath),
+        this.createCompression(),
+        fs.createWriteStream(outputPath),
+      );
+    }
 
     if (this.options.verbose) {
       const beforeSize = (await this.nativeFs.lstat(inputPath)).size / 1024;
@@ -231,7 +275,7 @@ export class Gzipper {
       artifactsMap.set('[hash]', null);
 
       filename = this.options.outputFileFormat.replace(
-        this.outputFileFormatRegexp,
+        OUTPUT_FILE_FORMAT_REGEXP,
         artifact => {
           if (artifactsMap.has(artifact)) {
             // Need to generate hash only if we have appropriate param
