@@ -4,22 +4,28 @@ import path from 'path';
 import util from 'util';
 import uuid from 'uuid/v4';
 
-import { CACHE_FOLDER, CACHE_FILE } from './constants';
+import { CACHE_FOLDER, CONFIG_FILE } from './constants';
 import { Helpers } from './helpers';
+import { Purge, FileConfig } from './interfaces';
 
-export class Incremental {
+export class Incremental implements Purge {
   private readonly nativeFs = {
     writeFile: util.promisify(fs.writeFile),
     readFile: util.promisify(fs.readFile),
     exists: util.promisify(fs.exists),
+    unlink: util.promisify(fs.unlink),
   };
   private readonly target: string;
   private readonly cacheFolder: string;
-  private readonly cacheFile: string;
+  private readonly configFile: string;
   private fileChecksums = new Map<
     string,
     { checksum: string; fileId: string }
   >();
+
+  get cacheFolderPath(): string {
+    return this.cacheFolder;
+  }
 
   /**
    * Creates an instance of Incremental.
@@ -27,29 +33,31 @@ export class Incremental {
   constructor(target: string) {
     this.target = target;
     this.cacheFolder = path.resolve(this.target, '..', CACHE_FOLDER);
-    this.cacheFile = path.resolve(this.target, '..', CACHE_FILE);
+    this.configFile = path.resolve(this.target, '..', CONFIG_FILE);
   }
 
   /**
-   * Read cache config (.gzippercache).
+   * Read config (.gzipperconfig).
    */
-  async readCacheConfig(): Promise<void> {
-    if (await this.nativeFs.exists(this.cacheFile)) {
-      const response = await this.nativeFs.readFile(this.cacheFile);
-      const data = JSON.parse(response.toString());
-      this.fileChecksums = new Map(Object.entries(data.files));
+  async readConfig(): Promise<void> {
+    if (await this.nativeFs.exists(this.configFile)) {
+      const response = await this.nativeFs.readFile(this.configFile);
+      const data: FileConfig = JSON.parse(response.toString());
+      this.fileChecksums = new Map(Object.entries(data.incremental.files));
     }
   }
 
   /**
-   * Create cache config (.gzippercache).
+   * Create config (.gzipperconfig).
    */
-  async initCacheConfig(): Promise<void> {
+  async initConfig(): Promise<void> {
     const writable = {
-      files: Helpers.mapToJSON(this.fileChecksums),
+      incremental: {
+        files: Helpers.mapToJSON(this.fileChecksums),
+      },
     };
     await this.nativeFs.writeFile(
-      path.resolve(this.cacheFile),
+      path.resolve(this.configFile),
       JSON.stringify(writable, null, 2),
     );
   }
@@ -85,5 +93,19 @@ export class Incremental {
       });
       stream.on('error', error => reject(error));
     });
+  }
+
+  /**
+   * purge cache folder and configuration
+   */
+  async purge(): Promise<void> {
+    await this.nativeFs.unlink(this.cacheFolder);
+    const response = await this.nativeFs.readFile(this.configFile);
+    const data: FileConfig = JSON.parse(response.toString());
+    delete data.incremental;
+    await this.nativeFs.writeFile(
+      path.resolve(this.configFile),
+      JSON.stringify(data, null, 2),
+    );
   }
 }

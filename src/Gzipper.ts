@@ -79,12 +79,12 @@ export class Gzipper {
       }
       if (this.options.incremental) {
         await this.incremental.initCacheFolder();
-        await this.incremental.readCacheConfig();
+        await this.incremental.readConfig();
       }
       this.compressionLog();
       files = await this.compileFolderRecursively(this.target);
       if (this.options.incremental) {
-        await this.incremental.initCacheConfig();
+        await this.incremental.initConfig();
       }
     } catch (error) {
       this.logger.error(error, true);
@@ -203,9 +203,7 @@ export class Gzipper {
         inputPath,
       );
       const cachedFile = path.resolve(
-        this.target,
-        '..',
-        CACHE_FOLDER,
+        this.incremental.cacheFolderPath,
         fileId as string,
       );
 

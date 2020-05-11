@@ -61,6 +61,6 @@ typings/
 .vscode
 .idea
 .gzipper
-.gzippercache
+.gzipperconfig
 tsconfig.tsbuildinfo
 dist

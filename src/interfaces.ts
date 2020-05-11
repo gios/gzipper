@@ -25,8 +25,21 @@ export type CompressionOptions = {
 } & zlib.ZlibOptions;
 
 export type BrotliOptions = { [key: number]: number };
+
 export interface CompressedFile {
   beforeSize: number;
   afterSize: number;
   isCached: boolean;
+}
+
+export interface Purge {
+  purge(): Promise<void>;
+}
+
+export interface FileConfig {
+  incremental: IncrementalConfig;
+}
+
+export interface IncrementalConfig {
+  files: { [path: string]: { checksum: string; fileId: string } };
 }
