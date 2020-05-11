@@ -9,7 +9,7 @@ export class Config {
   private readonly nativeFs = {
     writeFile: util.promisify(fs.writeFile),
   };
-  private readonly writableContent!: FileConfig;
+  private readonly writableContent: FileConfig = {} as FileConfig;
   private readonly configFile: string;
 
   get configFilePath(): string {
@@ -24,13 +24,20 @@ export class Config {
   }
 
   /**
-   * set additional data to config file (.gzipperconfig).
+   * set additional data for property to config file (.gzipperconfig).
    */
-  setWritableContent<T extends FileConfig[keyof FileConfig]>(
+  setWritableContentProperty<T extends FileConfig[keyof FileConfig]>(
     field: keyof FileConfig,
     content: T | null,
   ): void {
     this.writableContent[field] = content;
+  }
+
+  /**
+   * delete property from config file (.gzipperconfig).
+   */
+  deleteWritableContentProperty(field: keyof FileConfig): void {
+    delete this.writableContent[field];
   }
 
   /**
@@ -39,7 +46,7 @@ export class Config {
   async writeConfig(): Promise<void> {
     await this.nativeFs.writeFile(
       path.resolve(this.configFile),
-      JSON.stringify(this.writableContent || '', null, 2),
+      JSON.stringify(this.writableContent, null, 2),
     );
   }
 }

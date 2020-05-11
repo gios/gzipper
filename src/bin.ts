@@ -5,7 +5,7 @@ import { GlobalOptions } from '../src/interfaces';
 import * as pack from '../package.json';
 
 export class Index {
-  private target: string | undefined;
+  private target!: string;
   private outputPath: string | undefined;
   private options: GlobalOptions | undefined;
   private readonly argv: string[] = process.argv;
@@ -16,6 +16,7 @@ export class Index {
       .version(pack.version)
       .usage('[options] <path> [outputPath]')
       .option('-v, --verbose', 'detailed level of logs')
+      .option('--purge', 'purge entities, the types are: cache')
       .option('--incremental', '(beta) incremental compression')
       .option(
         '-e, --exclude <extensions>',

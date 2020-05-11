@@ -54,7 +54,7 @@ export class Incremental implements Purge {
    * update config (.gzipperconfig).
    */
   async updateConfig(): Promise<void> {
-    this.config.setWritableContent('incremental', {
+    this.config.setWritableContentProperty('incremental', {
       files: Helpers.mapToJSON(this.fileChecksums),
     });
   }
@@ -97,7 +97,6 @@ export class Incremental implements Purge {
    */
   async purge(): Promise<void> {
     await this.nativeFs.unlink(this.cacheFolder);
-    this.config.setWritableContent('incremental', null);
-    await this.config.writeConfig();
+    this.config.deleteWritableContentProperty('incremental');
   }
 }

@@ -44,27 +44,27 @@ export class Gzipper {
    * Creates an instance of Gzipper.
    */
   constructor(
-    target: string | undefined | null,
+    target: string,
     outputPath?: string | undefined | null,
     options: GlobalOptions = {} as never,
   ) {
     this.logger = new Logger(options.verbose as boolean);
+    this.target = path.resolve(process.cwd(), target);
+    this.config = new Config(this.target);
     if (!target) {
       const message = `Can't find a path.`;
       this.logger.error(message, true);
       throw new Error(message);
     }
-    this.options = options;
-    this.target = path.resolve(process.cwd(), target);
-    this.compressionInstance = this.getCompressionInstance();
-    this.createCompression = this.compressionInstance.getCompression();
-    this.config = new Config(this.target);
     if (outputPath) {
       this.outputPath = path.resolve(process.cwd(), outputPath);
     }
     if (options.incremental) {
       this.incremental = new Incremental(this.target, this.config);
     }
+    this.options = options;
+    this.compressionInstance = this.getCompressionInstance();
+    this.createCompression = this.compressionInstance.getCompression();
   }
 
   /**
@@ -83,6 +83,7 @@ export class Gzipper {
       this.compressionLog();
       files = await this.compileFolderRecursively(this.target);
       if (this.options.incremental) {
+        await this.incremental.updateConfig();
         await this.config.writeConfig();
       }
     } catch (error) {
