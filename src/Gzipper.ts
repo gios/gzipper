@@ -8,14 +8,11 @@ import { Helpers } from './helpers';
 import { Logger } from './Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
-import {
-  OUTPUT_FILE_FORMAT_REGEXP,
-  NO_FILES_MESSAGE,
-  CACHE_FOLDER,
-} from './constants';
+import { OUTPUT_FILE_FORMAT_REGEXP, NO_FILES_MESSAGE } from './constants';
 import { GlobalOptions, CompressedFile } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
+import { Config } from './Config';
 
 /**
  * Compressing files.
@@ -31,6 +28,7 @@ export class Gzipper {
   };
   private readonly logger: Logger;
   private readonly incremental!: Incremental;
+  private readonly config: Config;
   private readonly options: GlobalOptions;
   private readonly outputPath: string | undefined;
   private readonly compressionInstance:
@@ -60,11 +58,12 @@ export class Gzipper {
     this.target = path.resolve(process.cwd(), target);
     this.compressionInstance = this.getCompressionInstance();
     this.createCompression = this.compressionInstance.getCompression();
+    this.config = new Config(this.target);
     if (outputPath) {
       this.outputPath = path.resolve(process.cwd(), outputPath);
     }
     if (options.incremental) {
-      this.incremental = new Incremental(this.target);
+      this.incremental = new Incremental(this.target, this.config);
     }
   }
 
@@ -84,7 +83,7 @@ export class Gzipper {
       this.compressionLog();
       files = await this.compileFolderRecursively(this.target);
       if (this.options.incremental) {
-        await this.incremental.initConfig();
+        await this.config.writeConfig();
       }
     } catch (error) {
       this.logger.error(error, true);

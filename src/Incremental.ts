@@ -4,9 +4,10 @@ import path from 'path';
 import util from 'util';
 import uuid from 'uuid/v4';
 
-import { CACHE_FOLDER, CONFIG_FILE } from './constants';
+import { CACHE_FOLDER } from './constants';
 import { Helpers } from './helpers';
 import { Purge, FileConfig } from './interfaces';
+import { Config } from './Config';
 
 export class Incremental implements Purge {
   private readonly nativeFs = {
@@ -17,7 +18,7 @@ export class Incremental implements Purge {
   };
   private readonly target: string;
   private readonly cacheFolder: string;
-  private readonly configFile: string;
+  private readonly config: Config;
   private fileChecksums = new Map<
     string,
     { checksum: string; fileId: string }
@@ -30,36 +31,32 @@ export class Incremental implements Purge {
   /**
    * Creates an instance of Incremental.
    */
-  constructor(target: string) {
+  constructor(target: string, config: Config) {
     this.target = target;
+    this.config = config;
     this.cacheFolder = path.resolve(this.target, '..', CACHE_FOLDER);
-    this.configFile = path.resolve(this.target, '..', CONFIG_FILE);
   }
 
   /**
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    if (await this.nativeFs.exists(this.configFile)) {
-      const response = await this.nativeFs.readFile(this.configFile);
+    if (await this.nativeFs.exists(this.config.configFilePath)) {
+      const response = await this.nativeFs.readFile(this.config.configFilePath);
       const data: FileConfig = JSON.parse(response.toString());
-      this.fileChecksums = new Map(Object.entries(data.incremental.files));
+      if (data.incremental) {
+        this.fileChecksums = new Map(Object.entries(data.incremental.files));
+      }
     }
   }
 
   /**
-   * Create config (.gzipperconfig).
+   * update config (.gzipperconfig).
    */
-  async initConfig(): Promise<void> {
-    const writable = {
-      incremental: {
-        files: Helpers.mapToJSON(this.fileChecksums),
-      },
-    };
-    await this.nativeFs.writeFile(
-      path.resolve(this.configFile),
-      JSON.stringify(writable, null, 2),
-    );
+  async updateConfig(): Promise<void> {
+    this.config.setWritableContent('incremental', {
+      files: Helpers.mapToJSON(this.fileChecksums),
+    });
   }
 
   /**
@@ -96,16 +93,11 @@ export class Incremental implements Purge {
   }
 
   /**
-   * purge cache folder and configuration
+   * purge cache folder and configuration.
    */
   async purge(): Promise<void> {
     await this.nativeFs.unlink(this.cacheFolder);
-    const response = await this.nativeFs.readFile(this.configFile);
-    const data: FileConfig = JSON.parse(response.toString());
-    delete data.incremental;
-    await this.nativeFs.writeFile(
-      path.resolve(this.configFile),
-      JSON.stringify(data, null, 2),
-    );
+    this.config.setWritableContent('incremental', null);
+    await this.config.writeConfig();
   }
 }
