@@ -25,3 +25,8 @@ export type CompressionOptions = {
 } & zlib.ZlibOptions;
 
 export type BrotliOptions = { [key: number]: number };
+export interface CompressedFile {
+  beforeSize: number;
+  afterSize: number;
+  isCached: boolean;
+}

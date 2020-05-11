@@ -37,7 +37,7 @@ export abstract class Compression<T extends CompressionOptions> {
       options += `${keyWrapper(key)}: ${value}, `;
     }
 
-    return `${this.compressionName} -> ${options.slice(0, -2)}`;
+    return `${this.compressionName} | ${options.slice(0, -2)}`;
   }
 
   /**

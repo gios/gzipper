@@ -13,7 +13,7 @@ import {
   NO_FILES_MESSAGE,
   CACHE_FOLDER,
 } from './constants';
-import { GlobalOptions } from './interfaces';
+import { GlobalOptions, CompressedFile } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
 
@@ -166,13 +166,9 @@ export class Gzipper {
           );
 
           if (fileInfo) {
-            const [seconds, nanoseconds] = process.hrtime(hrtimeStart);
+            const hrTimeEnd = process.hrtime(hrtimeStart);
             this.logger.info(
-              `File ${file} has been compressed ${fileInfo.beforeSize.toFixed(
-                4,
-              )}Kb -> ${fileInfo.afterSize.toFixed(4)}Kb (${
-                seconds ? seconds + 's ' : ''
-              }${nanoseconds / 1e6}ms)`,
+              this.getCompressedFileMsg(file, fileInfo, hrTimeEnd),
             );
           }
         }
@@ -190,7 +186,8 @@ export class Gzipper {
     filename: string,
     target: string,
     outputDir: string | undefined,
-  ): Promise<{ beforeSize: number; afterSize: number } | undefined> {
+  ): Promise<CompressedFile | undefined> {
+    let isCached = false;
     const inputPath = path.join(target, filename);
     if (outputDir) {
       const isFileTarget = (await this.nativeFs.lstat(this.target)).isFile();
@@ -228,6 +225,7 @@ export class Gzipper {
           fs.createReadStream(cachedFile),
           fs.createWriteStream(outputPath),
         );
+        isCached = true;
       }
     } else {
       await this.nativeStream.pipeline(
@@ -240,7 +238,7 @@ export class Gzipper {
     if (this.options.verbose) {
       const beforeSize = (await this.nativeFs.lstat(inputPath)).size / 1024;
       const afterSize = (await this.nativeFs.lstat(outputPath)).size / 1024;
-      return { beforeSize, afterSize };
+      return { beforeSize, afterSize, isCached };
     }
   }
 
@@ -309,5 +307,23 @@ export class Gzipper {
     }
 
     return true;
+  }
+
+  /**
+   * Returns information message about compressed file (size, time, cache, etc.)
+   */
+  private getCompressedFileMsg(
+    file: string,
+    fileInfo: CompressedFile,
+    hrTime: [number, number],
+  ): string {
+    const [seconds, nanoseconds] = hrTime;
+    const getTime = `${seconds ? seconds + 's ' : ''}${nanoseconds / 1e6}ms`;
+    const getSize = `${fileInfo.beforeSize.toFixed(
+      4,
+    )}Kb -> ${fileInfo.afterSize.toFixed(4)}Kb`;
+    return fileInfo.isCached
+      ? `${file} has been retrieved from the cache ${getSize}`
+      : `File ${file} has been compressed ${getSize} (${getTime})`;
   }
 }

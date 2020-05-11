@@ -46,7 +46,6 @@ export class Incremental {
    */
   async initCacheConfig(): Promise<void> {
     const writable = {
-      destination: this.target,
       files: Helpers.mapToJSON(this.fileChecksums),
     };
     await this.nativeFs.writeFile(
