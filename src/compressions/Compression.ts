@@ -1,18 +1,18 @@
 import zlib from 'zlib';
 
-import { GlobalOptions, CompressionOptions } from '../interfaces';
+import { CompressOptions, CompressionOptions } from '../interfaces';
 import { Logger } from '../Logger';
 
 export abstract class Compression<T extends CompressionOptions> {
   abstract ext: string;
   abstract compressionName: string;
-  protected readonly options: GlobalOptions;
+  protected readonly options: CompressOptions;
   protected readonly logger: Logger;
   protected compressionOptions: T = {} as T;
   /**
    * Creates an instance of Compression.
    */
-  constructor(options: GlobalOptions, logger: Logger) {
+  constructor(options: CompressOptions, logger: Logger) {
     this.options = options;
     this.logger = logger;
     this.selectCompression();

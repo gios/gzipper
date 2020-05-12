@@ -1,6 +1,6 @@
 import zlib from 'zlib';
 
-export interface GlobalOptions {
+export interface CompressOptions {
   verbose?: boolean;
   incremental?: boolean;
   exclude?: string[];

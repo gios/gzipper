@@ -9,7 +9,7 @@ import { Logger } from './Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
 import { OUTPUT_FILE_FORMAT_REGEXP, NO_FILES_MESSAGE } from './constants';
-import { GlobalOptions, CompressedFile } from './interfaces';
+import { CompressOptions, CompressedFile } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
@@ -29,7 +29,7 @@ export class Gzipper {
   private readonly logger: Logger;
   private readonly incremental!: Incremental;
   private readonly config: Config;
-  private readonly options: GlobalOptions;
+  private readonly options: CompressOptions;
   private readonly outputPath: string | undefined;
   private readonly compressionInstance:
     | BrotliCompression
@@ -45,8 +45,8 @@ export class Gzipper {
    */
   constructor(
     target: string,
-    outputPath?: string | undefined | null,
-    options: GlobalOptions = {} as never,
+    outputPath?: string,
+    options: CompressOptions = {} as never,
   ) {
     this.logger = new Logger(options.verbose as boolean);
     this.target = path.resolve(process.cwd(), target);

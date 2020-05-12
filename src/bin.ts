@@ -2,7 +2,7 @@ import program from 'commander';
 
 import { Gzipper } from '../src/Gzipper';
 import { Helpers } from '../src/helpers';
-import { GlobalOptions } from '../src/interfaces';
+import { CompressOptions } from '../src/interfaces';
 
 export class Index {
   private static readonly argv: string[] = process.argv;
@@ -77,7 +77,7 @@ export class Index {
       .option('', 'test-[filename]-[hash].[compressExt].[ext]')
       .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
       .action((target, outputPath, options) => {
-        const globalOptions: GlobalOptions = {
+        const globalOptions: CompressOptions = {
           verbose: this.env.GZIPPER_VERBOSE
             ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
             : options.verbose,
@@ -140,13 +140,10 @@ export class Index {
   }
 
   // Delete undefined and NaN options.
-  private static filterOptions(options: GlobalOptions): GlobalOptions {
-    Object.keys(options as GlobalOptions).forEach(key => {
-      if (
-        (options as GlobalOptions)[key] === undefined ||
-        (options as GlobalOptions)[key] !== (options as GlobalOptions)[key]
-      ) {
-        delete (options as GlobalOptions)[key];
+  private static filterOptions(options: CompressOptions): CompressOptions {
+    Object.keys(options).forEach(key => {
+      if (options[key] === undefined || options[key] !== options[key]) {
+        delete options[key];
       }
     });
 
@@ -156,7 +153,7 @@ export class Index {
   private static compress(
     target: string,
     outputPath: string,
-    options: GlobalOptions = {} as GlobalOptions,
+    options: CompressOptions = {} as CompressOptions,
   ): void {
     const gzipper = new Gzipper(target, outputPath, options);
     gzipper.compress().catch(err => console.error(err));

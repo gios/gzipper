@@ -1,7 +1,7 @@
 import zlib from 'zlib';
 
 import { Compression } from './Compression';
-import { GlobalOptions, CompressionOptions } from '../interfaces';
+import { CompressOptions, CompressionOptions } from '../interfaces';
 import { Logger } from '../Logger';
 
 /**
@@ -13,7 +13,7 @@ export class DeflateCompression extends Compression<CompressionOptions> {
   /**
    * Creates an instance of GzipCompression.
    */
-  constructor(options: GlobalOptions, logger: Logger) {
+  constructor(options: CompressOptions, logger: Logger) {
     super(options, logger);
   }
 

@@ -15,7 +15,7 @@ import {
   clear,
   COMPRESSION_EXTENSIONS,
 } from '../utils';
-import { GlobalOptions } from '../../src/interfaces';
+import { CompressOptions } from '../../src/interfaces';
 import { NO_FILES_MESSAGE } from '../../src/constants';
 
 const lstat = util.promisify(fs.lstat);
@@ -310,7 +310,7 @@ describe('CLI Gzipper', () => {
   });
 
   async function validateOutputFileFormat(
-    options: GlobalOptions,
+    options: CompressOptions,
     outputFileFormat: string,
   ): Promise<[Gzipper, sinon.SinonSpy]> {
     const gzipper = new Gzipper(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
