@@ -1,1 +1,1 @@
-export * from './src/Gzipper';
+export * from './src/Compress';

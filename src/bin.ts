@@ -1,6 +1,6 @@
 import program from 'commander';
 
-import { Gzipper } from '../src/Gzipper';
+import { Compress } from '../src/Compress';
 import { Helpers } from '../src/helpers';
 import { CompressOptions } from '../src/interfaces';
 
@@ -155,8 +155,8 @@ export class Index {
     outputPath: string,
     options: CompressOptions = {} as CompressOptions,
   ): void {
-    const gzipper = new Gzipper(target, outputPath, options);
-    gzipper.compress().catch(err => console.error(err));
+    const compress = new Compress(target, outputPath, options);
+    compress.compress().catch(err => console.error(err));
   }
 
   private static optionToArray(value: string): string[] | string {

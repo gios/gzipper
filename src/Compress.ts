@@ -17,7 +17,7 @@ import { Config } from './Config';
 /**
  * Compressing files.
  */
-export class Gzipper {
+export class Compress {
   private readonly nativeFs = {
     lstat: util.promisify(fs.lstat),
     readdir: util.promisify(fs.readdir),
@@ -41,7 +41,7 @@ export class Gzipper {
     | ReturnType<GzipCompression['getCompression']>
     | ReturnType<DeflateCompression['getCompression']>;
   /**
-   * Creates an instance of Gzipper.
+   * Creates an instance of Compress.
    */
   constructor(
     target: string,
