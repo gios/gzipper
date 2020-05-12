@@ -37,7 +37,8 @@ export interface Purge {
 }
 
 export interface FileConfig {
-  incremental: IncrementalConfig | null;
+  incremental?: IncrementalConfig;
+  version: string;
 }
 
 export interface IncrementalConfig {

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
-import uuid from 'uuid/v4';
+import { v4 } from 'uuid';
 import stream from 'stream';
 
 import { Helpers } from './helpers';
@@ -276,7 +276,7 @@ export class Gzipper {
           if (artifactsMap.has(artifact)) {
             // Need to generate hash only if we have appropriate param
             if (artifact === '[hash]') {
-              artifactsMap.set('[hash]', uuid());
+              artifactsMap.set('[hash]', v4());
             }
             return artifactsMap.get(artifact) as string;
           } else {

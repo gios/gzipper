@@ -4,6 +4,7 @@ import fs from 'fs';
 
 import { FileConfig } from './interfaces';
 import { CONFIG_FILE } from './constants';
+import { Helpers } from './helpers';
 
 export class Config {
   private readonly nativeFs = {
@@ -21,22 +22,23 @@ export class Config {
    */
   constructor(target: string) {
     this.configFile = path.resolve(target, '..', CONFIG_FILE);
+    this.setWritableContentProperty('version', Helpers.getVersion());
   }
 
   /**
    * set additional data for property to config file (.gzipperconfig).
    */
-  setWritableContentProperty<T extends FileConfig[keyof FileConfig]>(
-    field: keyof FileConfig,
-    content: T | null,
-  ): void {
+  setWritableContentProperty<
+    T extends keyof FileConfig,
+    K extends FileConfig[T]
+  >(field: T, content: K): void {
     this.writableContent[field] = content;
   }
 
   /**
    * delete property from config file (.gzipperconfig).
    */
-  deleteWritableContentProperty(field: keyof FileConfig): void {
+  deleteWritableContentProperty<T extends keyof FileConfig>(field: T): void {
     delete this.writableContent[field];
   }
 

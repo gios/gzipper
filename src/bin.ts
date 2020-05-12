@@ -1,8 +1,8 @@
 import program from 'commander';
 
 import { Gzipper } from '../src/Gzipper';
+import { Helpers } from '../src/helpers';
 import { GlobalOptions } from '../src/interfaces';
-import * as pack from '../package.json';
 
 export class Index {
   private target!: string;
@@ -13,10 +13,9 @@ export class Index {
 
   getOptions(): this {
     program
-      .version(pack.version)
+      .version(Helpers.getVersion())
       .usage('[options] <path> [outputPath]')
       .option('-v, --verbose', 'detailed level of logs')
-      .option('--purge', 'purge entities, the types are: cache')
       .option('--incremental', '(beta) incremental compression')
       .option(
         '-e, --exclude <extensions>',
@@ -76,9 +75,26 @@ export class Index {
       .option('', 'samples:')
       .option('', '[filename].[compressExt].[ext]')
       .option('', 'test-[filename]-[hash].[compressExt].[ext]')
-      .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
-      .parse(this.argv)
-      .removeAllListeners();
+      .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]');
+
+    program
+      .command('cache <action>')
+      .description(
+        'command to work with cache, available actions are: purge, size',
+      )
+      .action(action => {
+        switch (action) {
+          case 'purge':
+            break;
+
+          case 'size':
+            break;
+        }
+        console.log('aaa', action);
+        process.exit();
+      });
+
+    program.parse(this.argv).removeAllListeners();
 
     const [target, outputPath] = program.args;
     const options: GlobalOptions = {

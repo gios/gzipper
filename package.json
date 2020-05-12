@@ -63,7 +63,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "commander": "^3.0.2",
-    "uuid": "^3.4.0"
+    "commander": "^5.1.0",
+    "uuid": "^8.0.0"
   }
 }

@@ -2,7 +2,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import path from 'path';
 import util from 'util';
-import uuid from 'uuid/v4';
+import { v4 } from 'uuid';
 
 import { CACHE_FOLDER } from './constants';
 import { Helpers } from './helpers';
@@ -81,7 +81,7 @@ export class Incremental implements Purge {
         const checksum = hash.digest('hex');
         const isChanged = this.fileChecksums.get(target)?.checksum !== checksum;
         if (isChanged) {
-          this.fileChecksums.set(target, { checksum, fileId: uuid() });
+          this.fileChecksums.set(target, { checksum, fileId: v4() });
         }
         resolve({
           isChanged,

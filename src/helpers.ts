@@ -1,6 +1,8 @@
 import fs from 'fs';
 import util from 'util';
 
+import * as pack from '../package.json';
+
 export class Helpers {
   private static readonly nativeFs = {
     mkdir: util.promisify(fs.mkdir),
@@ -21,5 +23,12 @@ export class Helpers {
       obj[key] = value;
       return obj;
     }, {} as Record<K, V>);
+  }
+
+  /**
+   * Returns package version.
+   */
+  static getVersion(): string {
+    return pack.version;
   }
 }
