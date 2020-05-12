@@ -5,16 +5,16 @@ import { Helpers } from '../src/helpers';
 import { GlobalOptions } from '../src/interfaces';
 
 export class Index {
-  private target!: string;
-  private outputPath: string | undefined;
-  private options: GlobalOptions | undefined;
-  private readonly argv: string[] = process.argv;
-  private readonly env: NodeJS.ProcessEnv = process.env;
+  private static readonly argv: string[] = process.argv;
+  private static readonly env: NodeJS.ProcessEnv = process.env;
 
-  getOptions(): this {
+  static exec(): void {
+    program.version(Helpers.getVersion()).name('gzipper');
+
     program
-      .version(Helpers.getVersion())
-      .usage('[options] <path> [outputPath]')
+      .command('compress <path> [outputPath]')
+      .alias('c')
+      .description('compress selected path and optionally set output directory')
       .option('-v, --verbose', 'detailed level of logs')
       .option('--incremental', '(beta) incremental compression')
       .option(
@@ -75,100 +75,94 @@ export class Index {
       .option('', 'samples:')
       .option('', '[filename].[compressExt].[ext]')
       .option('', 'test-[filename]-[hash].[compressExt].[ext]')
-      .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]');
+      .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
+      .action((target, outputPath, options) => {
+        const globalOptions: GlobalOptions = {
+          verbose: this.env.GZIPPER_VERBOSE
+            ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
+            : options.verbose,
+          incremental: this.env.GZIPPER_INCREMENTAL
+            ? !!parseInt(this.env.GZIPPER_INCREMENTAL as string)
+            : options.incremental,
+          exclude:
+            this.optionToArray(this.env.GZIPPER_EXCLUDE as string) ||
+            options.exclude,
+          include:
+            this.optionToArray(this.env.GZIPPER_INCLUDE as string) ||
+            options.include,
+          threshold:
+            parseInt(this.env.GZIPPER_THRESHOLD as string) ||
+            options.threshold ||
+            0,
+          level: parseInt(this.env.GZIPPER_LEVEL as string) || options.level,
+          memoryLevel:
+            parseInt(this.env.GZIPPER_MEMORY_LEVEL as string) ||
+            options.memoryLevel,
+          strategy:
+            parseInt(this.env.GZIPPER_STRATEGY as string) || options.strategy,
+          brotli: this.env.GZIPPER_BROTLI
+            ? !!parseInt(this.env.GZIPPER_BROTLI as string)
+            : options.brotli,
+          deflate: this.env.GZIPPER_DEFLATE
+            ? !!parseInt(this.env.GZIPPER_DEFLATE as string)
+            : options.deflate,
+          brotliParamMode:
+            this.env.GZIPPER_BROTLI_PARAM_MODE || options.brotliParamMode,
+          brotliQuality:
+            parseInt(this.env.GZIPPER_BROTLI_QUALITY as string) ||
+            options.brotliQuality,
+          brotliSizeHint:
+            parseInt(this.env.GZIPPER_BROTLI_SIZE_HINT as string) ||
+            options.brotliSizeHint,
+          outputFileFormat:
+            this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
+        };
+
+        this.compress(target, outputPath, this.filterOptions(globalOptions));
+      });
 
     program
-      .command('cache <action>')
-      .description(
-        'command to work with cache, available actions are: purge, size',
-      )
-      .action(action => {
-        switch (action) {
-          case 'purge':
-            break;
-
-          case 'size':
-            break;
+      .command('cache')
+      .description('manipulation and information regarding cache')
+      .option('--purge', 'purge cache information')
+      .option('--size', 'size of cached resources')
+      .action(options => {
+        if (options.purge) {
+          console.log('PURGE!');
         }
-        console.log('aaa', action);
-        process.exit();
+
+        if (options.size) {
+          console.log('SIZE!');
+        }
       });
 
     program.parse(this.argv).removeAllListeners();
-
-    const [target, outputPath] = program.args;
-    const options: GlobalOptions = {
-      verbose: this.env.GZIPPER_VERBOSE
-        ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
-        : program.verbose,
-      incremental: this.env.GZIPPER_INCREMENTAL
-        ? !!parseInt(this.env.GZIPPER_INCREMENTAL as string)
-        : program.incremental,
-      exclude:
-        this.optionToArray(this.env.GZIPPER_EXCLUDE as string) ||
-        program.exclude,
-      include:
-        this.optionToArray(this.env.GZIPPER_INCLUDE as string) ||
-        program.include,
-      threshold:
-        parseInt(this.env.GZIPPER_THRESHOLD as string) ||
-        program.threshold ||
-        0,
-      level: parseInt(this.env.GZIPPER_LEVEL as string) || program.level,
-      memoryLevel:
-        parseInt(this.env.GZIPPER_MEMORY_LEVEL as string) ||
-        program.memoryLevel,
-      strategy:
-        parseInt(this.env.GZIPPER_STRATEGY as string) || program.strategy,
-      brotli: this.env.GZIPPER_BROTLI
-        ? !!parseInt(this.env.GZIPPER_BROTLI as string)
-        : program.brotli,
-      deflate: this.env.GZIPPER_DEFLATE
-        ? !!parseInt(this.env.GZIPPER_DEFLATE as string)
-        : program.deflate,
-      brotliParamMode:
-        this.env.GZIPPER_BROTLI_PARAM_MODE || program.brotliParamMode,
-      brotliQuality:
-        parseInt(this.env.GZIPPER_BROTLI_QUALITY as string) ||
-        program.brotliQuality,
-      brotliSizeHint:
-        parseInt(this.env.GZIPPER_BROTLI_SIZE_HINT as string) ||
-        program.brotliSizeHint,
-      outputFileFormat:
-        this.env.GZIPPER_OUTPUT_FILE_FORMAT || program.outputFileFormat,
-    };
-
-    this.target = target;
-    this.outputPath = outputPath;
-    this.options = options;
-    return this;
   }
 
   // Delete undefined and NaN options.
-  filterOptions(): this {
-    Object.keys(this.options as GlobalOptions).forEach(key => {
+  private static filterOptions(options: GlobalOptions): GlobalOptions {
+    Object.keys(options as GlobalOptions).forEach(key => {
       if (
-        (this.options as GlobalOptions)[key] === undefined ||
-        (this.options as GlobalOptions)[key] !==
-          (this.options as GlobalOptions)[key]
+        (options as GlobalOptions)[key] === undefined ||
+        (options as GlobalOptions)[key] !== (options as GlobalOptions)[key]
       ) {
-        delete (this.options as GlobalOptions)[key];
+        delete (options as GlobalOptions)[key];
       }
     });
 
-    return this;
+    return options;
   }
 
-  start(): void {
-    const gzipper = new Gzipper(
-      this.target,
-      this.outputPath,
-      (this.options as GlobalOptions) || {},
-    );
+  private static compress(
+    target: string,
+    outputPath: string,
+    options: GlobalOptions = {} as GlobalOptions,
+  ): void {
+    const gzipper = new Gzipper(target, outputPath, options);
     gzipper.compress().catch(err => console.error(err));
   }
 
-  private optionToArray(value: string): string[] | string {
+  private static optionToArray(value: string): string[] | string {
     if (value) {
       return value.split(',').map(item => item.trim());
     }
@@ -178,8 +172,5 @@ export class Index {
 }
 
 if (process.env.NODE_ENV !== 'testing') {
-  new Index()
-    .getOptions()
-    .filterOptions()
-    .start();
+  Index.exec();
 }
