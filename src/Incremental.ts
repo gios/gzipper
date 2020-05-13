@@ -16,7 +16,6 @@ export class Incremental implements Purge {
     exists: util.promisify(fs.exists),
     unlink: util.promisify(fs.unlink),
   };
-  private readonly target: string;
   private readonly cacheFolder: string;
   private readonly config: Config;
   private fileChecksums = new Map<
@@ -31,15 +30,9 @@ export class Incremental implements Purge {
   /**
    * Creates an instance of Incremental.
    */
-  constructor(target: string, config: Config) {
-    this.target = target;
+  constructor(config: Config) {
     this.config = config;
-    this.cacheFolder = path.resolve(
-      this.target,
-      '..',
-      CONFIG_FOLDER,
-      CACHE_FOLDER,
-    );
+    this.cacheFolder = path.resolve(process.cwd(), CONFIG_FOLDER, CACHE_FOLDER);
   }
 
   /**

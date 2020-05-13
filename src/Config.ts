@@ -20,8 +20,8 @@ export class Config {
   /**
    * Creates an instance of Config.
    */
-  constructor(target: string) {
-    this.configFile = path.resolve(target, '..', CONFIG_FOLDER, CONFIG_FILE);
+  constructor() {
+    this.configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
     this.setWritableContentProperty('version', Helpers.getVersion());
   }
 
