@@ -317,9 +317,9 @@ export class Compress {
   ): string {
     const [seconds, nanoseconds] = hrTime;
     const getTime = `${seconds ? seconds + 's ' : ''}${nanoseconds / 1e6}ms`;
-    const getSize = `${fileInfo.beforeSize.toFixed(
-      4,
-    )}Kb -> ${fileInfo.afterSize.toFixed(4)}Kb`;
+    const getSize = `${Helpers.readableBytes(
+      fileInfo.beforeSize,
+    )} -> ${Helpers.readableBytes(fileInfo.afterSize)}`;
     return fileInfo.isCached
       ? `${file} has been retrieved from the cache ${getSize}`
       : `File ${file} has been compressed ${getSize} (${getTime})`;

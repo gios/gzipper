@@ -123,7 +123,7 @@ export class Index {
 
     program
       .command('cache')
-      .description('manipulation and information regarding cache')
+      .description('manipulations with cache')
       .option('--purge', 'purge cache information')
       .option('--size', 'size of cached resources')
       .action(options => {

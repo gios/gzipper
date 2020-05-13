@@ -99,4 +99,11 @@ export class Incremental implements Purge {
     await this.nativeFs.unlink(this.cacheFolder);
     this.config.deleteWritableContentProperty('incremental');
   }
+
+  /**
+   * returns cache size.
+   */
+  async cacheSize(): Promise<string> {
+    return 'under development';
+  }
 }
