@@ -124,7 +124,7 @@ export class Index {
     program
       .command('cache')
       .description('manipulations with cache')
-      .option('--purge', 'purge cache information')
+      .option('--purge', 'remove cache files')
       .option('--size', 'size of cached resources')
       .action(options => {
         if (options.purge) {
