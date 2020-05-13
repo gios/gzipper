@@ -3,7 +3,7 @@ import util from 'util';
 import fs from 'fs';
 
 import { FileConfig } from './interfaces';
-import { CONFIG_FILE } from './constants';
+import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
 
 export class Config {
@@ -21,7 +21,7 @@ export class Config {
    * Creates an instance of Config.
    */
   constructor(target: string) {
-    this.configFile = path.resolve(target, '..', CONFIG_FILE);
+    this.configFile = path.resolve(target, '..', CONFIG_FOLDER, CONFIG_FILE);
     this.setWritableContentProperty('version', Helpers.getVersion());
   }
 

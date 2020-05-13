@@ -4,7 +4,7 @@ import path from 'path';
 import util from 'util';
 import { v4 } from 'uuid';
 
-import { CACHE_FOLDER } from './constants';
+import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
 import { Purge, FileConfig } from './interfaces';
 import { Config } from './Config';
@@ -34,7 +34,12 @@ export class Incremental implements Purge {
   constructor(target: string, config: Config) {
     this.target = target;
     this.config = config;
-    this.cacheFolder = path.resolve(this.target, '..', CACHE_FOLDER);
+    this.cacheFolder = path.resolve(
+      this.target,
+      '..',
+      CONFIG_FOLDER,
+      CACHE_FOLDER,
+    );
   }
 
   /**
