@@ -3,6 +3,9 @@ import program from 'commander';
 import { Compress } from '../src/Compress';
 import { Helpers } from '../src/helpers';
 import { CompressOptions } from '../src/interfaces';
+import { Incremental } from './Incremental';
+import { Config } from './Config';
+import { Logger } from './Logger';
 
 export class Index {
   private static readonly argv: string[] = process.argv;
@@ -124,15 +127,33 @@ export class Index {
     program
       .command('cache')
       .description('manipulations with cache')
-      .option('--purge', 'remove cache files')
+      .option('--purge', 'purge cache storage')
       .option('--size', 'size of cached resources')
-      .action(options => {
+      .action(async options => {
+        const logger = new Logger();
+        if (options.parent.args.length === 1) {
+          const availableOptions = options.options.reduce(
+            (prev: { flags: string }, next: { flags: string }) =>
+              `${prev.flags}, ${next.flags}`,
+          );
+          logger.warn(
+            `Select one of the options to proceed (${availableOptions}).`,
+          );
+          return;
+        }
+        const config = new Config();
+        const incremental = new Incremental(config);
+
         if (options.purge) {
-          console.log('PURGE!');
+          await incremental.cachePurge();
+          logger.success(
+            'Cache has been purged, you are free to initialize a new one.',
+          );
         }
 
         if (options.size) {
-          console.log('SIZE!');
+          const size = await incremental.cacheSize();
+          logger.info(`Cache size is ${Helpers.readableSize(size)}`);
         }
       });
 

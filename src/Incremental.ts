@@ -6,26 +6,23 @@ import { v4 } from 'uuid';
 
 import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
-import { Purge, FileConfig } from './interfaces';
+import { Cache, FileConfig } from './interfaces';
 import { Config } from './Config';
 
-export class Incremental implements Purge {
+export class Incremental implements Cache {
+  readonly cacheFolder: string;
   private readonly nativeFs = {
-    writeFile: util.promisify(fs.writeFile),
     readFile: util.promisify(fs.readFile),
     exists: util.promisify(fs.exists),
     unlink: util.promisify(fs.unlink),
+    readdir: util.promisify(fs.readdir),
+    lstat: util.promisify(fs.lstat),
   };
-  private readonly cacheFolder: string;
   private readonly config: Config;
   private fileChecksums = new Map<
     string,
     { checksum: string; fileId: string }
   >();
-
-  get cacheFolderPath(): string {
-    return this.cacheFolder;
-  }
 
   /**
    * Creates an instance of Incremental.
@@ -39,8 +36,8 @@ export class Incremental implements Purge {
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    if (await this.nativeFs.exists(this.config.configFilePath)) {
-      const response = await this.nativeFs.readFile(this.config.configFilePath);
+    if (await this.nativeFs.exists(this.config.configFile)) {
+      const response = await this.nativeFs.readFile(this.config.configFile);
       const data: FileConfig = JSON.parse(response.toString());
       if (data.incremental) {
         this.fileChecksums = new Map(Object.entries(data.incremental.files));
@@ -91,9 +88,9 @@ export class Incremental implements Purge {
   }
 
   /**
-   * purge cache folder and configuration.
+   * purge cache folder.
    */
-  async purge(): Promise<void> {
+  async cachePurge(): Promise<void> {
     await this.nativeFs.unlink(this.cacheFolder);
     this.config.deleteWritableContentProperty('incremental');
   }
@@ -101,7 +98,19 @@ export class Incremental implements Purge {
   /**
    * returns cache size.
    */
-  async cacheSize(): Promise<string> {
-    return 'under development';
+  async cacheSize(folderPath = this.cacheFolder, size = 0): Promise<number> {
+    const files = await this.nativeFs.readdir(folderPath);
+
+    for (const file of files) {
+      const filePath = path.resolve(folderPath, file);
+      const fileStat = await this.nativeFs.lstat(filePath);
+
+      if (fileStat.isDirectory()) {
+        size += await this.cacheSize(filePath, size);
+      } else if (fileStat.isFile()) {
+        size += fileStat.size;
+      }
+    }
+    return size;
   }
 }

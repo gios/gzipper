@@ -141,19 +141,17 @@ export class Compress {
 
       for (const file of filesList) {
         const filePath = path.resolve(target, file);
-        const isFile = (await this.nativeFs.lstat(filePath)).isFile();
-        const isDirectory = (await this.nativeFs.lstat(filePath)).isDirectory();
+        const fileStat = await this.nativeFs.lstat(filePath);
 
-        if (isDirectory) {
+        if (fileStat.isDirectory()) {
           compressedFiles.push(
             ...(await this.compileFolderRecursively(filePath)),
           );
         } else if (
-          isFile &&
+          fileStat.isFile() &&
           this.isValidFileExtensions(path.extname(filePath).slice(1))
         ) {
-          const { size: fileSize } = await this.nativeFs.lstat(filePath);
-          if (fileSize < this.options.threshold) {
+          if (fileStat.size < this.options.threshold) {
             continue;
           }
 
@@ -203,7 +201,7 @@ export class Compress {
         inputPath,
       );
       const cachedFile = path.resolve(
-        this.incremental.cacheFolderPath,
+        this.incremental.cacheFolder,
         fileId as string,
       );
 
@@ -245,7 +243,7 @@ export class Compress {
    */
   private compressionLog(): void {
     const options = this.compressionInstance.readableOptions();
-    this.logger.warn(options, true);
+    this.logger.warn(`Compression ${options}`, true);
 
     if (!this.options.outputFileFormat) {
       this.logger.info(
@@ -317,9 +315,9 @@ export class Compress {
   ): string {
     const [seconds, nanoseconds] = hrTime;
     const getTime = `${seconds ? seconds + 's ' : ''}${nanoseconds / 1e6}ms`;
-    const getSize = `${Helpers.readableBytes(
+    const getSize = `${Helpers.readableSize(
       fileInfo.beforeSize,
-    )} -> ${Helpers.readableBytes(fileInfo.afterSize)}`;
+    )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
     return fileInfo.isCached
       ? `${file} has been retrieved from the cache ${getSize}`
       : `File ${file} has been compressed ${getSize} (${getTime})`;

@@ -7,15 +7,11 @@ import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
 
 export class Config {
+  readonly configFile: string;
   private readonly nativeFs = {
     writeFile: util.promisify(fs.writeFile),
   };
   private readonly writableContent: FileConfig = {} as FileConfig;
-  private readonly configFile: string;
-
-  get configFilePath(): string {
-    return this.configFile;
-  }
 
   /**
    * Creates an instance of Config.

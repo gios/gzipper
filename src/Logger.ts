@@ -6,7 +6,7 @@ export class Logger {
   /**
    * Creates an instance of Logger.
    */
-  constructor(verbose: boolean) {
+  constructor(verbose = true) {
     this.verbose = verbose;
   }
 
@@ -45,23 +45,23 @@ export class Logger {
     level: 'info' | 'error' | 'warning' | 'success',
   ): (message: string, force?: boolean) => void {
     let colorfulMessage: string;
-    const prefix = 'gzipper: ';
+    const prefix = 'gzipper';
 
     switch (level) {
       case 'info':
-        colorfulMessage = `\x1b[36m${prefix}%s\x1b[0m`;
+        colorfulMessage = `\x1b[30;46m${prefix}:\x1b[0m\x1b[36m %s\x1b[0m`;
         break;
 
       case 'error':
-        colorfulMessage = `\x1b[31m${prefix}%s\x1b[0m`;
+        colorfulMessage = `\x1b[30;41m${prefix}:\x1b[0m\x1b[31m %s\x1b[0m`;
         break;
 
       case 'warning':
-        colorfulMessage = `\x1b[33m${prefix}%s\x1b[0m`;
+        colorfulMessage = `\x1b[30;43m${prefix}:\x1b[0m\x1b[33m %s\x1b[0m`;
         break;
 
       case 'success':
-        colorfulMessage = `\x1b[32m${prefix}%s\x1b[0m`;
+        colorfulMessage = `\x1b[30;42m${prefix}:\x1b[0m\x1b[32m %s\x1b[0m`;
         break;
     }
 

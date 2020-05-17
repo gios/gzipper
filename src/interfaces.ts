@@ -32,8 +32,9 @@ export interface CompressedFile {
   isCached: boolean;
 }
 
-export interface Purge {
-  purge(): Promise<void>;
+export interface Cache {
+  cachePurge(): Promise<void>;
+  cacheSize(): Promise<number>;
 }
 
 export interface FileConfig {
