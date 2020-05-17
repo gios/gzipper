@@ -17,6 +17,7 @@ export class Incremental implements Cache {
     unlink: util.promisify(fs.unlink),
     readdir: util.promisify(fs.readdir),
     lstat: util.promisify(fs.lstat),
+    rmdir: util.promisify(fs.rmdir),
   };
   private readonly config: Config;
   private fileChecksums = new Map<
@@ -91,8 +92,29 @@ export class Incremental implements Cache {
    * purge cache folder.
    */
   async cachePurge(): Promise<void> {
-    await this.nativeFs.unlink(this.cacheFolder);
+    const recursiveRemove = async (
+      folderPath = this.cacheFolder,
+    ): Promise<void> => {
+      const files = await this.nativeFs.readdir(folderPath);
+
+      for (const file of files) {
+        const filePath = path.resolve(folderPath, file);
+        const isDirectory = (await this.nativeFs.lstat(filePath)).isDirectory();
+
+        if (isDirectory) {
+          await recursiveRemove(filePath);
+        } else {
+          await this.nativeFs.unlink(filePath);
+        }
+      }
+
+      await this.nativeFs.rmdir(folderPath);
+    };
+    if (await this.nativeFs.exists(this.cacheFolder)) {
+      await recursiveRemove();
+    }
     this.config.deleteWritableContentProperty('incremental');
+    await this.config.writeConfig();
   }
 
   /**
@@ -100,6 +122,10 @@ export class Incremental implements Cache {
    */
   async cacheSize(folderPath = this.cacheFolder, size = 0): Promise<number> {
     const files = await this.nativeFs.readdir(folderPath);
+
+    if (!files.length) {
+      return 0;
+    }
 
     for (const file of files) {
       const filePath = path.resolve(folderPath, file);

@@ -153,7 +153,11 @@ export class Index {
 
         if (options.size) {
           const size = await incremental.cacheSize();
-          logger.info(`Cache size is ${Helpers.readableSize(size)}`);
+          logger.info(
+            size
+              ? `Cache size is ${Helpers.readableSize(size)}`
+              : `Cache is empty, initialize a new one with --incremental option.`,
+          );
         }
       });
 
