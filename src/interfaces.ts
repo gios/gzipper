@@ -42,6 +42,14 @@ export interface FileConfig {
   version: string;
 }
 
+export interface IncrementalFileValue {
+  checksum: string;
+  fileId: string;
+  options: CompressionOptions | BrotliOptions;
+}
+
 export interface IncrementalConfig {
-  files: { [path: string]: { checksum: string; fileId: string } };
+  files: {
+    [path: string]: IncrementalFileValue;
+  };
 }

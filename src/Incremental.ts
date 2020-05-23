@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 
 import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
-import { Cache, FileConfig } from './interfaces';
+import { Cache, FileConfig, IncrementalFileValue } from './interfaces';
 import { Config } from './Config';
 
 export class Incremental implements Cache {
@@ -20,10 +20,7 @@ export class Incremental implements Cache {
     rmdir: util.promisify(fs.rmdir),
   };
   private readonly config: Config;
-  private fileChecksums = new Map<
-    string,
-    { checksum: string; fileId: string }
-  >();
+  private filePaths = new Map<string, IncrementalFileValue>();
 
   /**
    * Creates an instance of Incremental.
@@ -41,7 +38,7 @@ export class Incremental implements Cache {
       const response = await this.nativeFs.readFile(this.config.configFile);
       const data: FileConfig = JSON.parse(response.toString());
       if (data.incremental) {
-        this.fileChecksums = new Map(Object.entries(data.incremental.files));
+        this.filePaths = new Map(Object.entries(data.incremental.files));
       }
     }
   }
@@ -51,7 +48,7 @@ export class Incremental implements Cache {
    */
   async updateConfig(): Promise<void> {
     this.config.setWritableContentProperty('incremental', {
-      files: Helpers.mapToJSON(this.fileChecksums),
+      files: Helpers.mapToJSON(this.filePaths),
     });
   }
 
@@ -63,27 +60,49 @@ export class Incremental implements Cache {
   }
 
   /**
+   * Returns file incremental info and save checksum and options to `filePath` (if file is changed or newly created).
+   */
+  setFile(
+    target: string,
+    checksum: string,
+    compressOptions: IncrementalFileValue['options'],
+  ): {
+    isChanged: boolean;
+    fileId: string;
+  } {
+    const filePath = this.filePaths.get(target);
+    const isChanged = filePath?.checksum !== checksum;
+
+    if (!filePath || isChanged) {
+      const fileId = v4();
+      this.filePaths.set(target, {
+        checksum,
+        fileId,
+        options: compressOptions,
+      });
+
+      return {
+        isChanged: true,
+        fileId,
+      };
+    }
+
+    return {
+      isChanged: false,
+      fileId: filePath.fileId,
+    };
+  }
+
+  /**
    * Returns file checksum.
    */
-  async setFileChecksum(
-    target: string,
-  ): Promise<{ isChanged: boolean; fileId?: string }> {
+  async getFileChecksum(target: string): Promise<string> {
     const hash = crypto.createHash('md5');
     const stream = fs.createReadStream(target);
 
     return new Promise((resolve, reject) => {
       stream.on('data', data => hash.update(data, 'utf8'));
-      stream.on('end', () => {
-        const checksum = hash.digest('hex');
-        const isChanged = this.fileChecksums.get(target)?.checksum !== checksum;
-        if (isChanged) {
-          this.fileChecksums.set(target, { checksum, fileId: v4() });
-        }
-        resolve({
-          isChanged,
-          fileId: this.fileChecksums.get(target)?.fileId,
-        });
-      });
+      stream.on('end', () => resolve(hash.digest('hex')));
       stream.on('error', error => reject(error));
     });
   }

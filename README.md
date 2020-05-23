@@ -92,7 +92,7 @@ Locally usage.
 ```javascript
 const { Gzipper } = require('gzipper');
 const gzipper = new Gzipper(target, outputPath, options?);
-await gzipper.compress()
+gzipper.compress()
   .then(files => console.info("Compressed files: ", files))
   .catch(err => console.error(err));
 ```

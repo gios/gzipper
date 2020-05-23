@@ -197,9 +197,13 @@ export class Compress {
     const outputPath = this.getOutputPath(target, filename);
 
     if (this.options.incremental) {
-      const { isChanged, fileId } = await this.incremental.setFileChecksum(
+      const checksum = await this.incremental.getFileChecksum(inputPath);
+      const { isChanged, fileId } = await this.incremental.setFile(
         inputPath,
+        checksum,
+        this.compressionInstance.compressionOptions,
       );
+
       const cachedFile = path.resolve(
         this.incremental.cacheFolder,
         fileId as string,

@@ -4,11 +4,12 @@ import { CompressOptions, CompressionOptions } from '../interfaces';
 import { Logger } from '../Logger';
 
 export abstract class Compression<T extends CompressionOptions> {
+  compressionOptions: T = {} as T;
   abstract ext: string;
   abstract compressionName: string;
   protected readonly options: CompressOptions;
   protected readonly logger: Logger;
-  protected compressionOptions: T = {} as T;
+
   /**
    * Creates an instance of Compression.
    */

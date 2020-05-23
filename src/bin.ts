@@ -79,7 +79,7 @@ export class Index {
       .option('', '[filename].[compressExt].[ext]')
       .option('', 'test-[filename]-[hash].[compressExt].[ext]')
       .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
-      .action((target, outputPath, options) => {
+      .action(async (target, outputPath, options) => {
         const globalOptions: CompressOptions = {
           verbose: this.env.GZIPPER_VERBOSE
             ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
@@ -121,7 +121,11 @@ export class Index {
             this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
         };
 
-        this.compress(target, outputPath, this.filterOptions(globalOptions));
+        await this.compress(
+          target,
+          outputPath,
+          this.filterOptions(globalOptions),
+        );
       });
 
     program
@@ -175,13 +179,17 @@ export class Index {
     return options;
   }
 
-  private static compress(
+  private static async compress(
     target: string,
     outputPath: string,
     options: CompressOptions = {} as CompressOptions,
-  ): void {
+  ): Promise<void> {
     const compress = new Compress(target, outputPath, options);
-    compress.compress().catch(err => console.error(err));
+    try {
+      await compress.compress();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   private static optionToArray(value: string): string[] | string {
