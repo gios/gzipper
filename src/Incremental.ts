@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import path from 'path';
 import util from 'util';
 import { v4 } from 'uuid';
+import deepEqual from 'deep-equal';
 
 import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
@@ -65,20 +66,56 @@ export class Incremental implements Cache {
   setFile(
     target: string,
     checksum: string,
-    compressOptions: IncrementalFileValue['options'],
+    compressOptions: IncrementalFileValue['revisions'][number]['options'],
   ): {
     isChanged: boolean;
     fileId: string;
   } {
     const filePath = this.filePaths.get(target);
-    const isChanged = filePath?.checksum !== checksum;
+    const selectedRevision = filePath?.revisions.find(revision =>
+      deepEqual(revision.options, compressOptions),
+    );
+    const fileId = v4();
 
-    if (!filePath || isChanged) {
-      const fileId = v4();
+    if (!filePath) {
       this.filePaths.set(target, {
-        checksum,
+        revisions: [
+          {
+            lastChecksum: checksum,
+            fileId,
+            options: compressOptions,
+          },
+        ],
+      });
+
+      return {
+        isChanged: true,
         fileId,
-        options: compressOptions,
+      };
+    }
+
+    if (!selectedRevision) {
+      this.filePaths.set(target, {
+        revisions: filePath.revisions.concat({
+          lastChecksum: checksum,
+          fileId,
+          options: compressOptions,
+        }),
+      });
+
+      return {
+        isChanged: true,
+        fileId,
+      };
+    }
+
+    if (selectedRevision.lastChecksum !== checksum) {
+      this.filePaths.set(target, {
+        revisions: filePath.revisions.map(revision => {
+          return revision.fileId === selectedRevision.fileId
+            ? { ...revision, fileId, lastChecksum: checksum }
+            : revision;
+        }),
       });
 
       return {
@@ -89,7 +126,7 @@ export class Incremental implements Cache {
 
     return {
       isChanged: false,
-      fileId: filePath.fileId,
+      fileId: selectedRevision.fileId,
     };
   }
 

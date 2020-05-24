@@ -43,7 +43,11 @@ export interface FileConfig {
 }
 
 export interface IncrementalFileValue {
-  checksum: string;
+  revisions: IncrementalFileValueRevisions[];
+}
+
+export interface IncrementalFileValueRevisions {
+  lastChecksum: string;
   fileId: string;
   options: CompressionOptions | BrotliOptions;
 }
