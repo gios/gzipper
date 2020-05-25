@@ -42,4 +42,12 @@ export class Helpers {
       (bytes / Math.pow(1024, i)).toFixed(2),
     ).toString()} ${sizes[i] || 'b'}`;
   }
+
+  /**
+   * returns readable format from hrtime.
+   */
+  static readableHrtime(hrTime: [number, number]): string {
+    const [seconds, nanoseconds] = hrTime;
+    return `${seconds ? seconds + 's ' : ''}${nanoseconds / 1e6}ms`;
+  }
 }

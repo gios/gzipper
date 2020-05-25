@@ -71,7 +71,8 @@ export class Compress {
    * Start compressing files.
    */
   async compress(): Promise<string[]> {
-    let files;
+    let files: string[];
+    let hrtime: [number, number];
     try {
       if (this.outputPath) {
         await Helpers.createFolders(this.outputPath);
@@ -81,7 +82,9 @@ export class Compress {
         await this.incremental.readConfig();
       }
       this.compressionLog();
+      const hrtimeStart = process.hrtime();
       files = await this.compileFolderRecursively(this.target);
+      hrtime = process.hrtime(hrtimeStart);
       if (this.options.incremental) {
         await this.incremental.updateConfig();
         await this.config.writeConfig();
@@ -96,7 +99,7 @@ export class Compress {
       this.logger.success(
         `${filesCount} ${
           filesCount > 1 ? 'files have' : 'file has'
-        } been compressed.`,
+        } been compressed. (${Helpers.readableHrtime(hrtime)})`,
         true,
       );
     } else {
@@ -315,15 +318,15 @@ export class Compress {
   private getCompressedFileMsg(
     file: string,
     fileInfo: CompressedFile,
-    hrTime: [number, number],
+    hrtime: [number, number],
   ): string {
-    const [seconds, nanoseconds] = hrTime;
-    const getTime = `${seconds ? seconds + 's ' : ''}${nanoseconds / 1e6}ms`;
     const getSize = `${Helpers.readableSize(
       fileInfo.beforeSize,
     )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
     return fileInfo.isCached
       ? `${file} has been retrieved from the cache ${getSize}`
-      : `File ${file} has been compressed ${getSize} (${getTime})`;
+      : `File ${file} has been compressed ${getSize} (${Helpers.readableHrtime(
+          hrtime,
+        )})`;
   }
 }
