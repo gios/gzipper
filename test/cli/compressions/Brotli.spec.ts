@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import zlib from 'zlib';
 
 import { disableBrotli } from '../../helpers';
-import { Gzipper } from '../../../src/Gzipper';
+import { Compress } from '../../../src/Compress';
 import {
   COMPRESS_PATH,
   getFiles,
@@ -13,7 +13,7 @@ import {
 
 const describeTest = disableBrotli ? describe.skip : describe;
 
-describeTest('CLI Gzipper -> Brotli compression', () => {
+describeTest('CLI Compress -> Brotli compression', () => {
   beforeEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
   });
@@ -27,7 +27,7 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
       zlib.createBrotliCompress && zlib.createBrotliCompress.bind({});
     try {
       delete zlib.createBrotliCompress;
-      new Gzipper(COMPRESS_PATH, null, { brotli: true, threshold: 0 });
+      new Compress(COMPRESS_PATH, null, { brotli: true, threshold: 0 });
     } catch (err) {
       assert.ok(err instanceof Error);
       assert.strictEqual(
@@ -49,9 +49,9 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const gzipper = new Gzipper(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
-    await gzipper.compress();
+    const compress = new Compress(COMPRESS_PATH, null, options);
+    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
     assert.ok(
@@ -61,30 +61,30 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
       ),
     );
     assert.ok(
-      (gzipper as any).createCompression() instanceof
+      (compress as any).createCompression() instanceof
         (zlib as any).BrotliCompress,
     );
-    assert.strictEqual((gzipper as any).compressionInstance.ext, 'br');
+    assert.strictEqual((compress as any).compressionInstance.ext, 'br');
     assert.strictEqual(
-      Object.keys((gzipper as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstance.compressionOptions)
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 5);
+    assert.strictEqual(Object.keys((compress as any).options).length, 5);
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstance.compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
       zlib.constants.BROTLI_MODE_TEXT,
     );
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstance.compressionOptions[
         zlib.constants.BROTLI_PARAM_QUALITY
       ],
       10,
     );
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstance.compressionOptions[
         zlib.constants.BROTLI_PARAM_SIZE_HINT
       ],
       5,
@@ -100,9 +100,9 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const gzipper = new Gzipper(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
-    await gzipper.compress();
+    const compress = new Compress(COMPRESS_PATH, null, options);
+    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
     assert.ok(
@@ -112,18 +112,18 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
       ),
     );
     assert.ok(
-      (gzipper as any).createCompression() instanceof
+      (compress as any).createCompression() instanceof
         (zlib as any).BrotliCompress,
     );
-    assert.strictEqual((gzipper as any).compressionInstance.ext, 'br');
+    assert.strictEqual((compress as any).compressionInstance.ext, 'br');
     assert.strictEqual(
-      Object.keys((gzipper as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstance.compressionOptions)
         .length,
       1,
     );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 3);
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstance.compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
       zlib.constants.BROTLI_MODE_GENERIC,
@@ -139,9 +139,9 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const gzipper = new Gzipper(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
-    await gzipper.compress();
+    const compress = new Compress(COMPRESS_PATH, null, options);
+    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
     assert.ok(
@@ -151,18 +151,18 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
       ),
     );
     assert.ok(
-      (gzipper as any).createCompression() instanceof
+      (compress as any).createCompression() instanceof
         (zlib as any).BrotliCompress,
     );
-    assert.strictEqual((gzipper as any).compressionInstance.ext, 'br');
+    assert.strictEqual((compress as any).compressionInstance.ext, 'br');
     assert.strictEqual(
-      Object.keys((gzipper as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstance.compressionOptions)
         .length,
       1,
     );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 3);
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstance.compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
       zlib.constants.BROTLI_MODE_GENERIC,
@@ -178,9 +178,9 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const gzipper = new Gzipper(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((gzipper as any).logger, 'success');
-    await gzipper.compress();
+    const compress = new Compress(COMPRESS_PATH, null, options);
+    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
     assert.ok(
@@ -190,18 +190,18 @@ describeTest('CLI Gzipper -> Brotli compression', () => {
       ),
     );
     assert.ok(
-      (gzipper as any).createCompression() instanceof
+      (compress as any).createCompression() instanceof
         (zlib as any).BrotliCompress,
     );
-    assert.strictEqual((gzipper as any).compressionInstance.ext, 'br');
+    assert.strictEqual((compress as any).compressionInstance.ext, 'br');
     assert.strictEqual(
-      Object.keys((gzipper as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstance.compressionOptions)
         .length,
       1,
     );
-    assert.strictEqual(Object.keys((gzipper as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 3);
     assert.strictEqual(
-      (gzipper as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstance.compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
       zlib.constants.BROTLI_MODE_FONT,

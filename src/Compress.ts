@@ -45,7 +45,7 @@ export class Compress {
    */
   constructor(
     target: string,
-    outputPath?: string,
+    outputPath?: string | null,
     options: CompressOptions = {} as never,
   ) {
     this.logger = new Logger(options.verbose as boolean);
@@ -70,7 +70,7 @@ export class Compress {
   /**
    * Start compressing files.
    */
-  async compress(): Promise<string[]> {
+  async run(): Promise<string[]> {
     let files: string[];
     let hrtime: [number, number];
     try {

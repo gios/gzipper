@@ -186,7 +186,7 @@ export class Index {
   ): Promise<void> {
     const compress = new Compress(target, outputPath, options);
     try {
-      await compress.compress();
+      await compress.run();
     } catch (err) {
       console.error(err);
     }

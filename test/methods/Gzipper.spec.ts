@@ -8,7 +8,7 @@ const fsWriteFile = promisify(fs.writeFile);
 const fsUnlink = promisify(fs.unlink);
 
 import { COMPRESS_PATH, RESOURCES_FOLDER_PATH } from '../utils';
-import { Gzipper } from '../../src/Gzipper';
+import { Compress } from '../../src/Compress';
 
 describe('Methods Gzipper', () => {
   describe('compress', () => {
@@ -24,22 +24,22 @@ describe('Methods Gzipper', () => {
     });
 
     it("should log success message when filesCount isn't empty", async () => {
-      const gzipper = new Gzipper(COMPRESS_PATH, null);
+      const compress = new Compress(COMPRESS_PATH, null);
       const compressionLogFake = sinon.fake();
       const compileFolderRecursively = sinon.fake.resolves(['one']);
-      const successSpy = sinonSandbox.spy((gzipper as any).logger, 'success');
+      const successSpy = sinonSandbox.spy((compress as any).logger, 'success');
 
       sinonSandbox.replace(
-        gzipper,
+        compress,
         'compressionLog' as any,
         compressionLogFake,
       );
       sinonSandbox.replace(
-        gzipper,
+        compress,
         'compileFolderRecursively' as any,
         compileFolderRecursively,
       );
-      await gzipper.compress();
+      await compress.run();
 
       const [message] = successSpy.args[0];
       assert.ok(compressionLogFake.calledOnce);
@@ -62,32 +62,32 @@ describe('Methods Gzipper', () => {
 
     it("should ignore entity if it's not a file", async () => {
       const files = ['one', 'two'];
-      const gzipper = new Gzipper(COMPRESS_PATH, null);
-      sinonSandbox.stub((gzipper as any).nativeFs, 'readdir').resolves(files);
+      const compress = new Compress(COMPRESS_PATH, null);
+      sinonSandbox.stub((compress as any).nativeFs, 'readdir').resolves(files);
       sinonSandbox
-        .stub((gzipper as any).nativeFs, 'lstat')
+        .stub((compress as any).nativeFs, 'lstat')
         .resolves({ isFile: () => false, isDirectory: () => false });
 
       const compressFile = sinon.fake();
-      sinonSandbox.replace(gzipper, 'compressFile' as any, compressFile);
-      await (gzipper as any).compileFolderRecursively(process.cwd());
+      sinonSandbox.replace(compress, 'compressFile' as any, compressFile);
+      await (compress as any).compileFolderRecursively(process.cwd());
       assert.ok(compressFile.notCalled);
     });
 
     it('should print time in seconds if operation takes more than 1000ms', async () => {
       const MESSAGE_VALIDATION = /File one\.js has been compressed \d+\.\d{4}Kb -> \d+\.\d{4}Kb \([1-9]\d*s \d+\.\d+ms\)/;
       const files = ['one.js', 'two.js'];
-      const gzipper = new Gzipper(COMPRESS_PATH, null);
-      const infoSpy = sinonSandbox.spy((gzipper as any).logger, 'info');
-      sinonSandbox.stub((gzipper as any).nativeFs, 'readdir').resolves(files);
+      const compress = new Compress(COMPRESS_PATH, null);
+      const infoSpy = sinonSandbox.spy((compress as any).logger, 'info');
+      sinonSandbox.stub((compress as any).nativeFs, 'readdir').resolves(files);
       sinonSandbox
-        .stub((gzipper as any).nativeFs, 'lstat')
+        .stub((compress as any).nativeFs, 'lstat')
         .onFirstCall()
         .resolves({ isFile: () => false, isDirectory: () => true })
         .resolves({ isFile: () => true, isDirectory: () => false });
 
       const compressFileStub = sinonSandbox
-        .stub(gzipper, 'compressFile' as any)
+        .stub(compress, 'compressFile' as any)
         .callsFake(async () => {
           return new Promise((resolve): void => {
             setTimeout(
@@ -97,7 +97,7 @@ describe('Methods Gzipper', () => {
           });
         });
 
-      await (gzipper as any).compileFolderRecursively(process.cwd());
+      await (compress as any).compileFolderRecursively(process.cwd());
       assert.ok(compressFileStub.calledTwice);
       assert.ok(infoSpy.calledTwice);
       const [message] = infoSpy.args[0];
@@ -130,17 +130,20 @@ describe('Methods Gzipper', () => {
       );
       await fsWriteFile(tmpInputFilePath, 'const a = () => null');
 
-      const gzipper = new Gzipper(COMPRESS_PATH, null, {
+      const compress = new Compress(COMPRESS_PATH, null, {
         verbose: true,
         threshold: 0,
       });
       sinonSandbox
-        .stub(gzipper, 'getOutputPath' as any)
+        .stub(compress, 'getOutputPath' as any)
         .returns(tmpOutputFilePath);
-      sinonSandbox.stub((gzipper as any).nativeFs, 'stat').rejects(errName);
+      sinonSandbox.stub((compress as any).nativeFs, 'stat').rejects(errName);
 
       try {
-        await (gzipper as any).compressFile(tmpFilename, RESOURCES_FOLDER_PATH);
+        await (compress as any).compressFile(
+          tmpFilename,
+          RESOURCES_FOLDER_PATH,
+        );
       } catch (err) {
         assert.ok(err instanceof Error);
         assert.strictEqual(err.name, errName);
@@ -150,13 +153,16 @@ describe('Methods Gzipper', () => {
     });
 
     it("should throw an error if a file can't be compressed because of EISDIR exception", async () => {
-      const gzipper = new Gzipper(COMPRESS_PATH, null);
+      const compress = new Compress(COMPRESS_PATH, null);
       sinonSandbox
-        .stub(gzipper, 'getOutputPath' as any)
+        .stub(compress, 'getOutputPath' as any)
         .returns(RESOURCES_FOLDER_PATH);
 
       try {
-        await (gzipper as any).compressFile(tmpFilename, RESOURCES_FOLDER_PATH);
+        await (compress as any).compressFile(
+          tmpFilename,
+          RESOURCES_FOLDER_PATH,
+        );
       } catch (err) {
         assert.ok(err instanceof Error);
         assert.strictEqual(err.code, 'EISDIR');
@@ -166,11 +172,11 @@ describe('Methods Gzipper', () => {
 
   describe('getOutputPath', () => {
     it('should returns finalized output path with prefixes', async () => {
-      const gzipper = new Gzipper(COMPRESS_PATH, null, {
+      const compress = new Compress(COMPRESS_PATH, null, {
         outputFileFormat: 'iron-[hash]-[filename].[compressExt].[ext]',
         threshold: 0,
       });
-      const response = (gzipper as any).getOutputPath(
+      const response = (compress as any).getOutputPath(
         path.resolve(process.cwd(), 'amigo'),
         'test.js',
       );
@@ -178,12 +184,12 @@ describe('Methods Gzipper', () => {
     });
 
     it("should returns default text if artifact wasn't found", async () => {
-      const gzipper = new Gzipper(COMPRESS_PATH, null, {
+      const compress = new Compress(COMPRESS_PATH, null, {
         outputFileFormat: 'iron-[hash]-[filename].[compressExt].[ext].[wrong]',
         threshold: 0,
       });
-      (gzipper as any).outputFileFormatRegexp = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)|(\[wrong\]*)/g;
-      const response = (gzipper as any).getOutputPath(
+      (compress as any).outputFileFormatRegexp = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)|(\[wrong\]*)/g;
+      const response = (compress as any).getOutputPath(
         path.resolve(process.cwd(), 'amigo'),
         'test.js',
       );

@@ -90,9 +90,9 @@ Locally usage.
 ## Run as module
 
 ```javascript
-const { Gzipper } = require('gzipper');
-const gzipper = new Gzipper(target, outputPath, options?);
-gzipper.compress()
+const { Compress } = require('gzipper');
+const compress = new Compress(target, outputPath, options?);
+compress.run()
   .then(files => console.info("Compressed files: ", files))
   .catch(err => console.error(err));
 ```
