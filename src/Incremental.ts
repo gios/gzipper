@@ -75,9 +75,9 @@ export class Incremental implements Cache {
     const selectedRevision = filePath?.revisions.find(revision =>
       deepEqual(revision.options, compressOptions),
     );
-    const fileId = v4();
 
     if (!filePath) {
+      const fileId = v4();
       this.filePaths.set(target, {
         revisions: [
           {
@@ -95,6 +95,7 @@ export class Incremental implements Cache {
     }
 
     if (!selectedRevision) {
+      const fileId = v4();
       this.filePaths.set(target, {
         revisions: filePath.revisions.concat({
           lastChecksum: checksum,
@@ -110,6 +111,7 @@ export class Incremental implements Cache {
     }
 
     if (selectedRevision.lastChecksum !== checksum) {
+      const fileId = v4();
       this.filePaths.set(target, {
         revisions: filePath.revisions.map(revision => {
           return revision.fileId === selectedRevision.fileId
