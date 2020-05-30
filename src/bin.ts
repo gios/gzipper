@@ -1,4 +1,4 @@
-import program from 'commander';
+import { Command } from 'commander';
 
 import { Compress } from '../src/Compress';
 import { Helpers } from '../src/helpers';
@@ -10,11 +10,12 @@ import { Logger } from './Logger';
 export class Index {
   private static readonly argv: string[] = process.argv;
   private static readonly env: NodeJS.ProcessEnv = process.env;
+  private static commander = new Command();
 
   static exec(): void {
-    program.version(Helpers.getVersion()).name('gzipper');
+    this.commander.version(Helpers.getVersion()).name('gzipper');
 
-    program
+    this.commander
       .command('compress <path> [outputPath]')
       .alias('c')
       .description('compress selected path and optionally set output directory')
@@ -79,93 +80,111 @@ export class Index {
       .option('', '[filename].[compressExt].[ext]')
       .option('', 'test-[filename]-[hash].[compressExt].[ext]')
       .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
-      .action(async (target, outputPath, options) => {
-        const globalOptions: CompressOptions = {
-          verbose: this.env.GZIPPER_VERBOSE
-            ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
-            : options.verbose,
-          incremental: this.env.GZIPPER_INCREMENTAL
-            ? !!parseInt(this.env.GZIPPER_INCREMENTAL as string)
-            : options.incremental,
-          exclude:
-            this.optionToArray(this.env.GZIPPER_EXCLUDE as string) ||
-            options.exclude,
-          include:
-            this.optionToArray(this.env.GZIPPER_INCLUDE as string) ||
-            options.include,
-          threshold:
-            parseInt(this.env.GZIPPER_THRESHOLD as string) ||
-            options.threshold ||
-            0,
-          level: parseInt(this.env.GZIPPER_LEVEL as string) || options.level,
-          memoryLevel:
-            parseInt(this.env.GZIPPER_MEMORY_LEVEL as string) ||
-            options.memoryLevel,
-          strategy:
-            parseInt(this.env.GZIPPER_STRATEGY as string) || options.strategy,
-          brotli: this.env.GZIPPER_BROTLI
-            ? !!parseInt(this.env.GZIPPER_BROTLI as string)
-            : options.brotli,
-          deflate: this.env.GZIPPER_DEFLATE
-            ? !!parseInt(this.env.GZIPPER_DEFLATE as string)
-            : options.deflate,
-          brotliParamMode:
-            this.env.GZIPPER_BROTLI_PARAM_MODE || options.brotliParamMode,
-          brotliQuality:
-            parseInt(this.env.GZIPPER_BROTLI_QUALITY as string) ||
-            options.brotliQuality,
-          brotliSizeHint:
-            parseInt(this.env.GZIPPER_BROTLI_SIZE_HINT as string) ||
-            options.brotliSizeHint,
-          outputFileFormat:
-            this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
-        };
+      .action(this.compress.bind(this));
 
-        await this.compress(
-          target,
-          outputPath,
-          this.filterOptions(globalOptions),
-        );
-      });
-
-    program
+    this.commander
       .command('cache')
       .description('manipulations with cache')
       .option('--purge', 'purge cache storage')
       .option('--size', 'size of cached resources')
-      .action(async options => {
-        const logger = new Logger();
-        if (options.parent.args.length === 1) {
-          const availableOptions = options.options.reduce(
-            (prev: { flags: string }, next: { flags: string }) =>
-              `${prev.flags}, ${next.flags}`,
-          );
-          logger.warn(
-            `Select one of the options to proceed (${availableOptions}).`,
-          );
-          return;
-        }
-        const config = new Config();
-        const incremental = new Incremental(config);
+      .action(this.cache.bind(this));
 
-        if (options.purge) {
-          await incremental.cachePurge();
-          logger.success(
-            'Cache has been purged, you are free to initialize a new one.',
-          );
-        }
+    this.commander.parse(this.argv).removeAllListeners();
+  }
 
-        if (options.size) {
-          const size = await incremental.cacheSize();
-          logger.info(
-            size
-              ? `Cache size is ${Helpers.readableSize(size)}`
-              : `Cache is empty, initialize a new one with --incremental option.`,
-          );
-        }
-      });
+  private static async compress(
+    target: string,
+    outputPath: string,
+    options: CompressOptions,
+  ): Promise<void> {
+    const globalOptions: CompressOptions = {
+      verbose: this.env.GZIPPER_VERBOSE
+        ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
+        : options.verbose,
+      incremental: this.env.GZIPPER_INCREMENTAL
+        ? !!parseInt(this.env.GZIPPER_INCREMENTAL as string)
+        : options.incremental,
+      exclude:
+        (this.optionToArray(this.env.GZIPPER_EXCLUDE) as string[]) ||
+        options.exclude,
+      include:
+        (this.optionToArray(this.env.GZIPPER_INCLUDE) as string[]) ||
+        options.include,
+      threshold:
+        parseInt(this.env.GZIPPER_THRESHOLD as string) ||
+        options.threshold ||
+        0,
+      level: parseInt(this.env.GZIPPER_LEVEL as string) || options.level,
+      memoryLevel:
+        parseInt(this.env.GZIPPER_MEMORY_LEVEL as string) ||
+        options.memoryLevel,
+      strategy:
+        parseInt(this.env.GZIPPER_STRATEGY as string) || options.strategy,
+      brotli: this.env.GZIPPER_BROTLI
+        ? !!parseInt(this.env.GZIPPER_BROTLI as string)
+        : options.brotli,
+      deflate: this.env.GZIPPER_DEFLATE
+        ? !!parseInt(this.env.GZIPPER_DEFLATE as string)
+        : options.deflate,
+      brotliParamMode:
+        this.env.GZIPPER_BROTLI_PARAM_MODE || options.brotliParamMode,
+      brotliQuality:
+        parseInt(this.env.GZIPPER_BROTLI_QUALITY as string) ||
+        options.brotliQuality,
+      brotliSizeHint:
+        parseInt(this.env.GZIPPER_BROTLI_SIZE_HINT as string) ||
+        options.brotliSizeHint,
+      outputFileFormat:
+        this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
+    };
 
-    program.parse(this.argv).removeAllListeners();
+    const compress = new Compress(
+      target,
+      outputPath,
+      this.filterOptions(globalOptions),
+    );
+    try {
+      await compress.run();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  private static async cache(options: {
+    parent: { args: string[] };
+    purge: boolean;
+    size: boolean;
+    options: Array<{ flags: string }>;
+  }): Promise<void> {
+    const logger = new Logger();
+    if (options.parent.args.length === 1) {
+      const availableOptions = options.options.reduce(
+        (prev, next) => `${prev ? prev + ' ' : ''}${next.flags}`,
+        '',
+      );
+      logger.warn(
+        `Select one of the options to proceed (${availableOptions}).`,
+      );
+      return;
+    }
+    const config = new Config();
+    const incremental = new Incremental(config);
+
+    if (options.purge) {
+      await incremental.cachePurge();
+      logger.success(
+        'Cache has been purged, you are free to initialize a new one.',
+      );
+    }
+
+    if (options.size) {
+      const size = await incremental.cacheSize();
+      logger.info(
+        size
+          ? `Cache size is ${Helpers.readableSize(size)}`
+          : `Cache is empty, initialize a new one with --incremental option.`,
+      );
+    }
   }
 
   // Delete undefined and NaN options.
@@ -179,21 +198,8 @@ export class Index {
     return options;
   }
 
-  private static async compress(
-    target: string,
-    outputPath: string,
-    options: CompressOptions = {} as CompressOptions,
-  ): Promise<void> {
-    const compress = new Compress(target, outputPath, options);
-    try {
-      await compress.run();
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  private static optionToArray(value: string): string[] | string {
-    if (value) {
+  private static optionToArray<T>(value: T): string[] | T {
+    if (typeof value === 'string' && value) {
       return value.split(',').map(item => item.trim());
     }
 

@@ -5,7 +5,7 @@ import path from 'path';
 import util from 'util';
 import fs from 'fs';
 
-import { Compress } from '../../src/Compress';
+import { Compress } from '../../../src/Compress';
 import {
   EMPTY_FOLDER_PATH,
   COMPRESS_PATH,
@@ -14,9 +14,9 @@ import {
   createFolder,
   clear,
   COMPRESSION_EXTENSIONS,
-} from '../utils';
-import { CompressOptions } from '../../src/interfaces';
-import { NO_FILES_MESSAGE } from '../../src/constants';
+} from '../../utils';
+import { CompressOptions } from '../../../src/interfaces';
+import { NO_FILES_MESSAGE } from '../../../src/constants';
 
 const lstat = util.promisify(fs.lstat);
 

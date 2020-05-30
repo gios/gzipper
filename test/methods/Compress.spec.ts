@@ -10,7 +10,7 @@ const fsUnlink = promisify(fs.unlink);
 import { COMPRESS_PATH, RESOURCES_FOLDER_PATH } from '../utils';
 import { Compress } from '../../src/Compress';
 
-describe('Methods Gzipper', () => {
+describe('Methods Compress', () => {
   describe('compress', () => {
     let sinonSandbox: sinon.SinonSandbox;
 

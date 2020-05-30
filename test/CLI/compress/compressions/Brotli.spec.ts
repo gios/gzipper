@@ -2,14 +2,14 @@ import assert from 'assert';
 import sinon from 'sinon';
 import zlib from 'zlib';
 
-import { disableBrotli } from '../../helpers';
-import { Compress } from '../../../src/Compress';
+import { disableBrotli } from '../../../helpers';
+import { Compress } from '../../../../src/Compress';
 import {
   COMPRESS_PATH,
   getFiles,
   clear,
   COMPRESSION_EXTENSIONS,
-} from '../../utils';
+} from '../../../utils';
 
 const describeTest = disableBrotli ? describe.skip : describe;
 

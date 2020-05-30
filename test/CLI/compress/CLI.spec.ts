@@ -1,7 +1,7 @@
 import sinon from 'sinon';
 import assert from 'assert';
 
-import { Index } from '../../bin/index';
+import { Index } from '../../../src/bin';
 
 describe('Index CLI', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -26,38 +26,41 @@ describe('Index CLI', () => {
     sinon.restore();
   });
 
-  xit('getOptions() should return target, outputPath and all options', () => {
-    // const cliArguments = [
-    //   'node.exe',
-    //   'index.js',
-    //   'folder_to_compress',
-    //   'folder_to_compress_out',
-    //   '--verbose',
-    //   '--exclude',
-    //   'png,jpg,js',
-    //   '--include',
-    //   'png,wav',
-    //   '--threshold',
-    //   '500',
-    //   '--level',
-    //   '7',
-    //   '--memory-level',
-    //   '1',
-    //   '--strategy',
-    //   '3',
-    //   '--brotli',
-    //   '--deflate',
-    //   '--brotli-param-mode',
-    //   'text',
-    //   '--brotli-quality',
-    //   '5',
-    //   '--brotli-size-hint',
-    //   '77',
-    //   '--output-file-format',
-    //   'test-[filename].[ext].[compressExt]',
-    // ];
-    // const index = new Index();
-    // (index as any).argv = cliArguments;
+  it('compress <path> [outputPath] - should run compress', () => {
+    const cliArguments = [
+      'node.exe',
+      'index.js',
+      'folder_to_compress',
+      'folder_to_compress_out',
+      '--verbose',
+      '--exclude',
+      'png,jpg,js',
+      '--include',
+      'png,wav',
+      '--threshold',
+      '500',
+      '--level',
+      '7',
+      '--memory-level',
+      '1',
+      '--strategy',
+      '3',
+      '--brotli',
+      '--deflate',
+      '--brotli-param-mode',
+      'text',
+      '--brotli-quality',
+      '5',
+      '--brotli-size-hint',
+      '77',
+      '--output-file-format',
+      'test-[filename].[ext].[compressExt]',
+    ];
+    (Index as any).argv = cliArguments;
+    const commander = (Index as any).commander;
+    console.log('AAA ', commander);
+    console.log('AAA ', commander);
+    // sinonSandbox.spy((index as any).commander);
     // sinonSandbox.stub(index, 'start' as any).returns(null);
     // const result: any = index.getOptions();
     // assert.strictEqual(result.target, 'folder_to_compress');
