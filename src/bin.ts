@@ -161,20 +161,24 @@ export class Index {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    if (options.purge) {
-      await incremental.cachePurge();
-      logger.success(
-        'Cache has been purged, you are free to initialize a new one.',
-      );
-    }
+    try {
+      if (options.purge) {
+        await incremental.cachePurge();
+        logger.success(
+          'Cache has been purged, you are free to initialize a new one.',
+        );
+      }
 
-    if (options.size) {
-      const size = await incremental.cacheSize();
-      logger.info(
-        size
-          ? `Cache size is ${Helpers.readableSize(size)}`
-          : `Cache is empty, initialize a new one with --incremental option.`,
-      );
+      if (options.size) {
+        const size = await incremental.cacheSize();
+        logger.info(
+          size
+            ? `Cache size is ${Helpers.readableSize(size)}`
+            : `Cache is empty, initialize a new one with --incremental option.`,
+        );
+      }
+    } catch (err) {
+      logger.error(err.message);
     }
   }
 

@@ -4,6 +4,8 @@ import assert from 'assert';
 import { Index } from '../../../src/bin';
 import { Compress } from '../../../src/Compress';
 import { CompressOptions } from '../../../src/interfaces';
+import { Logger } from '../../../src/Logger';
+import { Incremental } from '../../../src/Incremental';
 
 describe('Index CLI', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -240,5 +242,39 @@ describe('Index CLI', () => {
         compareValues(options[key], val),
       ),
     );
+  });
+
+  it('cache without args should throw the warning message', () => {
+    const cliArguments = ['node.exe', 'index.js', 'cache'];
+    const index = new Index();
+    (index as any).argv = cliArguments;
+    const loggerWarnStub = sinonSandbox.stub(Logger.prototype, 'warn');
+    const cachePurgeStub = sinonSandbox.stub(
+      Incremental.prototype,
+      'cachePurge',
+    );
+    const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
+    index.exec();
+    assert.strictEqual(loggerWarnStub.callCount, 1);
+    assert.strictEqual(cachePurgeStub.callCount, 0);
+    assert.strictEqual(cacheSizeStub.callCount, 0);
+  });
+
+  it("cache --purge should exec 'cachePurge' and throw the success message", () => {
+    const cliArguments = ['node.exe', 'index.js', 'cache', '--purge'];
+    const index = new Index();
+    (index as any).argv = cliArguments;
+    const loggerWarnStub = sinonSandbox.stub(Logger.prototype, 'warn');
+    const loggerSuccessStub = sinonSandbox.stub(Logger.prototype, 'success');
+    const cachePurgeStub = sinonSandbox.stub(
+      Incremental.prototype,
+      'cachePurge',
+    );
+    const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
+    index.exec();
+    assert.strictEqual(loggerWarnStub.callCount, 0);
+    assert.strictEqual(loggerSuccessStub.callCount, 1);
+    assert.strictEqual(cachePurgeStub.callCount, 1);
+    assert.strictEqual(cacheSizeStub.callCount, 0);
   });
 });

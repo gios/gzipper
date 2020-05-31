@@ -149,6 +149,10 @@ export class Incremental implements Cache {
    * purge cache folder.
    */
   async cachePurge(): Promise<void> {
+    if (!(await this.nativeFs.exists(this.cacheFolder))) {
+      throw new Error('No cache found.');
+    }
+
     const recursiveRemove = async (
       folderPath = this.cacheFolder,
     ): Promise<void> => {
@@ -167,9 +171,8 @@ export class Incremental implements Cache {
 
       await this.nativeFs.rmdir(folderPath);
     };
-    if (await this.nativeFs.exists(this.cacheFolder)) {
-      await recursiveRemove();
-    }
+
+    await recursiveRemove();
     this.config.deleteWritableContentProperty('incremental');
     await this.config.writeConfig();
   }
@@ -178,6 +181,10 @@ export class Incremental implements Cache {
    * returns cache size.
    */
   async cacheSize(folderPath = this.cacheFolder, size = 0): Promise<number> {
+    if (!(await this.nativeFs.exists(this.cacheFolder))) {
+      throw new Error('No cache found.');
+    }
+
     const files = await this.nativeFs.readdir(folderPath);
 
     if (!files.length) {
