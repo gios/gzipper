@@ -1,18 +1,18 @@
 import { Command } from 'commander';
 
-import { Compress } from '../src/Compress';
-import { Helpers } from '../src/helpers';
-import { CompressOptions } from '../src/interfaces';
+import { Compress } from './Compress';
+import { Helpers } from './helpers';
+import { CompressOptions } from './interfaces';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
 import { Logger } from './Logger';
 
 export class Index {
-  private static readonly argv: string[] = process.argv;
-  private static readonly env: NodeJS.ProcessEnv = process.env;
-  private static commander = new Command();
+  private readonly argv: string[] = process.argv;
+  private readonly env: NodeJS.ProcessEnv = process.env;
+  private commander = new Command();
 
-  static exec(): void {
+  exec(): void {
     this.commander.version(Helpers.getVersion()).name('gzipper');
 
     this.commander
@@ -92,12 +92,12 @@ export class Index {
     this.commander.parse(this.argv).removeAllListeners();
   }
 
-  private static async compress(
+  private async compress(
     target: string,
     outputPath: string,
     options: CompressOptions,
   ): Promise<void> {
-    const globalOptions: CompressOptions = {
+    const adjustedOptions: CompressOptions = {
       verbose: this.env.GZIPPER_VERBOSE
         ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
         : options.verbose,
@@ -138,19 +138,10 @@ export class Index {
         this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
     };
 
-    const compress = new Compress(
-      target,
-      outputPath,
-      this.filterOptions(globalOptions),
-    );
-    try {
-      await compress.run();
-    } catch (err) {
-      console.error(err);
-    }
+    await this.runCompress(target, outputPath, adjustedOptions);
   }
 
-  private static async cache(options: {
+  private async cache(options: {
     parent: { args: string[] };
     purge: boolean;
     size: boolean;
@@ -187,8 +178,26 @@ export class Index {
     }
   }
 
+  private async runCompress(
+    target: string,
+    outputPath: string,
+    options: CompressOptions,
+  ): Promise<void> {
+    const compress = new Compress(
+      target,
+      outputPath,
+      this.filterOptions(options),
+    );
+
+    try {
+      await compress.run();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   // Delete undefined and NaN options.
-  private static filterOptions(options: CompressOptions): CompressOptions {
+  private filterOptions(options: CompressOptions): CompressOptions {
     Object.keys(options).forEach(key => {
       if (options[key] === undefined || options[key] !== options[key]) {
         delete options[key];
@@ -198,7 +207,7 @@ export class Index {
     return options;
   }
 
-  private static optionToArray<T>(value: T): string[] | T {
+  private optionToArray<T>(value: T): string[] | T {
     if (typeof value === 'string' && value) {
       return value.split(',').map(item => item.trim());
     }
@@ -208,5 +217,5 @@ export class Index {
 }
 
 if (process.env.NODE_ENV !== 'testing') {
-  Index.exec();
+  new Index().exec();
 }
