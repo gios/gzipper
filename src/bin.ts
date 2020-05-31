@@ -12,7 +12,7 @@ export class Index {
   private readonly env: NodeJS.ProcessEnv = process.env;
   private commander = new Command();
 
-  exec(): void {
+  async exec(): Promise<void> {
     this.commander.version(Helpers.getVersion()).name('gzipper');
 
     this.commander
@@ -89,7 +89,7 @@ export class Index {
       .option('--size', 'size of cached resources')
       .action(this.cache.bind(this));
 
-    this.commander.parse(this.argv).removeAllListeners();
+    await this.commander.parseAsync(this.argv);
   }
 
   private async compress(

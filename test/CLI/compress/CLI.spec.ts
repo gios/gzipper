@@ -9,6 +9,7 @@ import { Incremental } from '../../../src/Incremental';
 
 describe('Index CLI', () => {
   let sinonSandbox: sinon.SinonSandbox;
+  let clock: sinon.SinonFakeTimers;
 
   function compareValues(value1: unknown, value2: unknown): boolean {
     if (Array.isArray(value1) && Array.isArray(value2)) {
@@ -22,15 +23,17 @@ describe('Index CLI', () => {
   }
 
   beforeEach(() => {
+    clock = sinon.useFakeTimers();
     sinonSandbox = sinon.createSandbox();
   });
 
   afterEach(async () => {
+    clock.restore();
     sinonSandbox.restore();
     sinon.restore();
   });
 
-  it("compress <path> [outputPath] - should exec 'runCompress' with options", () => {
+  it("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
     const cliArguments = [
       'node.exe',
       'index.js',
@@ -69,7 +72,7 @@ describe('Index CLI', () => {
     const compressRunStub = sinonSandbox
       .stub(Compress.prototype, 'run')
       .resolves([]);
-    index.exec();
+    await index.exec();
     assert.strictEqual(runCompressSpy.callCount, 1);
     assert.strictEqual(compressRunStub.callCount, 1);
     assert.strictEqual(filterOptionsSpy.callCount, 1);
@@ -100,7 +103,7 @@ describe('Index CLI', () => {
     );
   });
 
-  it("compress <path> [outputPath] - should exec 'runCompress' with filtered options", () => {
+  it("compress <path> [outputPath] - should exec 'runCompress' with filtered options", async () => {
     const cliArguments = [
       'node.exe',
       'index.js',
@@ -130,7 +133,7 @@ describe('Index CLI', () => {
     const compressRunStub = sinonSandbox
       .stub(Compress.prototype, 'run')
       .resolves([]);
-    index.exec();
+    await index.exec();
     assert.strictEqual(runCompressSpy.callCount, 1);
     assert.strictEqual(compressRunStub.callCount, 1);
     assert.strictEqual(filterOptionsSpy.callCount, 1);
@@ -158,7 +161,7 @@ describe('Index CLI', () => {
     );
   });
 
-  it("compress <path> [outputPath] - should exec 'runCompress' with overwrite options", () => {
+  it("compress <path> [outputPath] - should exec 'runCompress' with overwrite options", async () => {
     const envArguments = {
       GZIPPER_INCREMENTAL: '0',
       GZIPPER_VERBOSE: '0',
@@ -214,7 +217,7 @@ describe('Index CLI', () => {
     const compressRunStub = sinonSandbox
       .stub(Compress.prototype, 'run')
       .resolves([]);
-    index.exec();
+    await index.exec();
     assert.strictEqual(runCompressSpy.callCount, 1);
     assert.strictEqual(compressRunStub.callCount, 1);
     assert.strictEqual(filterOptionsSpy.callCount, 1);
@@ -244,7 +247,7 @@ describe('Index CLI', () => {
     );
   });
 
-  it('cache without args should throw the warning message', () => {
+  it('cache without args should throw the warning message', async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache'];
     const index = new Index();
     (index as any).argv = cliArguments;
@@ -254,13 +257,13 @@ describe('Index CLI', () => {
       'cachePurge',
     );
     const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
-    index.exec();
+    await index.exec();
     assert.strictEqual(loggerWarnStub.callCount, 1);
     assert.strictEqual(cachePurgeStub.callCount, 0);
     assert.strictEqual(cacheSizeStub.callCount, 0);
   });
 
-  it("cache --purge should exec 'cachePurge' and throw the success message", () => {
+  it("cache --purge should exec 'cachePurge' and throw the success message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', '--purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
@@ -271,7 +274,7 @@ describe('Index CLI', () => {
       'cachePurge',
     );
     const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
-    index.exec();
+    await index.exec();
     assert.strictEqual(loggerWarnStub.callCount, 0);
     assert.strictEqual(loggerSuccessStub.callCount, 1);
     assert.strictEqual(cachePurgeStub.callCount, 1);
