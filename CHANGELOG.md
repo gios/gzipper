@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `--incremental` compression
 
+### Changed
+
+- commander `5.1.0`
+- uuid `8.0.0`
+
 ### Removed
 
 - GZIPPER_GZIP_LEVEL, gzipLevel
