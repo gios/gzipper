@@ -82,12 +82,19 @@ export class Index {
       .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
       .action(this.compress.bind(this));
 
-    this.commander
+    const cache = this.commander
       .command('cache')
-      .description('manipulations with cache')
-      .option('--purge', 'purge cache storage')
-      .option('--size', 'size of cached resources')
-      .action(this.cache.bind(this));
+      .description('manipulations with cache');
+
+    cache
+      .command('purge')
+      .description('purge cache storage')
+      .action(this.cachePurge.bind(this));
+
+    cache
+      .command('size')
+      .description('size of cached resources')
+      .action(this.cacheSize.bind(this));
 
     await this.commander.parseAsync(this.argv);
   }
@@ -141,42 +148,34 @@ export class Index {
     await this.runCompress(target, outputPath, adjustedOptions);
   }
 
-  private async cache(options: {
-    parent: { args: string[] };
-    purge: boolean;
-    size: boolean;
-    options: Array<{ flags: string }>;
-  }): Promise<void> {
+  private async cachePurge(): Promise<void> {
     const logger = new Logger();
-    if (options.parent.args.length === 1) {
-      const availableOptions = options.options.reduce(
-        (prev, next) => `${prev ? prev + ' ' : ''}${next.flags}`,
-        '',
-      );
-      logger.warn(
-        `Select one of the options to proceed (${availableOptions}).`,
-      );
-      return;
-    }
     const config = new Config();
     const incremental = new Incremental(config);
 
     try {
-      if (options.purge) {
-        await incremental.cachePurge();
-        logger.success(
-          'Cache has been purged, you are free to initialize a new one.',
-        );
-      }
+      await incremental.cachePurge();
+      logger.success(
+        'Cache has been purged, you are free to initialize a new one.',
+      );
+    } catch (err) {
+      logger.error(err.message);
+    }
+  }
 
-      if (options.size) {
-        const size = await incremental.cacheSize();
-        logger.info(
-          size
-            ? `Cache size is ${Helpers.readableSize(size)}`
-            : `Cache is empty, initialize a new one with --incremental option.`,
-        );
-      }
+  private async cacheSize(): Promise<void> {
+    const logger = new Logger();
+
+    const config = new Config();
+    const incremental = new Incremental(config);
+
+    try {
+      const size = await incremental.cacheSize();
+      logger.info(
+        size
+          ? `Cache size is ${Helpers.readableSize(size)}`
+          : `Cache is empty, initialize a new one with --incremental option.`,
+      );
     } catch (err) {
       logger.error(err.message);
     }
