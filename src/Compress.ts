@@ -324,7 +324,9 @@ export class Compress {
       fileInfo.beforeSize,
     )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
     return fileInfo.isCached
-      ? `${file} has been retrieved from the cache ${getSize}`
+      ? `${file} has been retrieved from the cache ${getSize} (${Helpers.readableHrtime(
+          hrtime,
+        )})`
       : `File ${file} has been compressed ${getSize} (${Helpers.readableHrtime(
           hrtime,
         )})`;
