@@ -137,7 +137,9 @@ describe('CLI Compress', () => {
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
+        sinon.match(
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        ),
         true,
       ),
     );

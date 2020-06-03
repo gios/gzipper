@@ -49,7 +49,6 @@ export class Compress {
     options: CompressOptions = {} as never,
   ) {
     this.logger = new Logger(options.verbose as boolean);
-    this.target = path.resolve(process.cwd(), target);
     this.config = new Config();
     if (!target) {
       const message = `Can't find a path.`;
@@ -62,6 +61,7 @@ export class Compress {
     if (options.incremental) {
       this.incremental = new Incremental(this.config);
     }
+    this.target = path.resolve(process.cwd(), target);
     this.options = options;
     this.compressionInstance = this.getCompressionInstance();
     this.createCompression = this.compressionInstance.getCompression();
