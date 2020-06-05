@@ -13,6 +13,7 @@ import { CompressOptions, CompressedFile } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
+import { LogLevel } from './logger/LogLevel.enum';
 
 /**
  * Compressing files.
@@ -52,7 +53,7 @@ export class Compress {
     this.config = new Config();
     if (!target) {
       const message = `Can't find a path.`;
-      this.logger.error(message);
+      this.logger.log(message, LogLevel.ERROR);
       throw new Error(message);
     }
     if (outputPath) {
@@ -90,19 +91,20 @@ export class Compress {
         await this.config.writeConfig();
       }
     } catch (error) {
-      this.logger.error(error);
+      this.logger.log(error, LogLevel.ERROR);
       throw new Error(error.message);
     }
 
     const filesCount = files.length;
     if (filesCount) {
-      this.logger.success(
+      this.logger.log(
         `${filesCount} ${
           filesCount > 1 ? 'files have' : 'file has'
         } been compressed. (${Helpers.readableHrtime(hrtime)})`,
+        LogLevel.SUCCESS,
       );
     } else {
-      this.logger.warn(NO_FILES_MESSAGE);
+      this.logger.log(NO_FILES_MESSAGE, LogLevel.WARNING);
     }
 
     return files;
@@ -167,8 +169,9 @@ export class Compress {
 
           if (fileInfo) {
             const hrTimeEnd = process.hrtime(hrtimeStart);
-            this.logger.info(
+            this.logger.log(
               this.getCompressedFileMsg(file, fileInfo, hrTimeEnd),
+              LogLevel.INFO,
             );
           }
         }
@@ -249,11 +252,12 @@ export class Compress {
    */
   private compressionLog(): void {
     const options = this.compressionInstance.readableOptions();
-    this.logger.warn(`Compression ${options}`);
+    this.logger.log(`Compression ${options}`, LogLevel.WARNING);
 
     if (!this.options.outputFileFormat) {
-      this.logger.info(
+      this.logger.log(
         'Default output file format: [filename].[ext].[compressExt]',
+        LogLevel.INFO,
       );
     }
   }

@@ -6,6 +6,7 @@ import { CompressOptions } from './interfaces';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
 import { Logger } from './logger/Logger';
+import { LogLevel } from './logger/LogLevel.enum';
 
 export class Index {
   private readonly argv: string[] = process.argv;
@@ -155,11 +156,12 @@ export class Index {
 
     try {
       await incremental.cachePurge();
-      logger.success(
+      logger.log(
         'Cache has been purged, you are free to initialize a new one.',
+        LogLevel.SUCCESS,
       );
     } catch (err) {
-      logger.error(err.message);
+      logger.log(err.message, LogLevel.ERROR);
     }
   }
 
@@ -171,13 +173,14 @@ export class Index {
 
     try {
       const size = await incremental.cacheSize();
-      logger.info(
+      logger.log(
         size
           ? `Cache size is ${Helpers.readableSize(size)}`
           : `Cache is empty, initialize a new one with --incremental option.`,
+        LogLevel.INFO,
       );
     } catch (err) {
-      logger.error(err.message);
+      logger.log(err.message, LogLevel.ERROR);
     }
   }
 

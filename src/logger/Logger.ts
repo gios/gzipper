@@ -12,42 +12,19 @@ export class Logger {
   constructor(verbose: boolean) {
     this.verbose = verbose;
   }
-  /**
-   * Info logger.
-   */
-  @filter(LogLevel.INFO)
-  info(message: string): void {
-    return this.logger(LogLevel.INFO)(message);
-  }
 
   /**
-   * Error logger.
+   * Log message.
    */
-  @filter(LogLevel.ERROR)
-  error(message: string): void {
-    return this.logger(LogLevel.ERROR)(message);
-  }
-
-  /**
-   * Success logger.
-   */
-  @filter(LogLevel.SUCCESS)
-  success(message: string): void {
-    return this.logger(LogLevel.SUCCESS)(message);
-  }
-
-  /**
-   * Warning logger.
-   */
-  @filter(LogLevel.WARNING)
-  warn(message: string): void {
-    return this.logger(LogLevel.WARNING)(message);
+  @filter()
+  log(message: string, level: LogLevel = LogLevel.DEBUG): void {
+    return this.logger(message, level);
   }
 
   /**
    * Colorize messages depends on the level and return a wrapper.
    */
-  private logger(level: LogLevel): (message: string) => void {
+  private logger(message: string, level: LogLevel): void {
     let colorfulMessage: string;
     const prefix = 'gzipper';
 
@@ -67,8 +44,13 @@ export class Logger {
       case LogLevel.SUCCESS:
         colorfulMessage = `\x1b[30;42m${prefix}:\x1b[0m\x1b[32m %s\x1b[0m`;
         break;
+
+      case LogLevel.DEBUG:
+      default:
+        colorfulMessage = `${prefix}: %s`;
+        break;
     }
 
-    return (message: string): void => console.log(colorfulMessage, message);
+    console.log(colorfulMessage, message);
   }
 }

@@ -3,6 +3,7 @@ import zlib from 'zlib';
 import { Compression } from './Compression';
 import { Logger } from '../logger/Logger';
 import { CompressOptions, BrotliOptions } from '../interfaces';
+import { LogLevel } from '../logger/LogLevel.enum';
 
 /**
  * Brotli compression
@@ -99,7 +100,7 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   private availability(): void {
     if (typeof zlib.createBrotliCompress !== 'function') {
       const message = `Can't use brotli compression, Node.js >= v11.7.0 required.`;
-      this.logger.error(message);
+      this.logger.log(message, LogLevel.ERROR);
       throw new Error(message);
     }
   }
