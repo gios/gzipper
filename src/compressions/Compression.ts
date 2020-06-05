@@ -1,7 +1,7 @@
 import zlib from 'zlib';
 
 import { CompressOptions, CompressionOptions } from '../interfaces';
-import { Logger } from '../Logger';
+import { Logger } from '../logger/Logger';
 
 export abstract class Compression<T extends CompressionOptions> {
   compressionOptions: T = {} as T;

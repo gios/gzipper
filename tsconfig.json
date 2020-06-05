@@ -12,7 +12,8 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "inlineSourceMap": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "experimentalDecorators": true
   },
   "include": ["**/*.ts"],
   "exclude": ["test", "dist"]

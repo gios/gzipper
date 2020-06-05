@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import stream from 'stream';
 
 import { Helpers } from './helpers';
-import { Logger } from './Logger';
+import { Logger } from './logger/Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
 import { OUTPUT_FILE_FORMAT_REGEXP, NO_FILES_MESSAGE } from './constants';
@@ -52,7 +52,7 @@ export class Compress {
     this.config = new Config();
     if (!target) {
       const message = `Can't find a path.`;
-      this.logger.error(message, true);
+      this.logger.error(message);
       throw new Error(message);
     }
     if (outputPath) {
@@ -90,7 +90,7 @@ export class Compress {
         await this.config.writeConfig();
       }
     } catch (error) {
-      this.logger.error(error, true);
+      this.logger.error(error);
       throw new Error(error.message);
     }
 
@@ -100,10 +100,9 @@ export class Compress {
         `${filesCount} ${
           filesCount > 1 ? 'files have' : 'file has'
         } been compressed. (${Helpers.readableHrtime(hrtime)})`,
-        true,
       );
     } else {
-      this.logger.warn(NO_FILES_MESSAGE, true);
+      this.logger.warn(NO_FILES_MESSAGE);
     }
 
     return files;
@@ -250,7 +249,7 @@ export class Compress {
    */
   private compressionLog(): void {
     const options = this.compressionInstance.readableOptions();
-    this.logger.warn(`Compression ${options}`, true);
+    this.logger.warn(`Compression ${options}`);
 
     if (!this.options.outputFileFormat) {
       this.logger.info(

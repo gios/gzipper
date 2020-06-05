@@ -2,7 +2,7 @@ import zlib from 'zlib';
 
 import { Compression } from './Compression';
 import { CompressOptions, CompressionOptions } from '../interfaces';
-import { Logger } from '../Logger';
+import { Logger } from '../logger/Logger';
 
 /**
  * Gzip compression

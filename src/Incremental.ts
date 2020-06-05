@@ -117,7 +117,7 @@ export class Incremental implements Cache {
       this.filePaths.set(target, {
         revisions: filePath.revisions.map(revision => {
           return revision.fileId === selectedRevision.fileId
-            ? { ...revision, lastChecksum: checksum }
+            ? { ...revision, date: new Date(), lastChecksum: checksum }
             : revision;
         }),
       });

@@ -5,7 +5,7 @@ import { Helpers } from './helpers';
 import { CompressOptions } from './interfaces';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
-import { Logger } from './Logger';
+import { Logger } from './logger/Logger';
 
 export class Index {
   private readonly argv: string[] = process.argv;
@@ -149,7 +149,7 @@ export class Index {
   }
 
   private async cachePurge(): Promise<void> {
-    const logger = new Logger();
+    const logger = new Logger(true);
     const config = new Config();
     const incremental = new Incremental(config);
 
@@ -164,7 +164,7 @@ export class Index {
   }
 
   private async cacheSize(): Promise<void> {
-    const logger = new Logger();
+    const logger = new Logger(true);
 
     const config = new Config();
     const incremental = new Incremental(config);
