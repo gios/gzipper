@@ -1,5 +1,5 @@
 import { filter } from './filter.decorator';
-import { Types } from './types.enum';
+import { LogLevel } from './LogLevel.enum';
 
 /**
  * Custom logger.
@@ -15,56 +15,56 @@ export class Logger {
   /**
    * Info logger.
    */
-  @filter(Types.Info)
+  @filter(LogLevel.INFO)
   info(message: string): void {
-    return this.logger(Types.Info)(message);
+    return this.logger(LogLevel.INFO)(message);
   }
 
   /**
    * Error logger.
    */
-  @filter(Types.Error)
+  @filter(LogLevel.ERROR)
   error(message: string): void {
-    return this.logger(Types.Error)(message);
+    return this.logger(LogLevel.ERROR)(message);
   }
 
   /**
    * Success logger.
    */
-  @filter(Types.Success)
+  @filter(LogLevel.SUCCESS)
   success(message: string): void {
-    return this.logger(Types.Success)(message);
+    return this.logger(LogLevel.SUCCESS)(message);
   }
 
   /**
    * Warning logger.
    */
-  @filter(Types.Warning)
+  @filter(LogLevel.WARNING)
   warn(message: string): void {
-    return this.logger(Types.Warning)(message);
+    return this.logger(LogLevel.WARNING)(message);
   }
 
   /**
    * Colorize messages depends on the level and return a wrapper.
    */
-  private logger(level: Types): (message: string, force?: boolean) => void {
+  private logger(level: LogLevel): (message: string) => void {
     let colorfulMessage: string;
     const prefix = 'gzipper';
 
     switch (level) {
-      case Types.Info:
+      case LogLevel.INFO:
         colorfulMessage = `\x1b[30;46m${prefix}:\x1b[0m\x1b[36m %s\x1b[0m`;
         break;
 
-      case Types.Error:
+      case LogLevel.ERROR:
         colorfulMessage = `\x1b[30;41m${prefix}:\x1b[0m\x1b[31m %s\x1b[0m`;
         break;
 
-      case Types.Warning:
+      case LogLevel.WARNING:
         colorfulMessage = `\x1b[30;43m${prefix}:\x1b[0m\x1b[33m %s\x1b[0m`;
         break;
 
-      case Types.Success:
+      case LogLevel.SUCCESS:
         colorfulMessage = `\x1b[30;42m${prefix}:\x1b[0m\x1b[32m %s\x1b[0m`;
         break;
     }

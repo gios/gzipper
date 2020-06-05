@@ -1,11 +1,11 @@
 import { Logger } from './Logger';
-import { Types } from './types.enum';
+import { LogLevel } from './LogLevel.enum';
 
 /**
  * Exec only 'error', 'warn', 'success' or when 'verbose' flag is available.
  */
 export function filter(
-  type: Types,
+  level: LogLevel,
 ): (
   target: unknown,
   propertyKey: string,
@@ -17,9 +17,9 @@ export function filter(
     descriptor.value = function(...args: unknown[]): unknown {
       const shouldLog =
         (this as Logger).verbose ||
-        type === Types.Error ||
-        type === Types.Warning ||
-        type === Types.Success;
+        level === LogLevel.ERROR ||
+        level === LogLevel.WARNING ||
+        level === LogLevel.SUCCESS;
 
       if (shouldLog) {
         return valueDescriptor.call(this, ...args);
