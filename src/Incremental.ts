@@ -84,6 +84,7 @@ export class Incremental implements Cache {
           {
             lastChecksum: checksum,
             fileId,
+            date: new Date(),
             options: compressOptions,
           },
         ],
@@ -101,6 +102,7 @@ export class Incremental implements Cache {
         revisions: filePath.revisions.concat({
           lastChecksum: checksum,
           fileId,
+          date: new Date(),
           options: compressOptions,
         }),
       });

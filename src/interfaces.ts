@@ -49,11 +49,10 @@ export interface IncrementalFileValue {
 export interface IncrementalFileValueRevisions {
   lastChecksum: string;
   fileId: string;
+  date: Date;
   options: CompressionOptions | BrotliOptions;
 }
 
 export interface IncrementalConfig {
-  files: {
-    [path: string]: IncrementalFileValue;
-  };
+  files: Record<string, IncrementalFileValue>;
 }
