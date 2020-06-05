@@ -171,7 +171,6 @@ export class Compress {
             const hrTimeEnd = process.hrtime(hrtimeStart);
             this.logger.log(
               this.getCompressedFileMsg(file, fileInfo, hrTimeEnd),
-              LogLevel.INFO,
             );
           }
         }
