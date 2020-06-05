@@ -44,11 +44,6 @@ export class BrotliCompression extends Compression<BrotliOptions> {
 
     if (this.options.brotliParamMode !== undefined) {
       switch (this.options.brotliParamMode) {
-        case 'default':
-          options[zlib.constants.BROTLI_PARAM_MODE] =
-            zlib.constants.BROTLI_MODE_GENERIC;
-          break;
-
         case 'text':
           options[zlib.constants.BROTLI_PARAM_MODE] =
             zlib.constants.BROTLI_MODE_TEXT;
@@ -59,6 +54,7 @@ export class BrotliCompression extends Compression<BrotliOptions> {
             zlib.constants.BROTLI_MODE_FONT;
           break;
 
+        case 'default':
         default:
           options[zlib.constants.BROTLI_PARAM_MODE] =
             zlib.constants.BROTLI_MODE_GENERIC;
