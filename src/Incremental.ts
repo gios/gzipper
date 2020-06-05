@@ -36,6 +36,7 @@ export class Incremental implements Cache {
    */
   async readConfig(): Promise<void> {
     if (await this.nativeFs.exists(this.config.configFile)) {
+      // TODO: 'readFile' Possible rewrite to stream
       const response = await this.nativeFs.readFile(this.config.configFile);
       const data: FileConfig = JSON.parse(response.toString());
       if (data.incremental) {

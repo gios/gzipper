@@ -42,6 +42,7 @@ export class Config {
    * Init or update config (.gzipperconfig).
    */
   async writeConfig(): Promise<void> {
+    // TODO: 'writeFile' Possible rewrite to stream
     await this.nativeFs.writeFile(
       path.resolve(this.configFile),
       JSON.stringify(this.writableContent, null, 2),
