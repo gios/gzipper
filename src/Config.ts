@@ -1,10 +1,10 @@
-import path from 'path';
-import util from 'util';
-import fs from 'fs';
+import path from "path";
+import util from "util";
+import fs from "fs";
 
-import { FileConfig } from './interfaces';
-import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
-import { Helpers } from './helpers';
+import { FileConfig } from "./interfaces";
+import { CONFIG_FILE, CONFIG_FOLDER } from "./constants";
+import { Helpers } from "./helpers";
 
 export class Config {
   readonly configFile: string;
@@ -18,7 +18,7 @@ export class Config {
    */
   constructor() {
     this.configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
-    this.setWritableContentProperty('version', Helpers.getVersion());
+    this.setWritableContentProperty("version", Helpers.getVersion());
   }
 
   /**

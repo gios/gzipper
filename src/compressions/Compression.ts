@@ -1,7 +1,7 @@
-import zlib from 'zlib';
+import zlib from "zlib";
 
-import { CompressOptions, CompressionOptions } from '../interfaces';
-import { Logger } from '../logger/Logger';
+import { CompressOptions, CompressionOptions } from "../interfaces";
+import { Logger } from "../logger/Logger";
 
 export abstract class Compression<T extends CompressionOptions> {
   compressionOptions: T = {} as T;
@@ -32,7 +32,7 @@ export abstract class Compression<T extends CompressionOptions> {
       key: string,
     ): string | undefined => key,
   ): string {
-    let options = '';
+    let options = "";
 
     for (const [key, value] of Object.entries(this.compressionOptions)) {
       options += `${keyWrapper(key)}: ${value}, `;

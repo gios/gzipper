@@ -1,15 +1,15 @@
-import zlib from 'zlib';
+import zlib from "zlib";
 
-import { Compression } from './Compression';
-import { CompressOptions, CompressionOptions } from '../interfaces';
-import { Logger } from '../logger/Logger';
+import { Compression } from "./Compression";
+import { CompressOptions, CompressionOptions } from "../interfaces";
+import { Logger } from "../logger/Logger";
 
 /**
  * Deflate compression
  */
 export class DeflateCompression extends Compression<CompressionOptions> {
-  readonly compressionName = 'DEFLATE';
-  readonly ext = 'zz';
+  readonly compressionName = "DEFLATE";
+  readonly ext = "zz";
   /**
    * Creates an instance of GzipCompression.
    */

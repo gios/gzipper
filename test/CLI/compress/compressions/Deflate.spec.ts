@@ -1,16 +1,16 @@
-import assert from 'assert';
-import sinon from 'sinon';
-import zlib from 'zlib';
+import assert from "assert";
+import sinon from "sinon";
+import zlib from "zlib";
 
-import { Compress } from '../../../../src/Compress';
+import { Compress } from "../../../../src/Compress";
 import {
   COMPRESS_PATH,
   getFiles,
   clear,
   COMPRESSION_EXTENSIONS,
-} from '../../../utils';
+} from "../../../utils";
 
-describe('CLI Compress -> Deflate compression', () => {
+describe("CLI Compress -> Deflate compression", () => {
   beforeEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
   });
@@ -19,7 +19,7 @@ describe('CLI Compress -> Deflate compression', () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
   });
 
-  it('--level, --memory-level, --strategy should change gzip configuration', async () => {
+  it("--level, --memory-level, --strategy should change gzip configuration", async () => {
     const options = {
       deflate: true,
       level: 6,
@@ -28,9 +28,9 @@ describe('CLI Compress -> Deflate compression', () => {
       threshold: 0,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    const loggerSuccessSpy = sinon.spy((compress as any).logger, "success");
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.zz']);
+    const files = await getFiles(COMPRESS_PATH, [".zz"]);
 
     assert.ok(
       loggerSuccessSpy.calledOnceWithExactly(
@@ -41,7 +41,7 @@ describe('CLI Compress -> Deflate compression', () => {
     assert.ok(
       (compress as any).createCompression() instanceof (zlib as any).Deflate,
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'zz');
+    assert.strictEqual((compress as any).compressionInstance.ext, "zz");
     assert.strictEqual(
       Object.keys((compress as any).compressionInstance.compressionOptions)
         .length,

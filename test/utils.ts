@@ -1,6 +1,6 @@
-import path from 'path';
-import fs from 'fs';
-import util from 'util';
+import path from "path";
+import fs from "fs";
+import util from "util";
 
 const unlink = util.promisify(fs.unlink);
 const mkdir = util.promisify(fs.mkdir);
@@ -9,29 +9,29 @@ const stat = util.promisify(fs.stat);
 const readdir = util.promisify(fs.readdir);
 const rmdir = util.promisify(fs.rmdir);
 
-export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, './resources');
+export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, "./resources");
 
 export const EMPTY_FOLDER_PATH = path.resolve(
   __dirname,
-  './resources/empty_folder',
+  "./resources/empty_folder",
 );
 export const COMPRESS_PATH = path.resolve(
   __dirname,
-  './resources/folder_to_compress',
+  "./resources/folder_to_compress",
 );
 export const COMPRESS_PATH_TARGET = path.resolve(
   __dirname,
-  './resources/compress_target',
+  "./resources/compress_target",
 );
 
-export const COMPRESSION_EXTENSIONS = ['.gz', '.br', '.zz'];
+export const COMPRESSION_EXTENSIONS = [".gz", ".br", ".zz"];
 
 async function statExists(target: string): Promise<boolean> {
   try {
     await stat(target);
     return true;
   } catch (error) {
-    if (error && error.code === 'ENOENT') {
+    if (error && error.code === "ENOENT") {
       return false;
     } else {
       throw error;
@@ -40,8 +40,8 @@ async function statExists(target: string): Promise<boolean> {
 }
 
 function filterByExtension(extensions: string[], ext: string): boolean {
-  return !!extensions.find(fileExtension => {
-    if (fileExtension.startsWith('!')) {
+  return !!extensions.find((fileExtension) => {
+    if (fileExtension.startsWith("!")) {
       return fileExtension.slice(1) !== ext;
     }
     return fileExtension === ext;
@@ -56,7 +56,7 @@ export async function clearDirectory(
   extensions: string[] | boolean,
 ): Promise<string[]> {
   try {
-    const force = typeof extensions === 'boolean' && extensions;
+    const force = typeof extensions === "boolean" && extensions;
     const files: string[] = [];
     const filesList = await readdir(target);
 

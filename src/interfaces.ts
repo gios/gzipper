@@ -1,4 +1,4 @@
-import zlib from 'zlib';
+import zlib from "zlib";
 
 export interface CompressOptions {
   verbose?: boolean;

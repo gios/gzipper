@@ -1,5 +1,5 @@
-import { Logger } from './Logger';
-import { LogLevel } from './LogLevel.enum';
+import { Logger } from "./Logger";
+import { LogLevel } from "./LogLevel.enum";
 
 /**
  * Exec only 'ERROR', 'WARNING', 'SUCCESS' or when 'verbose' flag is available.
@@ -9,10 +9,10 @@ export function filter(): (
   propertyKey: string,
   descriptor: PropertyDescriptor,
 ) => void {
-  return function(_target, _propertyKey, descriptor): PropertyDescriptor {
+  return function (_target, _propertyKey, descriptor): PropertyDescriptor {
     const valueDescriptor = descriptor.value;
 
-    descriptor.value = function(...args: [string, LogLevel]): unknown {
+    descriptor.value = function (...args: [string, LogLevel]): unknown {
       const [, level] = args;
       const shouldLog =
         (this as Logger).verbose ||
