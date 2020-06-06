@@ -124,7 +124,7 @@ describe('Methods Compress', () => {
       await fsUnlink(tmpInputFilePath);
     });
 
-    it("should throw an error if a file can't be compressed because of size calculation on verbose mode", async () => {
+    it("should throw an error if a file can't be compressed because of size calculation", async () => {
       const errName = 'FAKE_COMPRESSION_ERROR';
       const tmpOutputFilePath = path.join(
         RESOURCES_FOLDER_PATH,
@@ -133,13 +133,12 @@ describe('Methods Compress', () => {
       await fsWriteFile(tmpInputFilePath, 'const a = () => null');
 
       const compress = new Compress(COMPRESS_PATH, null, {
-        verbose: true,
         threshold: 0,
       });
       sinonSandbox
         .stub(compress, 'getOutputPath' as any)
         .returns(tmpOutputFilePath);
-      sinonSandbox.stub((compress as any).nativeFs, 'stat').rejects(errName);
+      sinonSandbox.stub((compress as any).nativeFs, 'lstat').rejects(errName);
 
       try {
         await (compress as any).compressFile(
