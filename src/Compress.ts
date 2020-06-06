@@ -251,7 +251,7 @@ export class Compress {
    */
   private compressionLog(): void {
     const options = this.compressionInstance.readableOptions();
-    this.logger.log(`Compression ${options}`, LogLevel.WARNING);
+    this.logger.log(`Compression ${options}`, LogLevel.INFO);
 
     if (!this.options.outputFileFormat) {
       this.logger.log(

@@ -4,8 +4,9 @@ import assert from 'assert';
 import { Index } from '../../../src/bin';
 import { Compress } from '../../../src/Compress';
 import { CompressOptions } from '../../../src/interfaces';
-import { Logger } from '../../../src/Logger';
+import { Logger } from '../../../src/logger/Logger';
 import { Incremental } from '../../../src/Incremental';
+import { LogLevel } from '../../../src/logger/LogLevel.enum';
 
 describe('Index CLI', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -247,22 +248,19 @@ describe('Index CLI', () => {
     );
   });
 
-  it("cache purge should exec 'cachePurge' and throw the success message", async () => {
+  it("cache purge should exec 'cachePurge' and throw the SUCCESS message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerSuccessStub = sinonSandbox.stub(Logger.prototype, 'success');
-    const loggerInfoStub = sinonSandbox.stub(Logger.prototype, 'info');
-    const loggerErrorStub = sinonSandbox.stub(Logger.prototype, 'error');
+    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
     const cachePurgeStub = sinonSandbox.stub(
       Incremental.prototype,
       'cachePurge',
     );
     const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
     await index.exec();
-    assert.strictEqual(loggerSuccessStub.callCount, 1);
-    assert.strictEqual(loggerInfoStub.callCount, 0);
-    assert.strictEqual(loggerErrorStub.callCount, 0);
+    assert.strictEqual(loggerLogStub.callCount, 1);
+    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.SUCCESS);
     assert.strictEqual(cachePurgeStub.callCount, 1);
     assert.strictEqual(cacheSizeStub.callCount, 0);
   });
@@ -271,18 +269,15 @@ describe('Index CLI', () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerSuccessStub = sinonSandbox.stub(Logger.prototype, 'success');
-    const loggerInfoStub = sinonSandbox.stub(Logger.prototype, 'info');
-    const loggerErrorStub = sinonSandbox.stub(Logger.prototype, 'error');
+    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
     const cachePurgeStub = sinonSandbox.stub(
       Incremental.prototype,
       'cachePurge',
     );
     const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
     await index.exec();
-    assert.strictEqual(loggerSuccessStub.callCount, 0);
-    assert.strictEqual(loggerInfoStub.callCount, 1);
-    assert.strictEqual(loggerErrorStub.callCount, 0);
+    assert.strictEqual(loggerLogStub.callCount, 1);
+    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.INFO);
     assert.strictEqual(cachePurgeStub.callCount, 0);
     assert.strictEqual(cacheSizeStub.callCount, 1);
   });
@@ -291,9 +286,7 @@ describe('Index CLI', () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerSuccessStub = sinonSandbox.stub(Logger.prototype, 'success');
-    const loggerInfoStub = sinonSandbox.stub(Logger.prototype, 'info');
-    const loggerErrorStub = sinonSandbox.stub(Logger.prototype, 'error');
+    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
     const cachePurgeStub = sinonSandbox.stub(
       Incremental.prototype,
       'cachePurge',
@@ -302,9 +295,8 @@ describe('Index CLI', () => {
       .stub(Incremental.prototype, 'cacheSize')
       .throws('Error');
     await index.exec();
-    assert.strictEqual(loggerSuccessStub.callCount, 0);
-    assert.strictEqual(loggerInfoStub.callCount, 0);
-    assert.strictEqual(loggerErrorStub.callCount, 1);
+    assert.strictEqual(loggerLogStub.callCount, 1);
+    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.ERROR);
     assert.strictEqual(cachePurgeStub.callCount, 0);
     assert.strictEqual(cacheSizeStub.callCount, 1);
   });
@@ -313,18 +305,15 @@ describe('Index CLI', () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerSuccessStub = sinonSandbox.stub(Logger.prototype, 'success');
-    const loggerInfoStub = sinonSandbox.stub(Logger.prototype, 'info');
-    const loggerErrorStub = sinonSandbox.stub(Logger.prototype, 'error');
+    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
     const cachePurgeStub = sinonSandbox
       .stub(Incremental.prototype, 'cachePurge')
       .throws('Error');
     const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
 
     await index.exec();
-    assert.strictEqual(loggerSuccessStub.callCount, 0);
-    assert.strictEqual(loggerInfoStub.callCount, 0);
-    assert.strictEqual(loggerErrorStub.callCount, 1);
+    assert.strictEqual(loggerLogStub.callCount, 1);
+    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.ERROR);
     assert.strictEqual(cachePurgeStub.callCount, 1);
     assert.strictEqual(cacheSizeStub.callCount, 0);
   });

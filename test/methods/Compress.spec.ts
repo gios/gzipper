@@ -165,7 +165,7 @@ describe('Methods Compress', () => {
         );
       } catch (err) {
         assert.ok(err instanceof Error);
-        assert.strictEqual(err.code, 'EISDIR');
+        assert.strictEqual((err as any).code, 'EISDIR');
       }
     });
   });
