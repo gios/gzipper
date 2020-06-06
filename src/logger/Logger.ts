@@ -1,5 +1,5 @@
-import { filter } from "./filter.decorator";
-import { LogLevel } from "./LogLevel.enum";
+import { filter } from './filter.decorator';
+import { LogLevel } from './LogLevel.enum';
 
 /**
  * Custom logger.
@@ -26,7 +26,7 @@ export class Logger {
    */
   private logger(message: string, level: LogLevel): void {
     let colorfulMessage: string;
-    const prefix = "gzipper";
+    const prefix = 'gzipper';
 
     switch (level) {
       case LogLevel.INFO:

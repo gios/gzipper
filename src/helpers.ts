@@ -1,7 +1,7 @@
-import fs from "fs";
-import util from "util";
+import fs from 'fs';
+import util from 'util';
 
-import * as pack from "../package.json";
+import * as pack from '../package.json';
 
 export class Helpers {
   private static readonly nativeFs = {
@@ -37,9 +37,9 @@ export class Helpers {
    */
   static readableSize(bytes: number): string {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     return `${Number((bytes / Math.pow(1024, i)).toFixed(2)).toString()} ${
-      sizes[i] || "b"
+      sizes[i] || 'b'
     }`;
   }
 
@@ -48,6 +48,6 @@ export class Helpers {
    */
   static readableHrtime(hrTime: [number, number]): string {
     const [seconds, nanoseconds] = hrTime;
-    return `${seconds ? seconds + "s " : ""}${nanoseconds / 1e6}ms`;
+    return `${seconds ? seconds + 's ' : ''}${nanoseconds / 1e6}ms`;
   }
 }

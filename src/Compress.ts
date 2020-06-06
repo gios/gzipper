@@ -1,19 +1,19 @@
-import fs from "fs";
-import path from "path";
-import util from "util";
-import { v4 } from "uuid";
-import stream from "stream";
+import fs from 'fs';
+import path from 'path';
+import util from 'util';
+import { v4 } from 'uuid';
+import stream from 'stream';
 
-import { Helpers } from "./helpers";
-import { Logger } from "./logger/Logger";
-import { BrotliCompression } from "./compressions/Brotli";
-import { GzipCompression } from "./compressions/Gzip";
-import { OUTPUT_FILE_FORMAT_REGEXP, NO_FILES_MESSAGE } from "./constants";
-import { CompressOptions, CompressedFile } from "./interfaces";
-import { DeflateCompression } from "./compressions/Deflate";
-import { Incremental } from "./Incremental";
-import { Config } from "./Config";
-import { LogLevel } from "./logger/LogLevel.enum";
+import { Helpers } from './helpers';
+import { Logger } from './logger/Logger';
+import { BrotliCompression } from './compressions/Brotli';
+import { GzipCompression } from './compressions/Gzip';
+import { OUTPUT_FILE_FORMAT_REGEXP, NO_FILES_MESSAGE } from './constants';
+import { CompressOptions, CompressedFile } from './interfaces';
+import { DeflateCompression } from './compressions/Deflate';
+import { Incremental } from './Incremental';
+import { Config } from './Config';
+import { LogLevel } from './logger/LogLevel.enum';
 
 /**
  * Compressing files.
@@ -38,9 +38,9 @@ export class Compress {
     | DeflateCompression;
   private readonly target: string;
   private readonly createCompression:
-    | ReturnType<BrotliCompression["getCompression"]>
-    | ReturnType<GzipCompression["getCompression"]>
-    | ReturnType<DeflateCompression["getCompression"]>;
+    | ReturnType<BrotliCompression['getCompression']>
+    | ReturnType<GzipCompression['getCompression']>
+    | ReturnType<DeflateCompression['getCompression']>;
   /**
    * Creates an instance of Compress.
    */
@@ -99,7 +99,7 @@ export class Compress {
     if (filesCount) {
       this.logger.log(
         `${filesCount} ${
-          filesCount > 1 ? "files have" : "file has"
+          filesCount > 1 ? 'files have' : 'file has'
         } been compressed. (${Helpers.readableHrtime(hrtime)})`,
         LogLevel.SUCCESS,
       );
@@ -255,7 +255,7 @@ export class Compress {
 
     if (!this.options.outputFileFormat) {
       this.logger.log(
-        "Default output file format: [filename].[ext].[compressExt]",
+        'Default output file format: [filename].[ext].[compressExt]',
         LogLevel.INFO,
       );
     }
@@ -266,24 +266,24 @@ export class Compress {
    */
   private getOutputPath(target: string, file: string): string {
     const artifactsMap = new Map<string, string | null>([
-      ["[filename]", path.parse(file).name],
-      ["[ext]", path.extname(file).slice(1)],
-      ["[compressExt]", this.compressionInstance.ext],
+      ['[filename]', path.parse(file).name],
+      ['[ext]', path.extname(file).slice(1)],
+      ['[compressExt]', this.compressionInstance.ext],
     ]);
-    let filename = `${artifactsMap.get("[filename]")}.${artifactsMap.get(
-      "[ext]",
-    )}.${artifactsMap.get("[compressExt]")}`;
+    let filename = `${artifactsMap.get('[filename]')}.${artifactsMap.get(
+      '[ext]',
+    )}.${artifactsMap.get('[compressExt]')}`;
 
     if (this.options.outputFileFormat) {
-      artifactsMap.set("[hash]", null);
+      artifactsMap.set('[hash]', null);
 
       filename = this.options.outputFileFormat.replace(
         OUTPUT_FILE_FORMAT_REGEXP,
         (artifact) => {
           if (artifactsMap.has(artifact)) {
             // Need to generate hash only if we have appropriate param
-            if (artifact === "[hash]") {
-              artifactsMap.set("[hash]", v4());
+            if (artifact === '[hash]') {
+              artifactsMap.set('[hash]', v4());
             }
             return artifactsMap.get(artifact) as string;
           } else {

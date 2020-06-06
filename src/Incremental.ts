@@ -1,14 +1,14 @@
-import fs from "fs";
-import crypto from "crypto";
-import path from "path";
-import util from "util";
-import { v4 } from "uuid";
-import deepEqual from "deep-equal";
+import fs from 'fs';
+import crypto from 'crypto';
+import path from 'path';
+import util from 'util';
+import { v4 } from 'uuid';
+import deepEqual from 'deep-equal';
 
-import { CACHE_FOLDER, CONFIG_FOLDER } from "./constants";
-import { Helpers } from "./helpers";
-import { Cache, FileConfig, IncrementalFileValue } from "./interfaces";
-import { Config } from "./Config";
+import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
+import { Helpers } from './helpers';
+import { Cache, FileConfig, IncrementalFileValue } from './interfaces';
+import { Config } from './Config';
 
 export class Incremental implements Cache {
   readonly cacheFolder: string;
@@ -49,7 +49,7 @@ export class Incremental implements Cache {
    * update config (.gzipperconfig).
    */
   async updateConfig(): Promise<void> {
-    this.config.setWritableContentProperty("incremental", {
+    this.config.setWritableContentProperty('incremental', {
       files: Helpers.mapToJSON(this.filePaths),
     });
   }
@@ -67,7 +67,7 @@ export class Incremental implements Cache {
   setFile(
     target: string,
     checksum: string,
-    compressOptions: IncrementalFileValue["revisions"][number]["options"],
+    compressOptions: IncrementalFileValue['revisions'][number]['options'],
   ): {
     isChanged: boolean;
     fileId: string;
@@ -138,13 +138,13 @@ export class Incremental implements Cache {
    * Returns file checksum.
    */
   async getFileChecksum(target: string): Promise<string> {
-    const hash = crypto.createHash("md5");
+    const hash = crypto.createHash('md5');
     const stream = fs.createReadStream(target);
 
     return new Promise((resolve, reject) => {
-      stream.on("data", (data) => hash.update(data, "utf8"));
-      stream.on("end", () => resolve(hash.digest("hex")));
-      stream.on("error", (error) => reject(error));
+      stream.on('data', (data) => hash.update(data, 'utf8'));
+      stream.on('end', () => resolve(hash.digest('hex')));
+      stream.on('error', (error) => reject(error));
     });
   }
 
@@ -153,7 +153,7 @@ export class Incremental implements Cache {
    */
   async cachePurge(): Promise<void> {
     if (!(await this.nativeFs.exists(this.cacheFolder))) {
-      throw new Error("No cache found.");
+      throw new Error('No cache found.');
     }
 
     const recursiveRemove = async (
@@ -176,7 +176,7 @@ export class Incremental implements Cache {
     };
 
     await recursiveRemove();
-    this.config.deleteWritableContentProperty("incremental");
+    this.config.deleteWritableContentProperty('incremental');
     await this.config.writeConfig();
   }
 
@@ -185,7 +185,7 @@ export class Incremental implements Cache {
    */
   async cacheSize(folderPath = this.cacheFolder, size = 0): Promise<number> {
     if (!(await this.nativeFs.exists(this.cacheFolder))) {
-      throw new Error("No cache found.");
+      throw new Error('No cache found.');
     }
 
     const files = await this.nativeFs.readdir(folderPath);

@@ -1,8 +1,8 @@
-const config = require("../.eslintrc.js");
+const config = require('../.eslintrc.js');
 
 module.exports = {
   ...config,
   rules: {
-    "@typescript-eslint/no-explicit-any": "off",
+    '@typescript-eslint/no-explicit-any': 'off',
   },
 };

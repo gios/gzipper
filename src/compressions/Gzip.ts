@@ -1,15 +1,15 @@
-import zlib from "zlib";
+import zlib from 'zlib';
 
-import { Compression } from "./Compression";
-import { CompressOptions, CompressionOptions } from "../interfaces";
-import { Logger } from "../logger/Logger";
+import { Compression } from './Compression';
+import { CompressOptions, CompressionOptions } from '../interfaces';
+import { Logger } from '../logger/Logger';
 
 /**
  * Gzip compression
  */
 export class GzipCompression extends Compression<CompressionOptions> {
-  readonly compressionName = "GZIP";
-  readonly ext = "gz";
+  readonly compressionName = 'GZIP';
+  readonly ext = 'gz';
   /**
    * Creates an instance of GzipCompression.
    */
