@@ -171,6 +171,47 @@ describe('Methods Compress', () => {
   });
 
   describe('getOutputPath', () => {
+    it('should returns correct file path', () => {
+      const compress = new Compress(COMPRESS_PATH, null);
+      const target = '/the/elder/scrolls/';
+      const file = 'skyrim.js';
+
+      let outputFilePath = (compress as any).getOutputPath(target, file);
+      assert.strictEqual(
+        outputFilePath,
+        '/the/elder/scrolls/skyrim.js.gz'.split('/').join(path.sep),
+      );
+
+      (compress as any).options.outputFileFormat =
+        'test[filename].[compressExt].[ext]';
+      outputFilePath = (compress as any).getOutputPath(target, file);
+      assert.strictEqual(
+        outputFilePath,
+        '/the/elder/scrolls/testskyrim.gz.js'.split('/').join(path.sep),
+      );
+
+      (compress as any).options.outputFileFormat =
+        '[filename]-test.[compressExt]';
+      outputFilePath = (compress as any).getOutputPath(target, file);
+      assert.strictEqual(
+        outputFilePath,
+        '/the/elder/scrolls/skyrim-test.gz'.split('/').join(path.sep),
+      );
+
+      (compress as any).options.outputFileFormat =
+        '[filename]-[hash]-[filename]-test.[compressExt].[ext]';
+      outputFilePath = (compress as any).getOutputPath(target, file);
+      const execHash = /(?<=skyrim-)(.*)(?=-skyrim)/.exec(
+        outputFilePath,
+      ) as RegExpExecArray;
+      assert.strictEqual(
+        outputFilePath,
+        `/the/elder/scrolls/skyrim-${execHash[0]}-skyrim-test.gz.js`
+          .split('/')
+          .join(path.sep),
+      );
+    });
+
     it('should returns finalized output path with prefixes', async () => {
       const compress = new Compress(COMPRESS_PATH, null, {
         outputFileFormat: 'iron-[hash]-[filename].[compressExt].[ext]',

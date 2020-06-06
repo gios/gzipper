@@ -230,7 +230,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} file has been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -259,68 +259,37 @@ describe('CLI Compress', () => {
     assert.strictEqual(Object.keys((compress as any).options).length, 0);
   });
 
-  it('getOutputPath should returns correct file path', () => {
-    const compress = new Compress(COMPRESS_PATH, null);
-    const target = '/the/elder/scrolls/';
-    const file = 'skyrim.js';
-
-    let outputFilePath = (compress as any).getOutputPath(target, file);
-    assert.strictEqual(
-      outputFilePath,
-      '/the/elder/scrolls/skyrim.js.gz'.split('/').join(path.sep),
-    );
-
-    (compress as any).options.outputFileFormat =
-      'test[filename].[compressExt].[ext]';
-    outputFilePath = (compress as any).getOutputPath(target, file);
-    assert.strictEqual(
-      outputFilePath,
-      '/the/elder/scrolls/testskyrim.gz.js'.split('/').join(path.sep),
-    );
-
-    (compress as any).options.outputFileFormat =
-      '[filename]-test.[compressExt]';
-    outputFilePath = (compress as any).getOutputPath(target, file);
-    assert.strictEqual(
-      outputFilePath,
-      '/the/elder/scrolls/skyrim-test.gz'.split('/').join(path.sep),
-    );
-
-    (compress as any).options.outputFileFormat =
-      '[filename]-[hash]-[filename]-test.[compressExt].[ext]';
-    outputFilePath = (compress as any).getOutputPath(target, file);
-    const execHash = /(?<=skyrim-)(.*)(?=-skyrim)/.exec(
-      outputFilePath,
-    ) as RegExpExecArray;
-    assert.strictEqual(
-      outputFilePath,
-      `/the/elder/scrolls/skyrim-${execHash[0]}-skyrim-test.gz.js`
-        .split('/')
-        .join(path.sep),
-    );
-  });
-
   it('should use default file format artifacts via --output-file-format and print to console via --verbose flag', async () => {
     const options = { verbose: true, threshold: 0 };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
-    const loggerInfoSpy = sinon.spy((compress as any).logger, 'info');
+    const logSpy = sinon.spy((compress as any).logger, 'log');
     const getOutputPathSpy = sinon.spy(compress, 'getOutputPath' as any);
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.gz']);
 
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
-      loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
-        true,
+      logSpy.calledWithExactly(
+        'Default output file format: [filename].[ext].[compressExt]',
+        LogLevel.INFO,
       ),
     );
     assert.ok(
-      loggerInfoSpy.calledWithExactly(
-        `Default output file format: [filename].[ext].[compressExt]`,
+      logSpy.calledWithExactly(
+        sinon.match(
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        ),
+        LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual(loggerInfoSpy.callCount, files.length + 1);
+    assert.strictEqual(
+      logSpy.withArgs(
+        sinon.match(
+          /File \w+\.\w+ has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \(.+\)/,
+        ),
+      ).callCount,
+      files.length,
+    );
     assert.strictEqual(getOutputPathSpy.callCount, files.length);
     assert.ok(
       (compress as any).createCompression() instanceof (zlib as any).Gzip,
@@ -347,9 +316,8 @@ describe('CLI Compress', () => {
     }
   });
 
-  async function validateOutputFileFormat(
+  async function validateOutputPathOptions(
     options: CompressOptions,
-    outputFileFormat: string,
   ): Promise<[Compress, sinon.SinonSpy]> {
     const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
     const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
@@ -382,7 +350,7 @@ describe('CLI Compress', () => {
     assert.strictEqual(Object.keys((compress as any).options).length, 3);
     assert.strictEqual(
       (compress as any).options.outputFileFormat,
-      outputFileFormat,
+      options.outputFileFormat,
     );
 
     return [compress, getOutputPathSpy];
@@ -395,9 +363,8 @@ describe('CLI Compress', () => {
       threshold: 0,
     };
 
-    const [compress, getOutputPathSpy] = await validateOutputFileFormat(
+    const [compress, getOutputPathSpy] = await validateOutputPathOptions(
       options,
-      options.outputFileFormat,
     );
 
     for (let index = 0; index < getOutputPathSpy.callCount; index++) {
@@ -424,10 +391,7 @@ describe('CLI Compress', () => {
       threshold: 0,
     };
 
-    const [, getOutputPathSpy] = await validateOutputFileFormat(
-      options,
-      options.outputFileFormat,
-    );
+    const [, getOutputPathSpy] = await validateOutputPathOptions(options);
 
     for (let index = 0; index < getOutputPathSpy.callCount; index++) {
       const call = getOutputPathSpy.getCall(index);
