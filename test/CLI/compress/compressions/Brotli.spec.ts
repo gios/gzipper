@@ -10,6 +10,7 @@ import {
   clear,
   COMPRESSION_EXTENSIONS,
 } from '../../../utils';
+import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 
 const describeTest = disableBrotli ? describe.skip : describe;
 
@@ -38,27 +39,50 @@ describeTest('CLI Compress -> Brotli compression', () => {
     zlib.createBrotliCompress = createBrotliCompress;
   });
 
-  it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
+  it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration with --verbose', async () => {
     const options = {
       brotli: true,
       brotliParamMode: 'text',
       brotliQuality: 10,
       brotliSizeHint: 5,
       threshold: 0,
+      verbose: true,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    const logSpy = sinon.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
     assert.ok(
-      loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
-        true,
+      logSpy.calledWithExactly(
+        'Compression BROTLI | brotliParamMode: 1, brotliQuality: 10, brotliSizeHint: 5',
+        LogLevel.INFO,
       ),
+    );
+    assert.ok(
+      logSpy.calledWithExactly(
+        'Default output file format: [filename].[ext].[compressExt]',
+        LogLevel.INFO,
+      ),
+    );
+    assert.ok(
+      logSpy.calledWithExactly(
+        sinon.match(
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        ),
+        LogLevel.SUCCESS,
+      ),
+    );
+    assert.strictEqual(
+      logSpy.withArgs(
+        sinon.match(
+          /File \w+\.\w+ has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \(.+\)/,
+        ),
+      ).callCount,
+      files.length,
     );
     assert.ok(
       (compress as any).createCompression() instanceof
@@ -70,7 +94,7 @@ describeTest('CLI Compress -> Brotli compression', () => {
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 5);
+    assert.strictEqual(Object.keys((compress as any).options).length, 6);
     assert.strictEqual(
       (compress as any).compressionInstance.compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
@@ -101,14 +125,22 @@ describeTest('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    const logSpy = sinon.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
     assert.ok(
-      loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
-        true,
+      logSpy.calledWithExactly(
+        'Compression BROTLI | brotliParamMode: 0',
+        LogLevel.INFO,
+      ),
+    );
+    assert.ok(
+      logSpy.calledWithExactly(
+        sinon.match(
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        ),
+        LogLevel.SUCCESS,
       ),
     );
     assert.ok(
@@ -140,14 +172,22 @@ describeTest('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    const logSpy = sinon.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
     assert.ok(
-      loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
-        true,
+      logSpy.calledWithExactly(
+        'Compression BROTLI | brotliParamMode: 0',
+        LogLevel.INFO,
+      ),
+    );
+    assert.ok(
+      logSpy.calledWithExactly(
+        sinon.match(
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        ),
+        LogLevel.SUCCESS,
       ),
     );
     assert.ok(
@@ -179,14 +219,22 @@ describeTest('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
+    const logSpy = sinon.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
     assert.ok(
-      loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
-        true,
+      logSpy.calledWithExactly(
+        'Compression BROTLI | brotliParamMode: 2',
+        LogLevel.INFO,
+      ),
+    );
+    assert.ok(
+      logSpy.calledWithExactly(
+        sinon.match(
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        ),
+        LogLevel.SUCCESS,
       ),
     );
     assert.ok(

@@ -9,6 +9,7 @@ const fsUnlink = promisify(fs.unlink);
 
 import { COMPRESS_PATH, RESOURCES_FOLDER_PATH } from '../utils';
 import { Compress } from '../../src/Compress';
+import { LogLevel } from '../../src/logger/LogLevel.enum';
 
 describe('Methods Compress', () => {
   describe('compress', () => {
@@ -27,7 +28,7 @@ describe('Methods Compress', () => {
       const compress = new Compress(COMPRESS_PATH, null);
       const compressionLogFake = sinon.fake();
       const compileFolderRecursively = sinon.fake.resolves(['one']);
-      const successSpy = sinonSandbox.spy((compress as any).logger, 'success');
+      const logSpy = sinon.spy((compress as any).logger, 'log');
 
       sinonSandbox.replace(
         compress,
@@ -41,10 +42,11 @@ describe('Methods Compress', () => {
       );
       await compress.run();
 
-      const [message] = successSpy.args[0];
+      const [message, level] = logSpy.args[0];
       assert.ok(compressionLogFake.calledOnce);
       assert.ok(compileFolderRecursively.calledOnce);
-      assert.strictEqual(message, '1 file has been compressed.');
+      assert.ok(/1 file has been compressed. (.+)/.test(message));
+      assert.strictEqual(level, LogLevel.SUCCESS);
     });
   });
 
@@ -75,10 +77,10 @@ describe('Methods Compress', () => {
     });
 
     it('should print time in seconds if operation takes more than 1000ms', async () => {
-      const MESSAGE_VALIDATION = /File one\.js has been compressed \d+\.\d{4}Kb -> \d+\.\d{4}Kb \([1-9]\d*s \d+\.\d+ms\)/;
+      const MESSAGE_VALIDATION = /File one\.js has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \([1-9]\d*s \d+\.\d+ms\)/;
       const files = ['one.js', 'two.js'];
       const compress = new Compress(COMPRESS_PATH, null);
-      const infoSpy = sinonSandbox.spy((compress as any).logger, 'info');
+      const logSpy = sinon.spy((compress as any).logger, 'log');
       sinonSandbox.stub((compress as any).nativeFs, 'readdir').resolves(files);
       sinonSandbox
         .stub((compress as any).nativeFs, 'lstat')
@@ -99,8 +101,8 @@ describe('Methods Compress', () => {
 
       await (compress as any).compileFolderRecursively(process.cwd());
       assert.ok(compressFileStub.calledTwice);
-      assert.ok(infoSpy.calledTwice);
-      const [message] = infoSpy.args[0];
+      assert.ok(logSpy.calledTwice);
+      const [message] = logSpy.args[0];
       assert.ok(MESSAGE_VALIDATION.test(message));
     });
   });
