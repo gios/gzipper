@@ -320,21 +320,24 @@ describe('CLI Compress', () => {
     options: CompressOptions,
   ): Promise<[Compress, sinon.SinonSpy]> {
     const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
-    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
-    const loggerInfoSpy = sinon.spy((compress as any).logger, 'info');
+    const logSpy = sinon.spy((compress as any).logger, 'log');
     const getOutputPathSpy = sinon.spy(compress, 'getOutputPath' as any);
     await compress.run();
     const files = await getFiles(COMPRESS_PATH_TARGET);
 
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
-      loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} files have been compressed.`,
-        true,
+      logSpy.neverCalledWith(
+        'Default output file format: [filename].[ext].[compressExt]',
+        LogLevel.INFO,
       ),
     );
     assert.ok(
-      loggerInfoSpy.neverCalledWithMatch(
-        `Default output file format: [filename].[ext].[compressExt]`,
+      logSpy.calledWithExactly(
+        sinon.match(
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        ),
+        LogLevel.SUCCESS,
       ),
     );
     assert.strictEqual(getOutputPathSpy.callCount, files.length);
