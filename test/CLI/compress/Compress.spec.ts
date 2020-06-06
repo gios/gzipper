@@ -350,7 +350,7 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
     assert.strictEqual(
       (compress as any).options.outputFileFormat,
       options.outputFileFormat,
@@ -362,7 +362,6 @@ describe('CLI Compress', () => {
   it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
     const options = {
       outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
-      verbose: true,
       threshold: 0,
     };
 
@@ -390,7 +389,6 @@ describe('CLI Compress', () => {
   it('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
     const options = {
       outputFileFormat: '[filename]-[hash]-55.[ext]',
-      verbose: true,
       threshold: 0,
     };
 
@@ -414,23 +412,23 @@ describe('CLI Compress', () => {
   it('should include specific file extensions for compression (also exclude others)', async () => {
     const options = {
       include: ['sunny'],
-      verbose: true,
       threshold: 0,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const loggerSuccessSpy = sinon.spy((compress as any).logger, 'success');
-    const loggerInfoSpy = sinon.spy((compress as any).logger, 'info');
+    const logSpy = sinon.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.gz']);
 
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
-      loggerSuccessSpy.calledOnceWithExactly(
-        `${files.length} file has been compressed.`,
-        true,
+      logSpy.calledWithExactly(
+        sinon.match(
+          new RegExp(`${files.length} file has been compressed\. \(.+\)`),
+        ),
+        LogLevel.SUCCESS,
       ),
     );
     assert.equal(files.length, 1);
-    assert.strictEqual(loggerInfoSpy.callCount, files.length + 1);
     assert.ok(
       (compress as any).createCompression() instanceof (zlib as any).Gzip,
     );
@@ -440,7 +438,7 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('should exclude file extensions from compression jpeg,jpg', async () => {
