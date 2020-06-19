@@ -13,7 +13,6 @@ import { Config } from './Config';
 export class Incremental implements Cache {
   readonly cacheFolder: string;
   private readonly nativeFs = {
-    readFile: util.promisify(fs.readFile),
     exists: util.promisify(fs.exists),
     unlink: util.promisify(fs.unlink),
     readdir: util.promisify(fs.readdir),
@@ -36,8 +35,7 @@ export class Incremental implements Cache {
    */
   async readConfig(): Promise<void> {
     if (await this.nativeFs.exists(this.config.configFile)) {
-      // TODO: 'readFile' Possible rewrite to stream
-      const response = await this.nativeFs.readFile(this.config.configFile);
+      const response = await Helpers.readFile(this.config.configFile);
       const data: FileConfig = JSON.parse(response.toString());
       if (data.incremental) {
         this.filePaths = new Map(Object.entries(data.incremental.files));
@@ -142,7 +140,7 @@ export class Incremental implements Cache {
     const stream = fs.createReadStream(target);
 
     return new Promise((resolve, reject) => {
-      stream.on('data', (data) => hash.update(data, 'utf8'));
+      stream.on('data', (data: string) => hash.update(data, 'utf8'));
       stream.on('end', () => resolve(hash.digest('hex')));
       stream.on('error', (error) => reject(error));
     });

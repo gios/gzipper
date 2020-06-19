@@ -50,4 +50,18 @@ export class Helpers {
     const [seconds, nanoseconds] = hrTime;
     return `${seconds ? seconds + 's ' : ''}${nanoseconds / 1e6}ms`;
   }
+
+  /**
+   * Read file via readable stream.
+   */
+  static async readFile(file: string): Promise<string> {
+    let data = '';
+    const stream = fs.createReadStream(file, { encoding: 'utf8' });
+
+    return new Promise((resolve, reject) => {
+      stream.on('data', (chunk) => (data += chunk));
+      stream.on('end', () => resolve(data));
+      stream.on('error', (err) => reject(err));
+    });
+  }
 }
