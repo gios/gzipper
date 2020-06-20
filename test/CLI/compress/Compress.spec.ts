@@ -19,7 +19,7 @@ import { CompressOptions } from '../../../src/interfaces';
 import { NO_FILES_MESSAGE } from '../../../src/constants';
 import { LogLevel } from '../../../src/logger/LogLevel.enum';
 
-const lstat = util.promisify(fs.lstat);
+const fsLstat = util.promisify(fs.lstat);
 
 describe('CLI Compress', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -485,7 +485,7 @@ describe('CLI Compress', () => {
     let includedFiles = 0;
     const files = await getFiles(COMPRESS_PATH);
     for (const filePath of files) {
-      const { size: fileSize } = await lstat(filePath);
+      const { size: fileSize } = await fsLstat(filePath);
       if (fileSize < THRESHOLD) {
         continue;
       }

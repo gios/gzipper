@@ -1,12 +1,13 @@
 import sinon from 'sinon';
 import assert from 'assert';
 
-import { Index } from '../../../src/bin';
-import { Compress } from '../../../src/Compress';
-import { CompressOptions } from '../../../src/interfaces';
-import { Logger } from '../../../src/logger/Logger';
-import { Incremental } from '../../../src/Incremental';
-import { LogLevel } from '../../../src/logger/LogLevel.enum';
+import { Index } from '../../src/bin';
+import { Compress } from '../../src/Compress';
+import { CompressOptions } from '../../src/interfaces';
+import { Logger } from '../../src/logger/Logger';
+import { Incremental } from '../../src/Incremental';
+import { LogLevel } from '../../src/logger/LogLevel.enum';
+import { Helpers } from '../../src/helpers';
 
 describe('Index CLI', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -280,6 +281,27 @@ describe('Index CLI', () => {
     assert.strictEqual(loggerLogStub.args[0][1], LogLevel.INFO);
     assert.strictEqual(cachePurgeStub.callCount, 0);
     assert.strictEqual(cacheSizeStub.callCount, 1);
+  });
+
+  it("cache size should exec 'cacheSize', 'readableSize' and throw the info message", async () => {
+    const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
+    const index = new Index();
+    (index as any).argv = cliArguments;
+    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
+    const readableSizeStub = sinonSandbox.stub(Helpers, 'readableSize');
+    const cachePurgeStub = sinonSandbox.stub(
+      Incremental.prototype,
+      'cachePurge',
+    );
+    const cacheSizeStub = sinonSandbox
+      .stub(Incremental.prototype, 'cacheSize')
+      .resolves(12);
+    await index.exec();
+    assert.strictEqual(loggerLogStub.callCount, 1);
+    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.INFO);
+    assert.strictEqual(cachePurgeStub.callCount, 0);
+    assert.strictEqual(cacheSizeStub.callCount, 1);
+    assert.strictEqual(readableSizeStub.callCount, 1);
   });
 
   it('cache size should throw the error message', async () => {

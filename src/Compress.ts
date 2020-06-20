@@ -8,7 +8,13 @@ import { Helpers } from './helpers';
 import { Logger } from './logger/Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
-import { OUTPUT_FILE_FORMAT_REGEXP, NO_FILES_MESSAGE } from './constants';
+import {
+  OUTPUT_FILE_FORMAT_REGEXP,
+  NO_FILES_MESSAGE,
+  NO_PATH_MESSAGE,
+  DEFAULT_OUTPUT_FORMAT_MESSAGE,
+  INCREMENTAL_ENABLE_MESSAGE,
+} from './constants';
 import { CompressOptions, CompressedFile } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
@@ -52,7 +58,7 @@ export class Compress {
     this.logger = new Logger(options.verbose as boolean);
     this.config = new Config();
     if (!target) {
-      const message = `Can't find a path.`;
+      const message = NO_PATH_MESSAGE;
       this.logger.log(message, LogLevel.ERROR);
       throw new Error(message);
     }
@@ -79,6 +85,7 @@ export class Compress {
         await Helpers.createFolders(this.outputPath);
       }
       if (this.options.incremental) {
+        this.logger.log(INCREMENTAL_ENABLE_MESSAGE, LogLevel.INFO);
         await this.incremental.initCacheFolder();
         await this.incremental.readConfig();
       }
@@ -254,10 +261,7 @@ export class Compress {
     this.logger.log(`Compression ${options}`, LogLevel.INFO);
 
     if (!this.options.outputFileFormat) {
-      this.logger.log(
-        'Default output file format: [filename].[ext].[compressExt]',
-        LogLevel.INFO,
-      );
+      this.logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
     }
   }
 
