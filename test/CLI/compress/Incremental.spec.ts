@@ -4,6 +4,7 @@ import zlib from 'zlib';
 import path from 'path';
 import fs from 'fs';
 import util from 'util';
+import deepEqual from 'deep-equal';
 
 import {
   COMPRESSION_EXTENSIONS,
@@ -18,6 +19,7 @@ import { INCREMENTAL_ENABLE_MESSAGE } from '../../../src/constants';
 import {
   FileConfig,
   IncrementalFileValueRevisions,
+  IncrementalFileValue,
 } from '../../../src/interfaces';
 
 const fsExists = util.promisify(fs.exists);
@@ -179,11 +181,11 @@ describe('CLI Compress -> Incremental', () => {
 
     await fsWriteFile(fileToEdit, beforeFileContent);
 
-    assert.ok(
-      fileRevisionsBefore[0]?.lastChecksum !==
-        fileRevisionsAfter[0]?.lastChecksum,
+    assert.notEqual(
+      fileRevisionsBefore[0]?.lastChecksum,
+      fileRevisionsAfter[0]?.lastChecksum,
     );
-    assert.ok(fileRevisionsBefore[0]?.date !== fileRevisionsAfter[0]?.date);
+    assert.notEqual(fileRevisionsBefore[0]?.date, fileRevisionsAfter[0]?.date);
 
     delete fileRevisionsBefore[0]?.lastChecksum;
     delete fileRevisionsAfter[0]?.lastChecksum;
@@ -216,5 +218,39 @@ describe('CLI Compress -> Incremental', () => {
 
     await fsWriteFile(fileToEdit, beforeFileContent);
     assert.ok(!hashContentBefore.equals(hashContentAfter));
+  });
+
+  it('should add new revision if compress options were changed', async () => {
+    const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
+    const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
+    const files = await getFiles(COMPRESS_PATH);
+
+    const compress1 = new Compress(COMPRESS_PATH, null, {
+      threshold: 0,
+      incremental: true,
+    });
+    await compress1.run();
+    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+
+    const compress2 = new Compress(COMPRESS_PATH, null, {
+      threshold: 0,
+      incremental: true,
+      level: 8,
+    });
+    await compress2.run();
+    const configAfter: FileConfig = JSON.parse(
+      (await fsReadFile(configPath)).toString(),
+    );
+    const revisions = Object.values(
+      configAfter.incremental?.files as Record<string, IncrementalFileValue>,
+    ).every(
+      (file) =>
+        file.revisions.length === 2 &&
+        deepEqual(file.revisions[1].options, { level: 8 }),
+    );
+    const cachedFiles = await getFiles(cachePath);
+
+    assert.ok(revisions);
+    assert.equal(files.length * 2, cachedFiles.length);
   });
 });
