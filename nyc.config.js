@@ -8,7 +8,7 @@ module.exports = {
   all: true,
   include: ['src/**'],
   extension: ['.ts'],
-  exclude: exclude,
+  exclude,
   reporter: ['text-summary'],
   branches: 85,
   lines: 90,

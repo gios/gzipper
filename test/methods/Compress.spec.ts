@@ -77,32 +77,17 @@ describe('Methods Compress', () => {
     });
 
     it('should print time in seconds if operation takes more than 1000ms', async () => {
-      const MESSAGE_VALIDATION = /File one\.js has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \([1-9]\d*s \d+\.\d+ms\)/;
-      const files = ['one.js', 'two.js'];
+      const MESSAGE_VALIDATION = /File amigo\.js has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \([1-9]\d*s \d+\.\d+ms\)/;
       const compress = new Compress(COMPRESS_PATH, null);
-      const logSpy = sinon.spy((compress as any).logger, 'log');
-      sinonSandbox.stub((compress as any).nativeFs, 'readdir').resolves(files);
-      sinonSandbox
-        .stub((compress as any).nativeFs, 'lstat')
-        .onFirstCall()
-        .resolves({ isFile: () => false, isDirectory: () => true })
-        .resolves({ isFile: () => true, isDirectory: () => false });
-
-      const compressFileStub = sinonSandbox
-        .stub(compress, 'compressFile' as any)
-        .callsFake(async () => {
-          return new Promise((resolve): void => {
-            setTimeout(
-              () => resolve({ beforeSize: 5000, afterSize: 4000 }),
-              1100,
-            );
-          });
-        });
-
-      await (compress as any).compileFolderRecursively(process.cwd());
-      assert.ok(compressFileStub.calledTwice);
-      assert.ok(logSpy.calledTwice);
-      const [message] = logSpy.args[0];
+      const message = (compress as any).getCompressedFileMsg(
+        'amigo.js',
+        {
+          beforeSize: 100,
+          afterSize: 99,
+          isCached: false,
+        },
+        [10, 999],
+      );
       assert.ok(MESSAGE_VALIDATION.test(message));
     });
   });

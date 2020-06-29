@@ -174,10 +174,14 @@ export class Compress {
             this.outputPath,
           );
 
-          if (fileInfo) {
+          if (this.options.verbose) {
             const hrTimeEnd = process.hrtime(hrtimeStart);
             this.logger.log(
-              this.getCompressedFileMsg(file, fileInfo, hrTimeEnd),
+              this.getCompressedFileMsg(
+                file,
+                fileInfo as CompressedFile,
+                hrTimeEnd,
+              ),
             );
           }
         }
@@ -195,7 +199,7 @@ export class Compress {
     filename: string,
     target: string,
     outputDir: string | undefined,
-  ): Promise<CompressedFile | undefined> {
+  ): Promise<CompressedFile | Pick<CompressedFile, 'isCached'>> {
     let isCached = false;
     const inputPath = path.join(target, filename);
     if (outputDir) {
@@ -247,10 +251,12 @@ export class Compress {
     }
 
     if (this.options.verbose) {
-      const beforeSize = (await this.nativeFs.lstat(inputPath)).size / 1024;
-      const afterSize = (await this.nativeFs.lstat(outputPath)).size / 1024;
+      const beforeSize = (await this.nativeFs.lstat(inputPath)).size;
+      const afterSize = (await this.nativeFs.lstat(outputPath)).size;
       return { beforeSize, afterSize, isCached };
     }
+
+    return { isCached };
   }
 
   /**

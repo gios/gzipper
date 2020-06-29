@@ -21,6 +21,49 @@ import { LogLevel } from '../../../src/logger/LogLevel.enum';
 
 const fsLstat = util.promisify(fs.lstat);
 
+async function validateOutputPathOptions(
+  options: CompressOptions,
+): Promise<[Compress, sinon.SinonSpy]> {
+  const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
+  const logSpy = sinon.spy((compress as any).logger, 'log');
+  const getOutputPathSpy = sinon.spy(compress, 'getOutputPath' as any);
+  await compress.run();
+  const files = await getFiles(COMPRESS_PATH_TARGET);
+
+  assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
+  assert.ok(
+    logSpy.neverCalledWith(
+      'Default output file format: [filename].[ext].[compressExt]',
+      LogLevel.INFO,
+    ),
+  );
+  assert.ok(
+    logSpy.calledWithExactly(
+      sinon.match(
+        new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+      ),
+      LogLevel.SUCCESS,
+    ),
+  );
+  assert.strictEqual(getOutputPathSpy.callCount, files.length);
+  assert.ok(
+    (compress as any).createCompression() instanceof (zlib as any).Gzip,
+  );
+  assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+  assert.strictEqual(
+    Object.keys((compress as any).compressionInstance.compressionOptions)
+      .length,
+    0,
+  );
+  assert.strictEqual(Object.keys((compress as any).options).length, 2);
+  assert.strictEqual(
+    (compress as any).options.outputFileFormat,
+    options.outputFileFormat,
+  );
+
+  return [compress, getOutputPathSpy];
+}
+
 describe('CLI Compress', () => {
   let sinonSandbox: sinon.SinonSandbox;
 
@@ -315,49 +358,6 @@ describe('CLI Compress', () => {
       );
     }
   });
-
-  async function validateOutputPathOptions(
-    options: CompressOptions,
-  ): Promise<[Compress, sinon.SinonSpy]> {
-    const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
-    const getOutputPathSpy = sinon.spy(compress, 'getOutputPath' as any);
-    await compress.run();
-    const files = await getFiles(COMPRESS_PATH_TARGET);
-
-    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
-    assert.ok(
-      logSpy.neverCalledWith(
-        'Default output file format: [filename].[ext].[compressExt]',
-        LogLevel.INFO,
-      ),
-    );
-    assert.ok(
-      logSpy.calledWithExactly(
-        sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
-        ),
-        LogLevel.SUCCESS,
-      ),
-    );
-    assert.strictEqual(getOutputPathSpy.callCount, files.length);
-    assert.ok(
-      (compress as any).createCompression() instanceof (zlib as any).Gzip,
-    );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
-    assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
-        .length,
-      0,
-    );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
-    assert.strictEqual(
-      (compress as any).options.outputFileFormat,
-      options.outputFileFormat,
-    );
-
-    return [compress, getOutputPathSpy];
-  }
 
   it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
     const options = {

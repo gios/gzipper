@@ -56,7 +56,9 @@ export class Incremental implements Cache {
    * Create cache folder (.gzipper).
    */
   async initCacheFolder(): Promise<void> {
-    await Helpers.createFolders(path.resolve(this.cacheFolder));
+    if (!(await this.nativeFs.exists(this.cacheFolder))) {
+      await Helpers.createFolders(this.cacheFolder);
+    }
   }
 
   /**
@@ -147,7 +149,7 @@ export class Incremental implements Cache {
   }
 
   /**
-   * purge cache folder.
+   * Purge cache folder.
    */
   async cachePurge(): Promise<void> {
     if (!(await this.nativeFs.exists(this.cacheFolder))) {
@@ -179,7 +181,7 @@ export class Incremental implements Cache {
   }
 
   /**
-   * returns cache size.
+   * Returns cache size.
    */
   async cacheSize(folderPath = this.cacheFolder, size = 0): Promise<number> {
     if (!(await this.nativeFs.exists(this.cacheFolder))) {
