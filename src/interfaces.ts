@@ -43,10 +43,10 @@ export interface FileConfig {
 }
 
 export interface IncrementalFileValue {
-  revisions: IncrementalFileValueRevisions[];
+  revisions: IncrementalFileValueRevision[];
 }
 
-export interface IncrementalFileValueRevisions {
+export interface IncrementalFileValueRevision {
   lastChecksum: string;
   fileId: string;
   date: Date;

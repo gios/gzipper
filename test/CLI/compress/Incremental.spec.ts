@@ -18,7 +18,7 @@ import { LogLevel } from '../../../src/logger/LogLevel.enum';
 import { INCREMENTAL_ENABLE_MESSAGE } from '../../../src/constants';
 import {
   FileConfig,
-  IncrementalFileValueRevisions,
+  IncrementalFileValueRevision,
   IncrementalFileValue,
 } from '../../../src/interfaces';
 
@@ -29,7 +29,7 @@ const fsWriteFile = util.promisify(fs.writeFile);
 function getFileRevisions(
   config: FileConfig,
   filePath: string,
-): IncrementalFileValueRevisions[] {
+): IncrementalFileValueRevision[] {
   return config.incremental?.files[filePath].revisions || [];
 }
 
@@ -178,7 +178,6 @@ describe('CLI Compress -> Incremental', () => {
       (await fsReadFile(configPath)).toString(),
     );
     const fileRevisionsAfter = getFileRevisions(configAfter, fileToEdit);
-
     await fsWriteFile(fileToEdit, beforeFileContent);
 
     assert.notEqual(
@@ -214,9 +213,9 @@ describe('CLI Compress -> Incremental', () => {
     const beforeFileContent = await fsReadFile(fileToEdit);
     await fsWriteFile(fileToEdit, 'New content which breaks checksum.');
     await compress.run();
+    await fsWriteFile(fileToEdit, beforeFileContent);
     const hashContentAfter = await fsReadFile(hashPath);
 
-    await fsWriteFile(fileToEdit, beforeFileContent);
     assert.ok(!hashContentBefore.equals(hashContentAfter));
   });
 
@@ -252,5 +251,69 @@ describe('CLI Compress -> Incremental', () => {
 
     assert.ok(revisions);
     assert.equal(files.length * 2, cachedFiles.length);
+  });
+
+  it('should update certain revision if file was changed', async () => {
+    const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
+    const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
+    const fileToEdit = path.resolve(COMPRESS_PATH, './index.txt');
+
+    const compress1 = new Compress(COMPRESS_PATH, null, {
+      threshold: 0,
+      incremental: true,
+    });
+    await compress1.run();
+    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+
+    const compress2 = new Compress(COMPRESS_PATH, null, {
+      threshold: 0,
+      incremental: true,
+      level: 8,
+    });
+    await compress2.run();
+    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    const configBefore: FileConfig = JSON.parse(
+      (await fsReadFile(configPath)).toString(),
+    );
+    const fileRevisionsBefore = getFileRevisions(configBefore, fileToEdit);
+    assert.equal(fileRevisionsBefore.length, 2);
+    const fileRevisionBefore = fileRevisionsBefore.find((revision) =>
+      deepEqual(revision.options, { level: 8 }),
+    ) as IncrementalFileValueRevision;
+    const hashPath = path.resolve(cachePath, fileRevisionBefore.fileId);
+    const hashContentBefore = await fsReadFile(hashPath);
+
+    const compress3 = new Compress(COMPRESS_PATH, null, {
+      threshold: 0,
+      incremental: true,
+      level: 8,
+    });
+    const beforeFileContent = await fsReadFile(fileToEdit);
+    await fsWriteFile(fileToEdit, 'New content which breaks checksum.');
+    await compress3.run();
+    await fsWriteFile(fileToEdit, beforeFileContent);
+    const hashContentAfter = await fsReadFile(hashPath);
+    const configAfter: FileConfig = JSON.parse(
+      (await fsReadFile(configPath)).toString(),
+    );
+    const fileRevisionsAfter = getFileRevisions(configAfter, fileToEdit);
+    assert.equal(fileRevisionsAfter.length, 2);
+    const fileRevisionAfter = fileRevisionsAfter.find((revision) =>
+      deepEqual(revision.options, { level: 8 }),
+    ) as IncrementalFileValueRevision;
+
+    assert.ok(!hashContentBefore.equals(hashContentAfter));
+    assert.notEqual(
+      fileRevisionBefore.lastChecksum,
+      fileRevisionAfter.lastChecksum,
+    );
+    assert.notEqual(fileRevisionBefore.date, fileRevisionAfter.date);
+
+    delete fileRevisionBefore.lastChecksum;
+    delete fileRevisionAfter.lastChecksum;
+    delete fileRevisionBefore.date;
+    delete fileRevisionAfter.date;
+
+    assert.deepStrictEqual(configBefore, configAfter);
   });
 });
