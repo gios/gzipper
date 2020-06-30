@@ -95,7 +95,9 @@ export async function clear(
   directory: string,
   extensions: string[] | boolean,
 ): Promise<void> {
-  await clearDirectory(directory, extensions);
+  if (await statExists(directory)) {
+    await clearDirectory(directory, extensions);
+  }
 }
 
 export async function createFolder(target: string): Promise<string> {
