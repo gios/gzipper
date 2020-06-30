@@ -5,7 +5,7 @@ import util from 'util';
 const unlink = util.promisify(fs.unlink);
 const mkdir = util.promisify(fs.mkdir);
 const lstat = util.promisify(fs.lstat);
-const stat = util.promisify(fs.stat);
+const exists = util.promisify(fs.exists);
 const readdir = util.promisify(fs.readdir);
 const rmdir = util.promisify(fs.rmdir);
 
@@ -26,19 +26,6 @@ export const COMPRESS_PATH_TARGET = path.resolve(
 );
 
 export const COMPRESSION_EXTENSIONS = ['.gz', '.br', '.zz'];
-
-async function statExists(target: string): Promise<boolean> {
-  try {
-    await stat(target);
-    return true;
-  } catch (error) {
-    if (error && error.code === 'ENOENT') {
-      return false;
-    } else {
-      throw error;
-    }
-  }
-}
 
 function filterByExtension(extensions: string[], ext: string): boolean {
   return !!extensions.find((fileExtension) => {
@@ -95,14 +82,14 @@ export async function clear(
   directory: string,
   extensions: string[] | boolean,
 ): Promise<void> {
-  if (await statExists(directory)) {
+  if (await exists(directory)) {
     await clearDirectory(directory, extensions);
   }
 }
 
 export async function createFolder(target: string): Promise<string> {
   const folderPath = path.resolve(__dirname, target);
-  const isExists = await statExists(folderPath);
+  const isExists = await exists(folderPath);
   if (!isExists) {
     await mkdir(folderPath);
   }
