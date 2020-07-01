@@ -23,20 +23,23 @@ By default `gzipper` compress **all the files** but you could use `include` or `
     - [Node.js Module](#nodejs-module)
   - [Options](#options)
     - [Compress|c](#compressc-1)
-    - [--incremental](#--incremental)
-    - [-v, --verbose](#-v---verbose)
-    - [-e, --exclude <extensions>](#-e---exclude-extensions)
-    - [-i, --include <extensions>](#-i---include-extensions)
-    - [-t, --threshold <number>](#-t---threshold-number)
-    - [--level <number>](#--level-number)
-    - [--memory-level <number>](#--memory-level-number)
-    - [--strategy <number>](#--strategy-number)
-    - [--deflate](#--deflate)
-    - [--brotli](#--brotli)
-    - [--brotli-param-mode <value>](#--brotli-param-mode-value)
-    - [--brotli-quality <number>](#--brotli-quality-number)
-    - [--brotli-size-hint <number>](#--brotli-size-hint-number)
-    - [--output-file-format](#--output-file-format)
+      - [--incremental](#--incremental)
+      - [-v, --verbose](#-v---verbose)
+      - [-e, --exclude <extensions>](#-e---exclude-extensions)
+      - [-i, --include <extensions>](#-i---include-extensions)
+      - [-t, --threshold <number>](#-t---threshold-number)
+      - [--level <number>](#--level-number)
+      - [--memory-level <number>](#--memory-level-number)
+      - [--strategy <number>](#--strategy-number)
+      - [--deflate](#--deflate)
+      - [--brotli](#--brotli)
+      - [--brotli-param-mode <value>](#--brotli-param-mode-value)
+      - [--brotli-quality <number>](#--brotli-quality-number)
+      - [--brotli-size-hint <number>](#--brotli-size-hint-number)
+      - [--output-file-format](#--output-file-format)
+    - [Cache](#cache-1)
+      - [purge](#purge)
+      - [size](#size)
   - [Changelog](#changelog)
   - [Contribution](#contribution)
   - [Support](#support)
@@ -245,85 +248,85 @@ try {
 
 > ENV Variables have higher priority over CLI arguments.
 
-### --incremental
+#### --incremental
 
 `gzipper c --incremental ./dist`
 
 A special type of compression that significantly decreases the time of compression if you have a lot of big and rarely updated files. It creates a `.gzipper` folder with pre-compressed files (`cache`) and config file with all necessary metadata (`.gzipperconfig`).
 
-### -v, --verbose
+#### -v, --verbose
 
 `gzipper c --verbose ./dist`
 
 Get more information about executed work. (_Could increase time of compression because of gathering additional metrics_)
 
-### -e, --exclude <extensions>
+#### -e, --exclude <extensions>
 
 `gzipper c --exclude jpeg,png,ico ./dist`
 
 Exclude file extensions from compression, example: jpeg,jpg...
 
-### -i, --include <extensions>
+#### -i, --include <extensions>
 
 `gzipper c --include jpeg,png,ico ./dist`
 
 Include file extensions for compression(exclude others), example: js,css,html...
 
-### -t, --threshold <number>
+#### -t, --threshold <number>
 
 `gzipper c --threshold 900 ./dist`
 
 Exclude assets smaller than this byte size. 0 (default)
 
-### --level <number>
+#### --level <number>
 
 `gzipper c --level 8 ./dist`
 
 Compression level 6 (default), 0 (no compression) - 9 (best compression)
 
-### --memory-level <number>
+#### --memory-level <number>
 
 `gzipper c --memory-level 2 ./dist`
 
 Amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
 
-### --strategy <number>
+#### --strategy <number>
 
 `gzipper c --strategy 3 ./dist`
 
 Compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
 
-### --deflate
+#### --deflate
 
 `gzipper c --deflate ./dist`
 
 Enable deflate compression.
 
-### --brotli
+#### --brotli
 
 `gzipper c --brotli ./dist`
 
 Enable brotli compression, Node.js >= v11.7.0.
 
-### --brotli-param-mode <value>
+#### --brotli-param-mode <value>
 
 `gzipper c --brotli-param-mode text ./dist`
 
 Available values are default, text (for UTF-8 text), font (for WOFF 2.0 fonts), only for `--brotli`
 
-### --brotli-quality <number>
+#### --brotli-quality <number>
 
 `gzipper c --brotli-quality 10 ./dist`
 
 Brotli compression quality 11 (default), 0 - 11, only for `--brotli`
 
-### --brotli-size-hint <number>
+#### --brotli-size-hint <number>
 
 `gzipper c --brotli-size-hint 6 ./dist`
 
 Expected input size 0 (default), only for `--brotli`
 
-### --output-file-format
+#### --output-file-format
 
 Output file format with artifacts, default format: `[filename].[ext].[compressExt]`. Where: `filename` -> name of your file, `ext` -> file extension, `compressExt` -> compress extension (.gz, .br, etc), `hash` -> uniq hash.
 
@@ -382,6 +385,25 @@ xml
   main-a90fa10e-f7a4-4af9-af67-f887bb96f98b-main-tmp.xml.gz
 index-067c1e2d-0e12-4b57-980b-97c880c24d57-index-tmp.js.gz
 ```
+
+### Cache
+
+| Command           |
+| ----------------- |
+| [`purge`](#purge) |
+| [`size`](#size)   |
+
+#### purge
+
+`gzipper cache purge`
+
+Removes all pre-compressed files from `cache` which was generated via `--incremental` flag.
+
+#### size
+
+`gzipper cache size`
+
+Returns the size of all pre-compiled files from `cache`.
 
 ## Changelog
 
