@@ -91,7 +91,7 @@ export async function createFolder(target: string): Promise<string> {
   const folderPath = path.resolve(__dirname, target);
   const isExists = await exists(folderPath);
   if (!isExists) {
-    await mkdir(folderPath);
+    await mkdir(folderPath, { recursive: true });
   }
   return folderPath;
 }

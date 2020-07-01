@@ -9,6 +9,7 @@ import {
   COMPRESS_PATH,
   COMPRESSION_EXTENSIONS,
   GZIPPER_CONFIG_FOLDER,
+  createFolder,
 } from '../../utils';
 import { Compress } from '../../../src/Compress';
 import { Config } from '../../../src/Config';
@@ -53,5 +54,15 @@ describe('CLI Cache -> Size', () => {
       name: 'Error',
       message: 'No cache found.',
     });
+  });
+
+  it('should return 0 if cache is empty', async () => {
+    const config = new Config();
+    const incremental = new Incremental(config);
+    const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
+
+    await createFolder(cachePath);
+    const size = await incremental.cacheSize();
+    assert.strictEqual(size, 0);
   });
 });

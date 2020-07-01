@@ -250,7 +250,7 @@ describe('CLI Compress -> Incremental', () => {
     const cachedFiles = await getFiles(cachePath);
 
     assert.ok(revisions);
-    assert.equal(files.length * 2, cachedFiles.length);
+    assert.strictEqual(files.length * 2, cachedFiles.length);
   });
 
   it('should update certain revision if file was changed', async () => {
@@ -276,7 +276,7 @@ describe('CLI Compress -> Incremental', () => {
       (await fsReadFile(configPath)).toString(),
     );
     const fileRevisionsBefore = getFileRevisions(configBefore, fileToEdit);
-    assert.equal(fileRevisionsBefore.length, 2);
+    assert.strictEqual(fileRevisionsBefore.length, 2);
     const fileRevisionBefore = fileRevisionsBefore.find((revision) =>
       deepEqual(revision.options, { level: 8 }),
     ) as IncrementalFileValueRevision;
@@ -297,7 +297,7 @@ describe('CLI Compress -> Incremental', () => {
       (await fsReadFile(configPath)).toString(),
     );
     const fileRevisionsAfter = getFileRevisions(configAfter, fileToEdit);
-    assert.equal(fileRevisionsAfter.length, 2);
+    assert.strictEqual(fileRevisionsAfter.length, 2);
     const fileRevisionAfter = fileRevisionsAfter.find((revision) =>
       deepEqual(revision.options, { level: 8 }),
     ) as IncrementalFileValueRevision;

@@ -428,7 +428,7 @@ describe('CLI Compress', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.equal(files.length, 1);
+    assert.strictEqual(files.length, 1);
     assert.ok(
       (compress as any).createCompression() instanceof (zlib as any).Gzip,
     );
@@ -464,7 +464,7 @@ describe('CLI Compress', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.equal(beforeFiles.length, files.length);
+    assert.strictEqual(beforeFiles.length, files.length);
     assert.ok(
       (compress as any).createCompression() instanceof (zlib as any).Gzip,
     );
