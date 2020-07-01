@@ -4,128 +4,330 @@
 [![npm version](https://badge.fury.io/js/gzipper.svg)](https://badge.fury.io/js/gzipper)
 [![codecov](https://codecov.io/gh/gios/gzipper/branch/master/graph/badge.svg)](https://codecov.io/gh/gios/gzipper)
 
-CLI for compressing files using the popular compress algorithms like Brotli and Gzip. Also this module works great with many CLI UI tools (Angular CLI, Vue CLI, create-react-app) and supports few option flags for each algorithm.
+A tool for compressing files by means of Brotli and Gzip algorithms, works seamlessly with many CLI UI tools (Angular CLI, Vue CLI, create-react-app).
 
-There are a couple of options flags such as `level`, `strategy`, `memory-level`, `brotli-param-mode`, `brotli-quality`, `brotli-size-hint` for extending algorithm flexibility. All flags can be declared via ENV variables (ENV variables have higher priority over CLI arguments).
+The flexibility of the algorithms could be extended by many options flags, including the `gzip-level`, `gzip-strategy`, `gzip-memory-level`, `brotli-param-mode`, `brotli-quality`, `brotli-size-hint`. All flags can be declared via ENV variables (ENV variables have higher priority over CLI arguments).
 
-You can enable `verbose` mode for better visual representation which files were compressed and how long it took. Also you can customize your file output using `output-file-format` command with predefined template `[filename]-[hash]-[filename].[ext]`.
+You can enable `verbose` mode for better visual representation, customize your file output using `output-file-format` or compress with `incremental` flag if you have a lot of files that rarely change.
 
-By default `gzipper` compress **all the files** but you could use `include` or `exclude` options for a variety of extensions.
+By default `gzipper` compress **all the files** but you could use `include` or `exclude` options for better flexibility.
 
 - [Gzipper](#gzipper)
   - [Install](#install)
-  - [Run as CLI](#run-as-cli)
-  - [Run as module](#run-as-module)
+  - [Usage](#usage)
+    - [Gzipper](#gzipper-1)
+    - [Compress|c](#compressc)
+    - [Cache](#cache)
+  - [Examples](#examples)
+    - [CLI](#cli)
+    - [Node.js Module](#nodejs-module)
   - [Options](#options)
-    - [Option Examples](#option-examples)
-      - [output-file-format](#output-file-format)
+    - [Compress|c](#compressc-1)
+    - [--incremental](#--incremental)
+    - [-v, --verbose](#-v---verbose)
+    - [-e, --exclude <extensions>](#-e---exclude-extensions)
+    - [-i, --include <extensions>](#-i---include-extensions)
+    - [-t, --threshold <number>](#-t---threshold-number)
+    - [--level <number>](#--level-number)
+    - [--memory-level <number>](#--memory-level-number)
+    - [--strategy <number>](#--strategy-number)
+    - [--deflate](#--deflate)
+    - [--brotli](#--brotli)
+    - [--brotli-param-mode <value>](#--brotli-param-mode-value)
+    - [--brotli-quality <number>](#--brotli-quality-number)
+    - [--brotli-size-hint <number>](#--brotli-size-hint-number)
+    - [--output-file-format](#--output-file-format)
+  - [Changelog](#changelog)
   - [Contribution](#contribution)
-  - [Requirements](#requirements)
+  - [Support](#support)
 
 ## Install
 
+- Globally
+
 `npm i gzipper -g`
 
-or locally to devDependencies
+- Locally to `devDependencies`.
 
 `npm i gzipper -D`
 
-## Run as CLI
+## Usage
 
-Globally usage.
+### Gzipper
 
-`gzipper [options] <path> [outputPath]`
+```shell
+Usage: gzipper [options] [command]
 
-Locally usage.
+Options:
+  -V, --version                             output the version number
+  -h, --help                                display help for command
 
-- add to scripts in your package.json
-
+Commands:
+  compress|c [options] <path> [outputPath]  compress selected path and optionally set output directory
+  cache                                     manipulations with cache
+  help [command]                            display help for command
 ```
+
+### Compress|c
+
+```shell
+Usage: gzipper compress|c [options] <path> [outputPath]
+
+compress selected path and optionally set output directory
+
+Options:
+  -v, --verbose                 detailed level of logs
+  --incremental                 (beta) incremental compression
+  -e, --exclude <extensions>    exclude file extensions from compression, example: jpeg,jpg...
+  -i, --include <extensions>    include file extensions for compression, example: js,css,html...
+  -t, --threshold <number>      exclude assets smaller than this byte size. 0 (default)
+  --level <number>              compression level 6 (default), 0 (no compression) - 9 (best compression)
+  --memory-level <number>       amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+  --strategy <number>           compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+  --deflate                     enable deflate compression
+  --brotli                      enable brotli compression, Node.js >= v11.7.0
+  --brotli-param-mode <value>   default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
+  --brotli-quality <number>     brotli compression quality 11 (default), 0 - 11
+  --brotli-size-hint <number>   expected input size 0 (default)
+  --output-file-format <value>  output file format with default artifacts [filename].[ext].[compressExt]
+                                where:
+                                filename -> file name
+                                ext -> file extension
+                                compressExt -> compress extension (.gz, .br, etc)
+                                hash -> uniq uuid/v4 hash
+                                examples:
+                                [filename].[compressExt].[ext]
+                                test-[filename]-[hash].[compressExt].[ext]
+                                [filename]-[hash]-[filename]-tmp.[ext].[compressExt]
+  -h, --help                    display help for command
+```
+
+### Cache
+
+```shell
+Usage: gzipper cache [options] [command]
+
+manipulations with cache
+
+Options:
+  -h, --help      display help for command
+
+Commands:
+  purge           purge cache storage
+  size            size of cached resources
+  help [command]  display help for command
+```
+
+## Examples
+
+### CLI
+
+- Globally usage
+
+  `gzipper compress [options] <path> [outputPath]`
+
+- Locally usage
+
+  1. Add module to scripts in your package.json and run `compress` command `npm run compress`.
+
+  ```json
+    "scripts": {
+      ...
+      "gzipper": "gzipper",
+      "compress": "gzipper compress ./dist"
+      ...
+    }
+  ```
+
+  2. Use `npx` command.
+
+  ```json
+    "scripts": {
+      ...
+      "compress": "npx gzipper compress ./dist"
+      ...
+    }
+  ```
+
+- UI build tools (e.g. Angular CLI)
+
+```json
   "scripts": {
     ...
-    "gzipper": "gzipper"
+    "build": "ng build && gzipper compress ./dist"
+    ...
   }
 ```
 
-- or use with `npx` command if module was installed to dependencies or devDependencies
+- Compress files to a certain directory `./gzipped` (folders structure inside `dist` will be saved)
 
-```
+```json
   "scripts": {
-    "compress": "npx gzipper --verbose ./dist"
+    ...
+    "build": "ng build && gzipper compress ./dist ./gzipped"
+    ...
   }
 ```
 
-- use gzipper with your build commands (e.g. Angular CLI)
+- Compress files to very deep folder `./very/deep/folder` (all folders will be automatically created if not exist)
 
-```
+```json
   "scripts": {
-    "build": "ng build && gzipper --verbose ./dist"
+    ...
+    "build": "ng build && gzipper compress ./dist ./very/deep/folder"
+    ...
   }
 ```
 
-- compress files to a certain directory `./gzipped` (folders structure inside `dist` will be saved)
+- Compress a single file
 
-```
+```json
   "scripts": {
-    "build": "ng build && gzipper --verbose ./dist ./gzipped"
+    ...
+    "build": "ng build && gzipper compress ./dist/awesomeness.txt"
+    ...
   }
 ```
 
-- even compress files to a very deep folder `./very/deep/folder` (all folders will be automatically created if not exist)
-
-```
-  "scripts": {
-    "build": "ng build && gzipper --verbose ./dist ./very/deep/folder"
-  }
-```
-
-- compress a single file
-
-```
-  "scripts": {
-    "build": "ng build && gzipper --verbose ./dist/awesomeness.txt"
-  }
-```
-
-## Run as module
+### Node.js Module
 
 ```javascript
 const { Compress } = require('gzipper');
-const compress = new Compress(target, outputPath, options?);
-compress.run()
-  .then(files => console.info("Compressed files: ", files))
-  .catch(err => console.error(err));
+const gzip = new Compress('./test', './dist', { verbose: true });
+
+try {
+  const files = await compress.run();
+  console.info('Compressed files: ', files);
+} catch (err) {
+  console.error(err);
+}
+```
+
+- Run multiple algorithms at the same time.
+
+```javascript
+const { Compress } = require('gzipper');
+const gzip = new Compress('./test');
+const brotli = new Compress('./test', null, { brotli: true });
+
+try {
+  const [gzipFiles, brotliFiles] = await Promise.all([
+    gzip.compress(),
+    brotli.compress(),
+  ]);
+  console.info('Compressed gzip files: ', gzipFiles);
+  console.info('Compressed brotli files: ', brotliFiles);
+} catch (err) {
+  console.error(err);
+}
 ```
 
 ## Options
 
-| Option                         | ENV                            | Description                                                                                                                                                                                                                                                                  |
-| ------------------------------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-V, --version`                |                                | output the version number                                                                                                                                                                                                                                                    |
-| `--purge <type>`               |                                | purge entities, the types are: `cache`                                                                                                                                                                                                                                       |
-| `--incremental`                | `GZIPPER_INCREMENTAL` (0 or 1) | (beta) incremental compression                                                                                                                                                                                                                                               |
-| `-v, --verbose`                | `GZIPPER_VERBOSE` (0 or 1)     | detailed level of logs                                                                                                                                                                                                                                                       |
-| `-e, --exclude <extensions>`   | `GZIPPER_EXCLUDE`              | exclude file extensions from compression, example: jpeg,jpg...                                                                                                                                                                                                               |
-| `-i, --include <extensions>`   | `GZIPPER_INCLUDE`              | include file extensions for compression(exclude others), example: js,css,html...                                                                                                                                                                                             |
-| `-t, --threshold <number>`     | `GZIPPER_THRESHOLD`            | exclude assets smaller than this byte size. 0 (default)                                                                                                                                                                                                                      |
-| `--level <number>`             | `GZIPPER_LEVEL`                | compression level 6 (default), 0 (no compression) - 9 (best compression)                                                                                                                                                                                                     |
-| `--memory-level <number>`      | `GZIPPER_MEMORY_LEVEL`         | amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)                                                                                                                                                                |
-| `--strategy <number>`          | `GZIPPER_STRATEGY`             | compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)                                                                                                                                                                                         |
-| `--deflate`                    | `GZIPPER_DEFLATE` (0 or 1)     | enable deflate compression                                                                                                                                                                                                                                                   |
-| `--brotli`                     | `GZIPPER_BROTLI` (0 or 1)      | enable brotli compression, Node.js >= v11.7.0                                                                                                                                                                                                                                |
-| `--brotli-param-mode <value>`  | `GZIPPER_BROTLI_PARAM_MODE`    | default, text (for UTF-8 text), font (for WOFF 2.0 fonts), only for `--brotli`                                                                                                                                                                                               |
-| `--brotli-quality <number>`    | `GZIPPER_BROTLI_QUALITY`       | brotli compression quality 11 (default), 0 - 11, only for `--brotli`                                                                                                                                                                                                         |
-| `--brotli-size-hint <number>`  | `GZIPPER_BROTLI_SIZE_HINT`     | expected input size 0 (default), only for `--brotli`                                                                                                                                                                                                                         |
-| `--output-file-format <value>` | `GZIPPER_OUTPUT_FILE_FORMAT`   | output file format with artifacts, default format: `[filename].[ext].[compressExt]`. Where: `filename` -> name of your file, `ext` -> file extension, `compressExt` -> compress extension (.gz, .br, etc), `hash` -> uniq uuid/v4 hash. [More examples](#output-file-format) |
-| `-h, --help`                   |                                | output usage information                                                                                                                                                                                                                                                     |
+### Compress|c
+
+| Option                                                      | ENV                            |
+| ----------------------------------------------------------- | ------------------------------ |
+| [`--incremental`](#--incremental) (beta)                    | `GZIPPER_INCREMENTAL` (0 or 1) |
+| [`-v, --verbose`](#-v---verbose)                            | `GZIPPER_VERBOSE` (0 or 1)     |
+| [`-e, --exclude <extensions>`](#-e---exclude-extensions)    | `GZIPPER_EXCLUDE`              |
+| [`-i, --include <extensions>`](#-i---include-extensions)    | `GZIPPER_INCLUDE`              |
+| [`-t, --threshold <number>`](#-t---threshold-number)        | `GZIPPER_THRESHOLD`            |
+| [`--level <number>`](#--level-number)                       | `GZIPPER_LEVEL`                |
+| [`--memory-level <number>`](#--memory-level-number)         | `GZIPPER_MEMORY_LEVEL`         |
+| [`--strategy <number>`](#--strategy-number)                 | `GZIPPER_STRATEGY`             |
+| [`--deflate`](#--deflate)                                   | `GZIPPER_DEFLATE` (0 or 1)     |
+| [`--brotli`](#--brotli)                                     | `GZIPPER_BROTLI` (0 or 1)      |
+| [`--brotli-param-mode <value>`](#--brotli-param-mode-value) | `GZIPPER_BROTLI_PARAM_MODE`    |
+| [`--brotli-quality <number>`](#--brotli-quality-number)     | `GZIPPER_BROTLI_QUALITY`       |
+| [`--brotli-size-hint <number>`](#--brotli-size-hint-number) | `GZIPPER_BROTLI_SIZE_HINT`     |
+| [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`   |
 
 > ENV Variables have higher priority over CLI arguments.
 
-### Option Examples
+### --incremental
 
-#### output-file-format
+`gzipper c --incremental ./dist`
 
-Example of folder structure:
+A special type of compression that significantly decreases the time of compression if you have a lot of big and rarely updated files. It creates a `.gzipper` folder with pre-compressed files (`cache`) and config file with all necessary metadata (`.gzipperconfig`).
+
+### -v, --verbose
+
+`gzipper c --verbose ./dist`
+
+Get more information about executed work. (_Could increase time of compression because of gathering additional metrics_)
+
+### -e, --exclude <extensions>
+
+`gzipper c --exclude jpeg,png,ico ./dist`
+
+Exclude file extensions from compression, example: jpeg,jpg...
+
+### -i, --include <extensions>
+
+`gzipper c --include jpeg,png,ico ./dist`
+
+Include file extensions for compression(exclude others), example: js,css,html...
+
+### -t, --threshold <number>
+
+`gzipper c --threshold 900 ./dist`
+
+Exclude assets smaller than this byte size. 0 (default)
+
+### --level <number>
+
+`gzipper c --level 8 ./dist`
+
+Compression level 6 (default), 0 (no compression) - 9 (best compression)
+
+### --memory-level <number>
+
+`gzipper c --memory-level 2 ./dist`
+
+Amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+
+### --strategy <number>
+
+`gzipper c --strategy 3 ./dist`
+
+Compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+
+### --deflate
+
+`gzipper c --deflate ./dist`
+
+Enable deflate compression.
+
+### --brotli
+
+`gzipper c --brotli ./dist`
+
+Enable brotli compression, Node.js >= v11.7.0.
+
+### --brotli-param-mode <value>
+
+`gzipper c --brotli-param-mode text ./dist`
+
+Available values are default, text (for UTF-8 text), font (for WOFF 2.0 fonts), only for `--brotli`
+
+### --brotli-quality <number>
+
+`gzipper c --brotli-quality 10 ./dist`
+
+Brotli compression quality 11 (default), 0 - 11, only for `--brotli`
+
+### --brotli-size-hint <number>
+
+`gzipper c --brotli-size-hint 6 ./dist`
+
+Expected input size 0 (default), only for `--brotli`
+
+### --output-file-format
+
+Output file format with artifacts, default format: `[filename].[ext].[compressExt]`. Where: `filename` -> name of your file, `ext` -> file extension, `compressExt` -> compress extension (.gz, .br, etc), `hash` -> uniq hash.
+
+_Example:_ Expected project structure.
 
 ```
 img
@@ -139,7 +341,7 @@ xml
 index.js
 ```
 
-- `--output-file-format [filename].[compressExt].[ext]`
+- `gzipper c --output-file-format [filename].[compressExt].[ext] ./dist`
 
 ```
 img
@@ -153,7 +355,7 @@ xml
 index.gz.js
 ```
 
-- `--output-file-format test-[filename]-[hash].[compressExt].[ext]`
+- `gzipper c --output-file-format test-[filename]-[hash].[compressExt].[ext] ./dist`
 
 ```
 img
@@ -167,7 +369,7 @@ xml
 test-index-067c1e2d-0e12-4b57-980b-97c880c24d57.gz.js
 ```
 
-- `--output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt]`
+- `gzipper c --output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt] ./dist`
 
 ```
 img
@@ -181,10 +383,14 @@ xml
 index-067c1e2d-0e12-4b57-980b-97c880c24d57-index-tmp.js.gz
 ```
 
+## Changelog
+
+[CHANGELOG.md](./CHANGELOG.md)
+
 ## Contribution
 
 I appreciate every contribution, just fork the repository and send the pull request with your changes.
 
-## Requirements
+## Support
 
 - Node.js >= 10
