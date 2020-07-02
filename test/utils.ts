@@ -5,42 +5,30 @@ import util from 'util';
 const unlink = util.promisify(fs.unlink);
 const mkdir = util.promisify(fs.mkdir);
 const lstat = util.promisify(fs.lstat);
-const stat = util.promisify(fs.stat);
+const exists = util.promisify(fs.exists);
 const readdir = util.promisify(fs.readdir);
 const rmdir = util.promisify(fs.rmdir);
 
 export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, './resources');
+export const GZIPPER_CONFIG_FOLDER = path.resolve(process.cwd(), './.gzipper');
 
 export const EMPTY_FOLDER_PATH = path.resolve(
-  __dirname,
-  './resources/empty_folder',
+  RESOURCES_FOLDER_PATH,
+  './empty_folder',
 );
 export const COMPRESS_PATH = path.resolve(
-  __dirname,
-  './resources/folder_to_compress',
+  RESOURCES_FOLDER_PATH,
+  './folder_to_compress',
 );
 export const COMPRESS_PATH_TARGET = path.resolve(
-  __dirname,
-  './resources/compress_target',
+  RESOURCES_FOLDER_PATH,
+  './compress_target',
 );
 
 export const COMPRESSION_EXTENSIONS = ['.gz', '.br', '.zz'];
 
-async function statExists(target: string): Promise<boolean> {
-  try {
-    await stat(target);
-    return true;
-  } catch (error) {
-    if (error && error.code === 'ENOENT') {
-      return false;
-    } else {
-      throw error;
-    }
-  }
-}
-
 function filterByExtension(extensions: string[], ext: string): boolean {
-  return !!extensions.find(fileExtension => {
+  return !!extensions.find((fileExtension) => {
     if (fileExtension.startsWith('!')) {
       return fileExtension.slice(1) !== ext;
     }
@@ -48,9 +36,6 @@ function filterByExtension(extensions: string[], ext: string): boolean {
   });
 }
 
-/**
- * Clear directory, extensions = true (delete all files), extensions = [.js, .ts] (only specific files)
- */
 export async function clearDirectory(
   target = COMPRESS_PATH,
   extensions: string[] | boolean,
@@ -90,18 +75,23 @@ export async function clearDirectory(
   }
 }
 
+/**
+ * Clear directory, extensions = true (delete all files), extensions = [.js, .ts] (only specific files)
+ */
 export async function clear(
   directory: string,
   extensions: string[] | boolean,
 ): Promise<void> {
-  await clearDirectory(directory, extensions);
+  if (await exists(directory)) {
+    await clearDirectory(directory, extensions);
+  }
 }
 
 export async function createFolder(target: string): Promise<string> {
   const folderPath = path.resolve(__dirname, target);
-  const isExists = await statExists(folderPath);
+  const isExists = await exists(folderPath);
   if (!isExists) {
-    await mkdir(folderPath);
+    await mkdir(folderPath, { recursive: true });
   }
   return folderPath;
 }

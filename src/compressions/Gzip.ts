@@ -1,26 +1,26 @@
 import zlib from 'zlib';
 
 import { Compression } from './Compression';
-import { GlobalOptions, CompressionOptions } from '../interfaces';
-import { Logger } from '../Logger';
+import { CompressOptions, CompressionOptions } from '../interfaces';
+import { Logger } from '../logger/Logger';
 
 /**
  * Gzip compression
  */
 export class GzipCompression extends Compression<CompressionOptions> {
-  public readonly compressionName = 'GZIP';
-  public readonly ext = 'gz';
+  readonly compressionName = 'GZIP';
+  readonly ext = 'gz';
   /**
    * Creates an instance of GzipCompression.
    */
-  constructor(options: GlobalOptions, logger: Logger) {
+  constructor(options: CompressOptions, logger: Logger) {
     super(options, logger);
   }
 
   /**
    * Returns gzip compression instance in closure.
    */
-  public getCompression(): () => zlib.Gzip {
+  getCompression(): () => zlib.Gzip {
     return (): zlib.Gzip => zlib.createGzip(this.compressionOptions);
   }
 }

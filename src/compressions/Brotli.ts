@@ -1,19 +1,20 @@
 import zlib from 'zlib';
 
 import { Compression } from './Compression';
-import { Logger } from '../Logger';
-import { GlobalOptions, BrotliOptions } from '../interfaces';
+import { Logger } from '../logger/Logger';
+import { CompressOptions, BrotliOptions } from '../interfaces';
+import { LogLevel } from '../logger/LogLevel.enum';
 
 /**
  * Brotli compression
  */
 export class BrotliCompression extends Compression<BrotliOptions> {
-  public readonly compressionName = 'BROTLI';
-  public readonly ext = 'br';
+  readonly compressionName = 'BROTLI';
+  readonly ext = 'br';
   /**
    * Creates an instance of BrotliCompression
    */
-  constructor(options: GlobalOptions, logger: Logger) {
+  constructor(options: CompressOptions, logger: Logger) {
     super(options, logger);
     this.availability();
   }
@@ -21,7 +22,7 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   /**
    * Returns brotli compression instance in closure.
    */
-  public getCompression(): () => zlib.BrotliCompress {
+  getCompression(): () => zlib.BrotliCompress {
     return (): zlib.BrotliCompress =>
       zlib.createBrotliCompress({
         params: this.compressionOptions,
@@ -31,7 +32,7 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   /**
    * Returns human-readable brotli compression options info.
    */
-  public readableOptions(): string {
+  readableOptions(): string {
     return super.readableOptions(this.getBrotliOptionName.bind(this));
   }
 
@@ -43,11 +44,6 @@ export class BrotliCompression extends Compression<BrotliOptions> {
 
     if (this.options.brotliParamMode !== undefined) {
       switch (this.options.brotliParamMode) {
-        case 'default':
-          options[zlib.constants.BROTLI_PARAM_MODE] =
-            zlib.constants.BROTLI_MODE_GENERIC;
-          break;
-
         case 'text':
           options[zlib.constants.BROTLI_PARAM_MODE] =
             zlib.constants.BROTLI_MODE_TEXT;
@@ -58,6 +54,7 @@ export class BrotliCompression extends Compression<BrotliOptions> {
             zlib.constants.BROTLI_MODE_FONT;
           break;
 
+        case 'default':
         default:
           options[zlib.constants.BROTLI_PARAM_MODE] =
             zlib.constants.BROTLI_MODE_GENERIC;
@@ -99,7 +96,7 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   private availability(): void {
     if (typeof zlib.createBrotliCompress !== 'function') {
       const message = `Can't use brotli compression, Node.js >= v11.7.0 required.`;
-      this.logger.error(message, true);
+      this.logger.log(message, LogLevel.ERROR);
       throw new Error(message);
     }
   }

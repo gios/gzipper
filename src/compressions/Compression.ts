@@ -1,18 +1,19 @@
 import zlib from 'zlib';
 
-import { GlobalOptions, CompressionOptions } from '../interfaces';
-import { Logger } from '../Logger';
+import { CompressOptions, CompressionOptions } from '../interfaces';
+import { Logger } from '../logger/Logger';
 
 export abstract class Compression<T extends CompressionOptions> {
-  public abstract ext: string;
-  public abstract compressionName: string;
-  protected readonly options: GlobalOptions;
+  compressionOptions: T = {} as T;
+  abstract ext: string;
+  abstract compressionName: string;
+  protected readonly options: CompressOptions;
   protected readonly logger: Logger;
-  protected compressionOptions: T = {} as T;
+
   /**
    * Creates an instance of Compression.
    */
-  constructor(options: GlobalOptions, logger: Logger) {
+  constructor(options: CompressOptions, logger: Logger) {
     this.options = options;
     this.logger = logger;
     this.selectCompression();
@@ -21,12 +22,12 @@ export abstract class Compression<T extends CompressionOptions> {
   /**
    * Returns a compression instance in closure.
    */
-  public abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip;
+  abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip;
 
   /**
    * Returns human-readable compression options info.
    */
-  public readableOptions(
+  readableOptions(
     keyWrapper: (key: string) => string | undefined = (
       key: string,
     ): string | undefined => key,
@@ -37,7 +38,7 @@ export abstract class Compression<T extends CompressionOptions> {
       options += `${keyWrapper(key)}: ${value}, `;
     }
 
-    return `${this.compressionName} -> ${options.slice(0, -2)}`;
+    return `${this.compressionName} | ${options.slice(0, -2)}`;
   }
 
   /**

@@ -1,21 +1,27 @@
-import program from 'commander';
+import { Command } from 'commander';
 
-import { Gzipper } from '../src/Gzipper';
-import { GlobalOptions } from '../src/interfaces';
-import * as pack from '../package.json';
+import { Compress } from './Compress';
+import { Helpers } from './helpers';
+import { CompressOptions } from './interfaces';
+import { Incremental } from './Incremental';
+import { Config } from './Config';
+import { Logger } from './logger/Logger';
+import { LogLevel } from './logger/LogLevel.enum';
 
 export class Index {
-  private target: string | undefined;
-  private outputPath: string | undefined;
-  private options: GlobalOptions | undefined;
   private readonly argv: string[] = process.argv;
   private readonly env: NodeJS.ProcessEnv = process.env;
+  private commander = new Command();
 
-  public getOptions(): this {
-    program
-      .version(pack.version)
-      .usage('[options] <path> [outputPath]')
+  async exec(): Promise<void> {
+    this.commander.version(Helpers.getVersion()).name('gzipper');
+
+    this.commander
+      .command('compress <path> [outputPath]')
+      .alias('c')
+      .description('compress selected path and optionally set output directory')
       .option('-v, --verbose', 'detailed level of logs')
+      .option('--incremental', '(beta) incremental compression')
       .option(
         '-e, --exclude <extensions>',
         'exclude file extensions from compression, example: jpeg,jpg...',
@@ -29,40 +35,22 @@ export class Index {
       .option(
         '-t, --threshold <number>',
         'exclude assets smaller than this byte size. 0 (default)',
-        value => parseInt(value),
-      )
-      // TODO: Remove @deprecated --gzip-level
-      .option(
-        '--gzip-level <number> (deprecated)',
-        'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
-        value => parseInt(value),
+        (value) => parseInt(value),
       )
       .option(
         '--level <number>',
         'compression level 6 (default), 0 (no compression) - 9 (best compression)',
-        value => parseInt(value),
-      )
-      // TODO: Remove @deprecated --gzip-memory-level
-      .option(
-        '--gzip-memory-level <number> (deprecated)',
-        'amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
-        value => parseInt(value),
+        (value) => parseInt(value),
       )
       .option(
         '--memory-level <number>',
         'amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
-        value => parseInt(value),
-      )
-      // TODO: Remove @deprecated --gzip-strategy
-      .option(
-        '--gzip-strategy <number> (deprecated)',
-        'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
-        value => parseInt(value),
+        (value) => parseInt(value),
       )
       .option(
         '--strategy <number>',
         'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
-        value => parseInt(value),
+        (value) => parseInt(value),
       )
       .option('--deflate', 'enable deflate compression')
       .option('--brotli', 'enable brotli compression, Node.js >= v11.7.0')
@@ -73,12 +61,12 @@ export class Index {
       .option(
         '--brotli-quality <number>',
         'brotli compression quality 11 (default), 0 - 11',
-        value => parseInt(value),
+        (value) => parseInt(value),
       )
       .option(
         '--brotli-size-hint <number>',
         'expected input size 0 (default)',
-        value => parseInt(value),
+        (value) => parseInt(value),
       )
       .option(
         '--output-file-format <value>',
@@ -88,98 +76,146 @@ export class Index {
       .option('', 'filename -> file name')
       .option('', 'ext -> file extension')
       .option('', 'compressExt -> compress extension (.gz, .br, etc)')
-      .option('', 'hash -> uniq uuid/v4 hash')
-      .option('', 'samples:')
+      .option('', 'hash -> uniq hash')
+      .option('', 'examples:')
       .option('', '[filename].[compressExt].[ext]')
       .option('', 'test-[filename]-[hash].[compressExt].[ext]')
       .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
-      .parse(this.argv)
-      .removeAllListeners();
+      .action(this.compress.bind(this));
 
-    const [target, outputPath] = program.args;
-    const options: GlobalOptions = {
+    const cache = this.commander
+      .command('cache')
+      .description('manipulations with cache');
+
+    cache
+      .command('purge')
+      .description('purge cache storage')
+      .action(this.cachePurge.bind(this));
+
+    cache
+      .command('size')
+      .description('size of cached resources')
+      .action(this.cacheSize.bind(this));
+
+    await this.commander.parseAsync(this.argv);
+  }
+
+  private async compress(
+    target: string,
+    outputPath: string,
+    options: CompressOptions,
+  ): Promise<void> {
+    const adjustedOptions: CompressOptions = {
       verbose: this.env.GZIPPER_VERBOSE
         ? !!parseInt(this.env.GZIPPER_VERBOSE as string)
-        : program.verbose,
+        : options.verbose,
+      incremental: this.env.GZIPPER_INCREMENTAL
+        ? !!parseInt(this.env.GZIPPER_INCREMENTAL as string)
+        : options.incremental,
       exclude:
-        this.optionToArray(this.env.GZIPPER_EXCLUDE as string) ||
-        program.exclude,
+        (this.optionToArray(this.env.GZIPPER_EXCLUDE) as string[]) ||
+        options.exclude,
       include:
-        this.optionToArray(this.env.GZIPPER_INCLUDE as string) ||
-        program.include,
+        (this.optionToArray(this.env.GZIPPER_INCLUDE) as string[]) ||
+        options.include,
       threshold:
         parseInt(this.env.GZIPPER_THRESHOLD as string) ||
-        program.threshold ||
+        options.threshold ||
         0,
-      // TODO: Remove @deprecated GZIPPER_GZIP_LEVEL, gzipLevel
-      level:
-        parseInt(this.env.GZIPPER_LEVEL as string) ||
-        program.level ||
-        parseInt(this.env.GZIPPER_GZIP_LEVEL as string) ||
-        program.gzipLevel,
-      // TODO: Remove @deprecated GZIPPER_GZIP_MEMORY_LEVEL, gzipMemoryLevel
+      level: parseInt(this.env.GZIPPER_LEVEL as string) || options.level,
       memoryLevel:
         parseInt(this.env.GZIPPER_MEMORY_LEVEL as string) ||
-        program.memoryLevel ||
-        parseInt(this.env.GZIPPER_GZIP_MEMORY_LEVEL as string) ||
-        program.gzipMemoryLevel,
-      // TODO: Remove @deprecated GZIPPER_GZIP_STRATEGY, gzipStrategy
+        options.memoryLevel,
       strategy:
-        parseInt(this.env.GZIPPER_STRATEGY as string) ||
-        program.strategy ||
-        parseInt(this.env.GZIPPER_GZIP_STRATEGY as string) ||
-        program.gzipStrategy,
+        parseInt(this.env.GZIPPER_STRATEGY as string) || options.strategy,
       brotli: this.env.GZIPPER_BROTLI
         ? !!parseInt(this.env.GZIPPER_BROTLI as string)
-        : program.brotli,
+        : options.brotli,
       deflate: this.env.GZIPPER_DEFLATE
         ? !!parseInt(this.env.GZIPPER_DEFLATE as string)
-        : program.deflate,
+        : options.deflate,
       brotliParamMode:
-        this.env.GZIPPER_BROTLI_PARAM_MODE || program.brotliParamMode,
+        this.env.GZIPPER_BROTLI_PARAM_MODE || options.brotliParamMode,
       brotliQuality:
         parseInt(this.env.GZIPPER_BROTLI_QUALITY as string) ||
-        program.brotliQuality,
+        options.brotliQuality,
       brotliSizeHint:
         parseInt(this.env.GZIPPER_BROTLI_SIZE_HINT as string) ||
-        program.brotliSizeHint,
+        options.brotliSizeHint,
       outputFileFormat:
-        this.env.GZIPPER_OUTPUT_FILE_FORMAT || program.outputFileFormat,
+        this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
     };
 
-    this.target = target;
-    this.outputPath = outputPath;
-    this.options = options;
-    return this;
+    await this.runCompress(target, outputPath, adjustedOptions);
+  }
+
+  private async cachePurge(): Promise<void> {
+    const logger = new Logger(true);
+    const config = new Config();
+    const incremental = new Incremental(config);
+
+    try {
+      await incremental.cachePurge();
+      logger.log(
+        'Cache has been purged, you are free to initialize a new one.',
+        LogLevel.SUCCESS,
+      );
+    } catch (err) {
+      logger.log(err.message, LogLevel.ERROR);
+    }
+  }
+
+  private async cacheSize(): Promise<void> {
+    const logger = new Logger(true);
+
+    const config = new Config();
+    const incremental = new Incremental(config);
+
+    try {
+      const size = await incremental.cacheSize();
+      logger.log(
+        size
+          ? `Cache size is ${Helpers.readableSize(size)}`
+          : `Cache is empty, initialize a new one with --incremental option.`,
+        LogLevel.INFO,
+      );
+    } catch (err) {
+      logger.log(err.message, LogLevel.ERROR);
+    }
+  }
+
+  private async runCompress(
+    target: string,
+    outputPath: string,
+    options: CompressOptions,
+  ): Promise<void> {
+    const compress = new Compress(
+      target,
+      outputPath,
+      this.filterOptions(options),
+    );
+
+    try {
+      await compress.run();
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   // Delete undefined and NaN options.
-  public filterOptions(): this {
-    Object.keys(this.options as GlobalOptions).forEach(key => {
-      if (
-        (this.options as GlobalOptions)[key] === undefined ||
-        (this.options as GlobalOptions)[key] !==
-          (this.options as GlobalOptions)[key]
-      ) {
-        delete (this.options as GlobalOptions)[key];
+  private filterOptions(options: CompressOptions): CompressOptions {
+    Object.keys(options).forEach((key) => {
+      if (options[key] === undefined || options[key] !== options[key]) {
+        delete options[key];
       }
     });
 
-    return this;
+    return options;
   }
 
-  public start(): void {
-    const gzipper = new Gzipper(
-      this.target,
-      this.outputPath,
-      (this.options as GlobalOptions) || {},
-    );
-    gzipper.compress().catch(err => console.error(err));
-  }
-
-  private optionToArray(value: string): string[] | string {
-    if (value) {
-      return value.split(',').map(item => item.trim());
+  private optionToArray<T>(value: T): string[] | T {
+    if (typeof value === 'string' && value) {
+      return value.split(',').map((item) => item.trim());
     }
 
     return value;
@@ -187,8 +223,5 @@ export class Index {
 }
 
 if (process.env.NODE_ENV !== 'testing') {
-  new Index()
-    .getOptions()
-    .filterOptions()
-    .start();
+  new Index().exec();
 }

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
+    "lib": ["ES2018"],
     "outDir": "dist",
     "declaration": true,
     "strict": true,
@@ -10,7 +11,9 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "inlineSourceMap": true
+    "inlineSourceMap": true,
+    "downlevelIteration": true,
+    "experimentalDecorators": true
   },
   "include": ["**/*.ts"],
   "exclude": ["test", "dist"]
