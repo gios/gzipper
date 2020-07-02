@@ -135,10 +135,8 @@ Commands:
 
   ```json
     "scripts": {
-      ...
       "gzipper": "gzipper",
       "compress": "gzipper compress ./dist"
-      ...
     }
   ```
 
@@ -146,9 +144,7 @@ Commands:
 
   ```json
     "scripts": {
-      ...
       "compress": "npx gzipper compress ./dist"
-      ...
     }
   ```
 
@@ -156,9 +152,7 @@ Commands:
 
 ```json
   "scripts": {
-    ...
     "build": "ng build && gzipper compress ./dist"
-    ...
   }
 ```
 
@@ -166,9 +160,7 @@ Commands:
 
 ```json
   "scripts": {
-    ...
     "build": "ng build && gzipper compress ./dist ./gzipped"
-    ...
   }
 ```
 
@@ -176,9 +168,7 @@ Commands:
 
 ```json
   "scripts": {
-    ...
     "build": "ng build && gzipper compress ./dist ./very/deep/folder"
-    ...
   }
 ```
 
@@ -186,9 +176,7 @@ Commands:
 
 ```json
   "scripts": {
-    ...
     "build": "ng build && gzipper compress ./dist/awesomeness.txt"
-    ...
   }
 ```
 
