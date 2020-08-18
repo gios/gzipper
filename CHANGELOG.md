@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - uuid 8.1.0 -> 8.3.0
 - typescript 3.9.5 -> 3.9.7
-- formatting
+- eslint ecmaVersion 2020
 
 ## [4.0.1] - 2020-07-18
 
