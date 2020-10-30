@@ -519,4 +519,36 @@ describe('CLI Compress', () => {
     );
     assert.strictEqual(Object.keys((compress as any).options).length, 1);
   });
+
+  it('--remove-larger should remove compressed files', async () => {
+    const options = {
+      removeLarger: true,
+      threshold: 0,
+    };
+    const compress = new Compress(COMPRESS_PATH, null, options);
+    const logSpy = sinon.spy((compress as any).logger, 'log');
+    await compress.run();
+    const files = await getFiles(COMPRESS_PATH, ['.gz']);
+
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
+    assert.ok(
+      logSpy.calledWithExactly(
+        sinon.match(
+          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        ),
+        LogLevel.SUCCESS,
+      ),
+    );
+    assert.strictEqual(files.length, 6);
+    assert.ok(
+      (compress as any).createCompression() instanceof (zlib as any).Gzip,
+    );
+    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual(
+      Object.keys((compress as any).compressionInstance.compressionOptions)
+        .length,
+      0,
+    );
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+  });
 });

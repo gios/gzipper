@@ -72,6 +72,10 @@ export class Index {
         '--output-file-format <value>',
         'output file format with default artifacts [filename].[ext].[compressExt]',
       )
+      .option(
+        '--remove-larger',
+        'remove compressed files if they larger than uncompressed originals',
+      )
       .action(this.compress.bind(this));
 
     const cache = this.commander
@@ -135,6 +139,9 @@ export class Index {
         options.brotliSizeHint,
       outputFileFormat:
         this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
+      removeLarger: this.env.GZIPPER_REMOVE_LARGER
+        ? !!parseInt(this.env.GZIPPER_REMOVE_LARGER as string)
+        : options.removeLarger,
     };
 
     await this.runCompress(target, outputPath, adjustedOptions);
