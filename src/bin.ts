@@ -72,15 +72,6 @@ export class Index {
         '--output-file-format <value>',
         'output file format with default artifacts [filename].[ext].[compressExt]',
       )
-      .option('', 'where:')
-      .option('', 'filename -> file name')
-      .option('', 'ext -> file extension')
-      .option('', 'compressExt -> compress extension (.gz, .br, etc)')
-      .option('', 'hash -> uniq hash')
-      .option('', 'examples:')
-      .option('', '[filename].[compressExt].[ext]')
-      .option('', 'test-[filename]-[hash].[compressExt].[ext]')
-      .option('', '[filename]-[hash]-[filename]-tmp.[ext].[compressExt]')
       .action(this.compress.bind(this));
 
     const cache = this.commander

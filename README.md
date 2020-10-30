@@ -93,15 +93,6 @@ Options:
   --brotli-quality <number>     brotli compression quality 11 (default), 0 - 11
   --brotli-size-hint <number>   expected input size 0 (default)
   --output-file-format <value>  output file format with default artifacts [filename].[ext].[compressExt]
-                                where:
-                                filename -> file name
-                                ext -> file extension
-                                compressExt -> compress extension (.gz, .br, etc)
-                                hash -> uniq uuid/v4 hash
-                                examples:
-                                [filename].[compressExt].[ext]
-                                test-[filename]-[hash].[compressExt].[ext]
-                                [filename]-[hash]-[filename]-tmp.[ext].[compressExt]
   -h, --help                    display help for command
 ```
 
