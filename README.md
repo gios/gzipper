@@ -37,6 +37,7 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--brotli-quality <number>](#--brotli-quality-number)
       - [--brotli-size-hint <number>](#--brotli-size-hint-number)
       - [--output-file-format](#--output-file-format)
+      - [--remove-larger](#--remove-larger)
     - [Cache](#cache-1)
       - [purge](#purge)
       - [size](#size)
@@ -93,6 +94,7 @@ Options:
   --brotli-quality <number>     brotli compression quality 11 (default), 0 - 11
   --brotli-size-hint <number>   expected input size 0 (default)
   --output-file-format <value>  output file format with default artifacts [filename].[ext].[compressExt]
+  --remove-larger               remove compressed files if they larger than uncompressed originals
   -h, --help                    display help for command
 ```
 
@@ -224,6 +226,7 @@ try {
 | [`--brotli-quality <number>`](#--brotli-quality-number)     | `GZIPPER_BROTLI_QUALITY`       |
 | [`--brotli-size-hint <number>`](#--brotli-size-hint-number) | `GZIPPER_BROTLI_SIZE_HINT`     |
 | [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`   |
+| [`--remove-larger`](#--remove-larger)                       | `GZIPPER_REMOVE_LARGER`        |
 
 > ENV Variables have higher priority over CLI arguments.
 
@@ -364,6 +367,10 @@ xml
   main-a90fa10e-f7a4-4af9-af67-f887bb96f98b-main-tmp.xml.gz
 index-067c1e2d-0e12-4b57-980b-97c880c24d57-index-tmp.js.gz
 ```
+
+#### --remove-larger
+
+Removes compressed files that larger than uncompressed originals in your directory.
 
 ### Cache
 
