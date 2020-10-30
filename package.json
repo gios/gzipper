@@ -62,7 +62,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "commander": "^5.1.0",
+    "commander": "^6.2.0",
     "deep-equal": "^2.0.4",
     "uuid": "^8.3.1"
   }
