@@ -66,6 +66,7 @@ describe('Index CLI', () => {
       '77',
       '--output-file-format',
       'test-[filename].[ext].[compressExt]',
+      '--remove-larger',
     ];
     const index = new Index();
     (index as any).argv = cliArguments;
@@ -96,6 +97,7 @@ describe('Index CLI', () => {
       brotliQuality: 5,
       brotliSizeHint: 77,
       outputFileFormat: 'test-[filename].[ext].[compressExt]',
+      removeLarger: true,
     };
     assert.deepStrictEqual(filterOptionsSpy.args[0][0], response);
     assert.ok(
@@ -179,6 +181,7 @@ describe('Index CLI', () => {
       GZIPPER_BROTLI_QUALITY: '3',
       GZIPPER_BROTLI_SIZE_HINT: '10',
       GZIPPER_OUTPUT_FILE_FORMAT: '[filename]-[hash].[ext].[compressExt]',
+      GZIPPER_REMOVE_LARGER: '0',
     };
     const cliArguments = [
       'node.exe',
@@ -210,6 +213,7 @@ describe('Index CLI', () => {
       '77',
       '--output-file-format',
       'test-[filename].[ext].[compressExt]',
+      '--remove-larger',
     ];
     const index = new Index();
     (index as any).argv = cliArguments;
@@ -241,6 +245,7 @@ describe('Index CLI', () => {
       brotliQuality: 3,
       brotliSizeHint: 10,
       outputFileFormat: '[filename]-[hash].[ext].[compressExt]',
+      removeLarger: false,
     };
     assert.ok(
       Object.entries(response).every(([key, val]) =>

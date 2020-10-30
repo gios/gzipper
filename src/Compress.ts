@@ -29,6 +29,7 @@ export class Compress {
     lstat: util.promisify(fs.lstat),
     readdir: util.promisify(fs.readdir),
     exists: util.promisify(fs.exists),
+    unlink: util.promisify(fs.unlink),
   };
   private readonly nativeStream = {
     pipeline: util.promisify(stream.pipeline),
@@ -167,12 +168,15 @@ export class Compress {
           }
 
           const hrtimeStart = process.hrtime();
-          compressedFiles.push(filePath);
           const fileInfo = await this.compressFile(
             file,
             target,
             this.outputPath,
           );
+
+          if (!(fileInfo as CompressedFile).removeCompiled) {
+            compressedFiles.push(filePath);
+          }
 
           if (this.options.verbose) {
             const hrTimeEnd = process.hrtime(hrtimeStart);
@@ -250,10 +254,16 @@ export class Compress {
       );
     }
 
-    if (this.options.verbose) {
+    if (this.options.verbose || this.options.removeLarger) {
       const beforeSize = (await this.nativeFs.lstat(inputPath)).size;
       const afterSize = (await this.nativeFs.lstat(outputPath)).size;
-      return { beforeSize, afterSize, isCached };
+
+      const removeCompiled =
+        this.options.removeLarger && beforeSize < afterSize;
+      if (removeCompiled) {
+        await this.nativeFs.unlink(outputPath);
+      }
+      return { beforeSize, afterSize, isCached, removeCompiled };
     }
 
     return { isCached };
