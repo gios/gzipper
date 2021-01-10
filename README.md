@@ -234,7 +234,7 @@ try {
 
 `gzipper c --incremental ./dist`
 
-A special type of compression that significantly decreases the time of compression (_on the second run_) if you have a lot of big and rarely updated files. It creates a `.gzipper` folder with pre-compressed files (`cache`) and config that store all necessary metadata (`.gzipperconfig`).
+A special type of compression that significantly decreases the time of compression (_on the second run_) if you have a lot of big and rarely updated files. It creates a `.gzipper` folder with pre-compressed files (`cache`) and config that stores all necessary metadata (`.gzipperconfig`).
 
 #### -v, --verbose
 
