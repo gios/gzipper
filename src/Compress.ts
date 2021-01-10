@@ -203,8 +203,9 @@ export class Compress {
     filename: string,
     target: string,
     outputDir: string | undefined,
-  ): Promise<CompressedFile | Pick<CompressedFile, 'isCached'>> {
-    let isCached = false;
+  ): Promise<Partial<CompressedFile>> {
+    let isCached,
+      isSkipped = false;
     const inputPath = path.join(target, filename);
     if (outputDir) {
       const isFileTarget = (await this.nativeFs.lstat(this.target)).isFile();
@@ -216,7 +217,10 @@ export class Compress {
     const outputPath = this.getOutputPath(target, filename);
 
     if (this.options.skipCompressed) {
-      // TODO
+      if (await this.nativeFs.exists(outputPath)) {
+        isSkipped = true;
+        return { isCached, isSkipped };
+      }
     }
 
     if (this.options.incremental) {
@@ -267,10 +271,16 @@ export class Compress {
       if (removeCompiled) {
         await this.nativeFs.unlink(outputPath);
       }
-      return { beforeSize, afterSize, isCached, removeCompiled };
+      return {
+        beforeSize,
+        afterSize,
+        isCached,
+        isSkipped,
+        removeCompiled,
+      };
     }
 
-    return { isCached };
+    return { isCached, isSkipped };
   }
 
   /**
@@ -346,11 +356,15 @@ export class Compress {
     fileInfo: CompressedFile,
     hrtime: [number, number],
   ): string {
+    if (fileInfo.isSkipped) {
+      return `File ${file} has skipped`;
+    }
+
     const getSize = `${Helpers.readableSize(
       fileInfo.beforeSize,
     )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
     return fileInfo.isCached
-      ? `${file} has been retrieved from the cache ${getSize} (${Helpers.readableHrtime(
+      ? `File ${file} has been retrieved from the cache ${getSize} (${Helpers.readableHrtime(
           hrtime,
         )})`
       : `File ${file} has been compressed ${getSize} (${Helpers.readableHrtime(

@@ -31,6 +31,7 @@ export interface CompressedFile {
   beforeSize: number;
   afterSize: number;
   isCached: boolean;
+  isSkipped: boolean;
   removeCompiled: boolean;
 }
 
