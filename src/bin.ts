@@ -76,6 +76,10 @@ export class Index {
         '--remove-larger',
         'remove compressed files if they larger than uncompressed originals',
       )
+      .option(
+        '--skip-compressed',
+        'skip compressed files if they already exist',
+      )
       .action(this.compress.bind(this));
 
     const cache = this.commander
@@ -142,6 +146,9 @@ export class Index {
       removeLarger: this.env.GZIPPER_REMOVE_LARGER
         ? !!parseInt(this.env.GZIPPER_REMOVE_LARGER as string)
         : options.removeLarger,
+      skipCompressed: this.env.GZIPPER_SKIP_COMPRESSED
+        ? !!parseInt(this.env.GZIPPER_SKIP_COMPRESSED as string)
+        : options.skipCompressed,
     };
 
     await this.runCompress(target, outputPath, adjustedOptions);

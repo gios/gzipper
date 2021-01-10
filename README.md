@@ -38,6 +38,7 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--brotli-size-hint <number>](#--brotli-size-hint-number)
       - [--output-file-format](#--output-file-format)
       - [--remove-larger](#--remove-larger)
+      - [--skip-compressed](#--skip-compressed)
     - [Cache](#cache-1)
       - [purge](#purge)
       - [size](#size)
@@ -95,6 +96,7 @@ Options:
   --brotli-size-hint <number>   expected input size 0 (default)
   --output-file-format <value>  output file format with default artifacts [filename].[ext].[compressExt]
   --remove-larger               remove compressed files if they larger than uncompressed originals
+  --skip-compressed             skip compressed files if they already exist
   -h, --help                    display help for command
 ```
 
@@ -210,23 +212,24 @@ try {
 
 ### Compress|c
 
-| Option                                                      | ENV                            |
-| ----------------------------------------------------------- | ------------------------------ |
-| [`--incremental`](#--incremental) (beta)                    | `GZIPPER_INCREMENTAL` (0 or 1) |
-| [`-v, --verbose`](#-v---verbose)                            | `GZIPPER_VERBOSE` (0 or 1)     |
-| [`-e, --exclude <extensions>`](#-e---exclude-extensions)    | `GZIPPER_EXCLUDE`              |
-| [`-i, --include <extensions>`](#-i---include-extensions)    | `GZIPPER_INCLUDE`              |
-| [`-t, --threshold <number>`](#-t---threshold-number)        | `GZIPPER_THRESHOLD`            |
-| [`--level <number>`](#--level-number)                       | `GZIPPER_LEVEL`                |
-| [`--memory-level <number>`](#--memory-level-number)         | `GZIPPER_MEMORY_LEVEL`         |
-| [`--strategy <number>`](#--strategy-number)                 | `GZIPPER_STRATEGY`             |
-| [`--deflate`](#--deflate)                                   | `GZIPPER_DEFLATE` (0 or 1)     |
-| [`--brotli`](#--brotli)                                     | `GZIPPER_BROTLI` (0 or 1)      |
-| [`--brotli-param-mode <value>`](#--brotli-param-mode-value) | `GZIPPER_BROTLI_PARAM_MODE`    |
-| [`--brotli-quality <number>`](#--brotli-quality-number)     | `GZIPPER_BROTLI_QUALITY`       |
-| [`--brotli-size-hint <number>`](#--brotli-size-hint-number) | `GZIPPER_BROTLI_SIZE_HINT`     |
-| [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`   |
-| [`--remove-larger`](#--remove-larger)                       | `GZIPPER_REMOVE_LARGER`        |
+| Option                                                      | ENV                                |
+| ----------------------------------------------------------- | ---------------------------------- |
+| [`--incremental`](#--incremental) (beta)                    | `GZIPPER_INCREMENTAL` (0 or 1)     |
+| [`-v, --verbose`](#-v---verbose)                            | `GZIPPER_VERBOSE` (0 or 1)         |
+| [`-e, --exclude <extensions>`](#-e---exclude-extensions)    | `GZIPPER_EXCLUDE`                  |
+| [`-i, --include <extensions>`](#-i---include-extensions)    | `GZIPPER_INCLUDE`                  |
+| [`-t, --threshold <number>`](#-t---threshold-number)        | `GZIPPER_THRESHOLD`                |
+| [`--level <number>`](#--level-number)                       | `GZIPPER_LEVEL`                    |
+| [`--memory-level <number>`](#--memory-level-number)         | `GZIPPER_MEMORY_LEVEL`             |
+| [`--strategy <number>`](#--strategy-number)                 | `GZIPPER_STRATEGY`                 |
+| [`--deflate`](#--deflate)                                   | `GZIPPER_DEFLATE` (0 or 1)         |
+| [`--brotli`](#--brotli)                                     | `GZIPPER_BROTLI` (0 or 1)          |
+| [`--brotli-param-mode <value>`](#--brotli-param-mode-value) | `GZIPPER_BROTLI_PARAM_MODE`        |
+| [`--brotli-quality <number>`](#--brotli-quality-number)     | `GZIPPER_BROTLI_QUALITY`           |
+| [`--brotli-size-hint <number>`](#--brotli-size-hint-number) | `GZIPPER_BROTLI_SIZE_HINT`         |
+| [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`       |
+| [`--remove-larger`](#--remove-larger)                       | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
+| [`-skip-compressed`](#--skip-compressed)                    | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
 
 > ENV Variables have higher priority over CLI arguments.
 
@@ -371,6 +374,10 @@ index-067c1e2d-0e12-4b57-980b-97c880c24d57-index-tmp.js.gz
 #### --remove-larger
 
 Removes compressed files that larger than uncompressed originals in your directory.
+
+#### --skip-compressed
+
+Ignores compressed files that have already exist in your directory.
 
 ### Cache
 
