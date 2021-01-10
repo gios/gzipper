@@ -174,7 +174,7 @@ export class Compress {
             this.outputPath,
           );
 
-          if (!(fileInfo as CompressedFile).removeCompiled) {
+          if (!fileInfo.removeCompiled && !fileInfo.isSkipped) {
             compressedFiles.push(filePath);
           }
 
