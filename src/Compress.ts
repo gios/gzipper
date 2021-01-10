@@ -215,6 +215,10 @@ export class Compress {
     }
     const outputPath = this.getOutputPath(target, filename);
 
+    if (this.options.skipCompressed) {
+      // TODO
+    }
+
     if (this.options.incremental) {
       const checksum = await this.incremental.getFileChecksum(inputPath);
       const { isChanged, fileId } = await this.incremental.setFile(

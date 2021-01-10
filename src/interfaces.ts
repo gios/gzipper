@@ -16,7 +16,7 @@ export interface CompressOptions {
   brotliSizeHint?: number;
   outputFileFormat?: string;
   removeLarger?: boolean;
-  [key: string]: unknown;
+  skipCompressed?: boolean;
 }
 
 export type CompressionOptions = {

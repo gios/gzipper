@@ -208,12 +208,14 @@ export class Index {
   }
 
   // Delete undefined and NaN options.
-  private filterOptions(options: CompressOptions): CompressOptions {
-    Object.keys(options).forEach((key) => {
-      if (options[key] === undefined || options[key] !== options[key]) {
-        delete options[key];
+  private filterOptions<T>(options: T): T {
+    for (const key in options) {
+      if (Object.prototype.hasOwnProperty.call(options, key)) {
+        if (options[key] === undefined || options[key] !== options[key]) {
+          delete options[key];
+        }
       }
-    });
+    }
 
     return options;
   }
