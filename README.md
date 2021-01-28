@@ -180,7 +180,7 @@ const { Compress } = require('gzipper');
 const gzip = new Compress('./test', './dist', { verbose: true });
 
 try {
-  const files = await compress.run();
+  const files = await gzip.run();
   console.info('Compressed files: ', files);
 } catch (err) {
   console.error(err);
@@ -196,8 +196,8 @@ const brotli = new Compress('./test', null, { brotli: true });
 
 try {
   const [gzipFiles, brotliFiles] = await Promise.all([
-    gzip.compress(),
-    brotli.compress(),
+    gzip.run(),
+    brotli.run(),
   ]);
   console.info('Compressed gzip files: ', gzipFiles);
   console.info('Compressed brotli files: ', brotliFiles);
