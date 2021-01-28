@@ -166,7 +166,7 @@ export class Index {
         LogLevel.SUCCESS,
       );
     } catch (err) {
-      logger.log(err.message, LogLevel.ERROR);
+      logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -185,7 +185,7 @@ export class Index {
         LogLevel.INFO,
       );
     } catch (err) {
-      logger.log(err.message, LogLevel.ERROR);
+      logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -204,7 +204,7 @@ export class Index {
     try {
       await compress.run();
     } catch (err) {
-      logger.log(err.message, LogLevel.ERROR);
+      logger.log(err, LogLevel.ERROR);
     }
   }
 
