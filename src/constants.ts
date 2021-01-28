@@ -8,3 +8,4 @@ export const DEFAULT_OUTPUT_FORMAT_MESSAGE =
 export const CONFIG_FOLDER = '.gzipper';
 export const CACHE_FOLDER = 'cache';
 export const CONFIG_FILE = '.gzipperconfig';
+export const COMPRESSION_EXTENSIONS = ['gz', 'zz', 'br'];

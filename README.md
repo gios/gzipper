@@ -249,7 +249,7 @@ Get more information about executed work. (_Could increase time of compression b
 
 `gzipper c --exclude jpeg,png,ico ./dist`
 
-Exclude file extensions from compression, example: jpeg,jpg...
+Exclude file extensions from compression (compression extensions like gz, zz, br, etc. excluded by default), example: jpeg,jpg...
 
 #### -i, --include <extensions>
 

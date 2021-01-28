@@ -14,6 +14,7 @@ import {
   NO_PATH_MESSAGE,
   DEFAULT_OUTPUT_FORMAT_MESSAGE,
   INCREMENTAL_ENABLE_MESSAGE,
+  COMPRESSION_EXTENSIONS,
 } from './constants';
 import { CompressOptions, CompressedFile } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
@@ -334,14 +335,18 @@ export class Compress {
    * Returns if the file extension is valid.
    */
   private isValidFileExtensions(ext: string): boolean {
+    if (COMPRESSION_EXTENSIONS.includes(ext)) {
+      return false;
+    }
+
     const excludeExtensions = this.options.exclude;
     const includeExtensions = this.options.include;
 
-    if (includeExtensions && includeExtensions.length) {
+    if (includeExtensions?.length) {
       return includeExtensions.includes(ext);
     }
 
-    if (excludeExtensions && excludeExtensions.length) {
+    if (excludeExtensions?.length) {
       return !excludeExtensions.includes(ext);
     }
 
