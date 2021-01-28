@@ -229,7 +229,7 @@ try {
 | [`--brotli-size-hint <number>`](#--brotli-size-hint-number) | `GZIPPER_BROTLI_SIZE_HINT`         |
 | [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`       |
 | [`--remove-larger`](#--remove-larger)                       | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
-| [`-skip-compressed`](#--skip-compressed)                    | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
+| [`--skip-compressed`](#--skip-compressed)                   | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
 
 > ENV Variables have higher priority over CLI arguments.
 
@@ -377,7 +377,7 @@ Removes compressed files that larger than uncompressed originals in your directo
 
 #### --skip-compressed
 
-Ignores compressed files that have already exist in your directory.
+Ignores compressed files that have already exist in your directory. Works only with default `--output-file-format`.
 
 ### Cache
 

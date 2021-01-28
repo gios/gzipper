@@ -204,8 +204,8 @@ export class Compress {
     target: string,
     outputDir: string | undefined,
   ): Promise<Partial<CompressedFile>> {
-    let isCached,
-      isSkipped = false;
+    let isCached = false;
+    let isSkipped = false;
     const inputPath = path.join(target, filename);
     if (outputDir) {
       const isFileTarget = (await this.nativeFs.lstat(this.target)).isFile();

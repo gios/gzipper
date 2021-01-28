@@ -551,4 +551,36 @@ describe('CLI Compress', () => {
     );
     assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
+
+  it('--skip-compressed should skip compressed files', async () => {
+    const options = {
+      skipCompressed: true,
+      threshold: 0,
+    };
+    const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
+    await compress.run();
+
+    const filesBefore = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
+
+    const logSpy = sinon.spy((compress as any).logger, 'log');
+    await compress.run();
+
+    const filesAfter = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
+
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
+    assert.ok(
+      logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
+    );
+    assert.strictEqual(filesBefore.length, filesAfter.length);
+    assert.ok(
+      (compress as any).createCompression() instanceof (zlib as any).Gzip,
+    );
+    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual(
+      Object.keys((compress as any).compressionInstance.compressionOptions)
+        .length,
+      0,
+    );
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+  });
 });
