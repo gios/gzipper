@@ -194,6 +194,7 @@ export class Index {
     outputPath: string,
     options: CompressOptions,
   ): Promise<void> {
+    const logger = new Logger(true);
     const compress = new Compress(
       target,
       outputPath,
@@ -203,7 +204,7 @@ export class Index {
     try {
       await compress.run();
     } catch (err) {
-      console.error(err);
+      logger.log(err.message, LogLevel.ERROR);
     }
   }
 
