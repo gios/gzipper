@@ -362,7 +362,7 @@ export class Compress {
     hrtime: [number, number],
   ): string {
     if (fileInfo.isSkipped) {
-      return `File ${file} has skipped`;
+      return `File ${file} has been skipped`;
     }
 
     const getSize = `${Helpers.readableSize(

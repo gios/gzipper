@@ -653,4 +653,41 @@ describe('CLI Compress', () => {
     );
     assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
+
+  it('--skip-compressed should skip compressed files with appropriate message in verbose mode', async () => {
+    const options = {
+      verbose: true,
+      skipCompressed: true,
+      threshold: 0,
+    };
+    const compress = new Compress(COMPRESS_PATH, null, options);
+    await compress.run();
+
+    const filesBefore = await getFiles(COMPRESS_PATH, ['.gz']);
+
+    const logSpy = sinon.spy((compress as any).logger, 'log');
+    await compress.run();
+
+    const filesAfter = await getFiles(COMPRESS_PATH, ['.gz']);
+
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
+    assert.ok(
+      logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
+    );
+    assert.strictEqual(
+      logSpy.withArgs(sinon.match(/File \w+\.\w+ has been skipped/)).callCount,
+      filesAfter.length,
+    );
+    assert.strictEqual(filesBefore.length, filesAfter.length);
+    assert.ok(
+      (compress as any).createCompression() instanceof (zlib as any).Gzip,
+    );
+    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual(
+      Object.keys((compress as any).compressionInstance.compressionOptions)
+        .length,
+      0,
+    );
+    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+  });
 });
