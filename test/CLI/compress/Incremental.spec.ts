@@ -180,11 +180,14 @@ describe('CLI Compress -> Incremental', () => {
     const fileRevisionsAfter = getFileRevisions(configAfter, fileToEdit);
     await fsWriteFile(fileToEdit, beforeFileContent);
 
-    assert.notEqual(
+    assert.notStrictEqual(
       fileRevisionsBefore[0]?.lastChecksum,
       fileRevisionsAfter[0]?.lastChecksum,
     );
-    assert.notEqual(fileRevisionsBefore[0]?.date, fileRevisionsAfter[0]?.date);
+    assert.notStrictEqual(
+      fileRevisionsBefore[0]?.date,
+      fileRevisionsAfter[0]?.date,
+    );
 
     delete fileRevisionsBefore[0]?.lastChecksum;
     delete fileRevisionsAfter[0]?.lastChecksum;
@@ -303,11 +306,11 @@ describe('CLI Compress -> Incremental', () => {
     ) as IncrementalFileValueRevision;
 
     assert.ok(!hashContentBefore.equals(hashContentAfter));
-    assert.notEqual(
+    assert.notStrictEqual(
       fileRevisionBefore.lastChecksum,
       fileRevisionAfter.lastChecksum,
     );
-    assert.notEqual(fileRevisionBefore.date, fileRevisionAfter.date);
+    assert.notStrictEqual(fileRevisionBefore.date, fileRevisionAfter.date);
 
     delete fileRevisionBefore.lastChecksum;
     delete fileRevisionAfter.lastChecksum;

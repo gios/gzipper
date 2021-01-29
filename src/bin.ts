@@ -76,6 +76,10 @@ export class Index {
         '--remove-larger',
         'remove compressed files if they larger than uncompressed originals',
       )
+      .option(
+        '--skip-compressed',
+        'skip compressed files if they already exist',
+      )
       .action(this.compress.bind(this));
 
     const cache = this.commander
@@ -142,6 +146,9 @@ export class Index {
       removeLarger: this.env.GZIPPER_REMOVE_LARGER
         ? !!parseInt(this.env.GZIPPER_REMOVE_LARGER as string)
         : options.removeLarger,
+      skipCompressed: this.env.GZIPPER_SKIP_COMPRESSED
+        ? !!parseInt(this.env.GZIPPER_SKIP_COMPRESSED as string)
+        : options.skipCompressed,
     };
 
     await this.runCompress(target, outputPath, adjustedOptions);
@@ -159,7 +166,7 @@ export class Index {
         LogLevel.SUCCESS,
       );
     } catch (err) {
-      logger.log(err.message, LogLevel.ERROR);
+      logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -178,7 +185,7 @@ export class Index {
         LogLevel.INFO,
       );
     } catch (err) {
-      logger.log(err.message, LogLevel.ERROR);
+      logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -187,6 +194,7 @@ export class Index {
     outputPath: string,
     options: CompressOptions,
   ): Promise<void> {
+    const logger = new Logger(true);
     const compress = new Compress(
       target,
       outputPath,
@@ -196,17 +204,19 @@ export class Index {
     try {
       await compress.run();
     } catch (err) {
-      console.error(err);
+      logger.log(err, LogLevel.ERROR);
     }
   }
 
   // Delete undefined and NaN options.
-  private filterOptions(options: CompressOptions): CompressOptions {
-    Object.keys(options).forEach((key) => {
-      if (options[key] === undefined || options[key] !== options[key]) {
-        delete options[key];
+  private filterOptions<T>(options: T): T {
+    for (const key in options) {
+      if (Object.prototype.hasOwnProperty.call(options, key)) {
+        if (options[key] === undefined || options[key] !== options[key]) {
+          delete options[key];
+        }
       }
-    });
+    }
 
     return options;
   }

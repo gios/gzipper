@@ -14,6 +14,7 @@ import {
   NO_PATH_MESSAGE,
   DEFAULT_OUTPUT_FORMAT_MESSAGE,
   INCREMENTAL_ENABLE_MESSAGE,
+  COMPRESSION_EXTENSIONS,
 } from './constants';
 import { CompressOptions, CompressedFile } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
@@ -174,7 +175,7 @@ export class Compress {
             this.outputPath,
           );
 
-          if (!(fileInfo as CompressedFile).removeCompiled) {
+          if (!fileInfo.removeCompiled && !fileInfo.isSkipped) {
             compressedFiles.push(filePath);
           }
 
@@ -203,8 +204,9 @@ export class Compress {
     filename: string,
     target: string,
     outputDir: string | undefined,
-  ): Promise<CompressedFile | Pick<CompressedFile, 'isCached'>> {
+  ): Promise<Partial<CompressedFile>> {
     let isCached = false;
+    let isSkipped = false;
     const inputPath = path.join(target, filename);
     if (outputDir) {
       const isFileTarget = (await this.nativeFs.lstat(this.target)).isFile();
@@ -214,6 +216,13 @@ export class Compress {
       await Helpers.createFolders(target);
     }
     const outputPath = this.getOutputPath(target, filename);
+
+    if (this.options.skipCompressed) {
+      if (await this.nativeFs.exists(outputPath)) {
+        isSkipped = true;
+        return { isCached, isSkipped };
+      }
+    }
 
     if (this.options.incremental) {
       const checksum = await this.incremental.getFileChecksum(inputPath);
@@ -263,10 +272,16 @@ export class Compress {
       if (removeCompiled) {
         await this.nativeFs.unlink(outputPath);
       }
-      return { beforeSize, afterSize, isCached, removeCompiled };
+      return {
+        beforeSize,
+        afterSize,
+        isCached,
+        isSkipped,
+        removeCompiled,
+      };
     }
 
-    return { isCached };
+    return { isCached, isSkipped };
   }
 
   /**
@@ -320,14 +335,18 @@ export class Compress {
    * Returns if the file extension is valid.
    */
   private isValidFileExtensions(ext: string): boolean {
+    if (COMPRESSION_EXTENSIONS.includes(ext)) {
+      return false;
+    }
+
     const excludeExtensions = this.options.exclude;
     const includeExtensions = this.options.include;
 
-    if (includeExtensions && includeExtensions.length) {
+    if (includeExtensions?.length) {
       return includeExtensions.includes(ext);
     }
 
-    if (excludeExtensions && excludeExtensions.length) {
+    if (excludeExtensions?.length) {
       return !excludeExtensions.includes(ext);
     }
 
@@ -342,11 +361,15 @@ export class Compress {
     fileInfo: CompressedFile,
     hrtime: [number, number],
   ): string {
+    if (fileInfo.isSkipped) {
+      return `File ${file} has been skipped`;
+    }
+
     const getSize = `${Helpers.readableSize(
       fileInfo.beforeSize,
     )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
     return fileInfo.isCached
-      ? `${file} has been retrieved from the cache ${getSize} (${Helpers.readableHrtime(
+      ? `File ${file} has been retrieved from the cache ${getSize} (${Helpers.readableHrtime(
           hrtime,
         )})`
       : `File ${file} has been compressed ${getSize} (${Helpers.readableHrtime(
