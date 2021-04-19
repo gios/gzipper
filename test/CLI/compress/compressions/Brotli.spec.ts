@@ -27,7 +27,7 @@ describeTest('CLI Compress -> Brotli compression', () => {
     const createBrotliCompress =
       zlib.createBrotliCompress && zlib.createBrotliCompress.bind({});
     try {
-      delete zlib.createBrotliCompress;
+      delete (zlib as any).createBrotliCompress;
       new Compress(COMPRESS_PATH, null, { brotli: true, threshold: 0 });
     } catch (err) {
       assert.ok(err instanceof Error);
@@ -71,7 +71,7 @@ describeTest('CLI Compress -> Brotli compression', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -138,7 +138,7 @@ describeTest('CLI Compress -> Brotli compression', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -185,7 +185,7 @@ describeTest('CLI Compress -> Brotli compression', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -232,7 +232,7 @@ describeTest('CLI Compress -> Brotli compression', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),

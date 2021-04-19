@@ -139,62 +139,54 @@ export class Compress {
    * Compile files in folder recursively.
    */
   private async compileFolderRecursively(target: string): Promise<string[]> {
-    try {
-      const compressedFiles: string[] = [];
-      const isFileTarget = (await this.nativeFs.lstat(target)).isFile();
-      let filesList: string[];
+    const compressedFiles: string[] = [];
+    const isFileTarget = (await this.nativeFs.lstat(target)).isFile();
+    let filesList: string[];
 
-      if (isFileTarget) {
-        const targetParsed = path.parse(target);
-        target = targetParsed.dir;
-        filesList = [targetParsed.base];
-      } else {
-        filesList = await this.nativeFs.readdir(target);
-      }
+    if (isFileTarget) {
+      const targetParsed = path.parse(target);
+      target = targetParsed.dir;
+      filesList = [targetParsed.base];
+    } else {
+      filesList = await this.nativeFs.readdir(target);
+    }
 
-      for (const file of filesList) {
-        const filePath = path.resolve(target, file);
-        const fileStat = await this.nativeFs.lstat(filePath);
+    for (const file of filesList) {
+      const filePath = path.resolve(target, file);
+      const fileStat = await this.nativeFs.lstat(filePath);
 
-        if (fileStat.isDirectory()) {
-          compressedFiles.push(
-            ...(await this.compileFolderRecursively(filePath)),
+      if (fileStat.isDirectory()) {
+        compressedFiles.push(
+          ...(await this.compileFolderRecursively(filePath)),
+        );
+      } else if (
+        fileStat.isFile() &&
+        this.isValidFileExtensions(path.extname(filePath).slice(1))
+      ) {
+        if (fileStat.size < this.options.threshold) {
+          continue;
+        }
+
+        const hrtimeStart = process.hrtime();
+        const fileInfo = await this.compressFile(file, target, this.outputPath);
+
+        if (!fileInfo.removeCompiled && !fileInfo.isSkipped) {
+          compressedFiles.push(filePath);
+        }
+
+        if (this.options.verbose) {
+          const hrTimeEnd = process.hrtime(hrtimeStart);
+          this.logger.log(
+            this.getCompressedFileMsg(
+              file,
+              fileInfo as CompressedFile,
+              hrTimeEnd,
+            ),
           );
-        } else if (
-          fileStat.isFile() &&
-          this.isValidFileExtensions(path.extname(filePath).slice(1))
-        ) {
-          if (fileStat.size < this.options.threshold) {
-            continue;
-          }
-
-          const hrtimeStart = process.hrtime();
-          const fileInfo = await this.compressFile(
-            file,
-            target,
-            this.outputPath,
-          );
-
-          if (!fileInfo.removeCompiled && !fileInfo.isSkipped) {
-            compressedFiles.push(filePath);
-          }
-
-          if (this.options.verbose) {
-            const hrTimeEnd = process.hrtime(hrtimeStart);
-            this.logger.log(
-              this.getCompressedFileMsg(
-                file,
-                fileInfo as CompressedFile,
-                hrTimeEnd,
-              ),
-            );
-          }
         }
       }
-      return compressedFiles;
-    } catch (error) {
-      throw error;
     }
+    return compressedFiles;
   }
 
   /**

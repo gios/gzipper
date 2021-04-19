@@ -49,7 +49,7 @@ describe('CLI Compress -> Deflate compression', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
