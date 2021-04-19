@@ -40,39 +40,31 @@ export async function clearDirectory(
   target = COMPRESS_PATH,
   extensions: string[] | boolean,
 ): Promise<string[]> {
-  try {
-    const force = typeof extensions === 'boolean' && extensions;
-    const files: string[] = [];
-    const filesList = await readdir(target);
+  const force = typeof extensions === 'boolean' && extensions;
+  const files: string[] = [];
+  const filesList = await readdir(target);
 
-    for (const file of filesList) {
-      const filePath = path.resolve(target, file);
-      const isFile = (await lstat(filePath)).isFile();
-      const isDirectory = (await lstat(filePath)).isDirectory();
+  for (const file of filesList) {
+    const filePath = path.resolve(target, file);
+    const isFile = (await lstat(filePath)).isFile();
+    const isDirectory = (await lstat(filePath)).isDirectory();
 
-      if (isDirectory) {
-        files.push(...(await clearDirectory(filePath, extensions)));
-      } else if (isFile) {
-        try {
-          if (Array.isArray(extensions) && extensions.length) {
-            if (extensions.includes(path.extname(filePath))) {
-              await unlink(path.resolve(target, filePath));
-              files.push(filePath);
-            }
-          } else if (force) {
-            await unlink(path.resolve(target, filePath));
-            files.push(filePath);
-          }
-        } catch (error) {
-          throw error;
+    if (isDirectory) {
+      files.push(...(await clearDirectory(filePath, extensions)));
+    } else if (isFile) {
+      if (Array.isArray(extensions) && extensions.length) {
+        if (extensions.includes(path.extname(filePath))) {
+          await unlink(path.resolve(target, filePath));
+          files.push(filePath);
         }
+      } else if (force) {
+        await unlink(path.resolve(target, filePath));
+        files.push(filePath);
       }
     }
-    force && (await rmdir(target));
-    return files;
-  } catch (error) {
-    throw error;
   }
+  force && (await rmdir(target));
+  return files;
 }
 
 /**

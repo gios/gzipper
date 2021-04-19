@@ -40,7 +40,7 @@ async function validateOutputPathOptions(
   assert.ok(
     logSpy.calledWithExactly(
       sinon.match(
-        new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
       LogLevel.SUCCESS,
     ),
@@ -191,7 +191,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -273,7 +273,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -320,7 +320,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -423,7 +423,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} file has been compressed\. \(.+\)`),
+          new RegExp(`${files.length} file has been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -459,7 +459,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -495,9 +495,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(
-            `${filesAfter.length} files have been compressed\. \(.+\)`,
-          ),
+          new RegExp(`${filesAfter.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -538,9 +536,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(
-            `${filesGzipped.length} files have been compressed\. \(.+\)`,
-          ),
+          new RegExp(`${filesGzipped.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -572,7 +568,7 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),

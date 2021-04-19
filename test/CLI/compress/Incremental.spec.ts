@@ -96,7 +96,7 @@ describe('CLI Compress -> Incremental', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinon.match(
-          new RegExp(`${files.length} files have been compressed\. \(.+\)`),
+          new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
@@ -169,7 +169,10 @@ describe('CLI Compress -> Incremental', () => {
     const configBefore: FileConfig = JSON.parse(
       (await fsReadFile(configPath)).toString(),
     );
-    const fileRevisionsBefore = getFileRevisions(configBefore, fileToEdit);
+    const fileRevisionsBefore: Partial<IncrementalFileValueRevision>[] = getFileRevisions(
+      configBefore,
+      fileToEdit,
+    );
 
     const beforeFileContent = await fsReadFile(fileToEdit);
     await fsWriteFile(fileToEdit, 'New content which breaks checksum.');
@@ -177,7 +180,10 @@ describe('CLI Compress -> Incremental', () => {
     const configAfter: FileConfig = JSON.parse(
       (await fsReadFile(configPath)).toString(),
     );
-    const fileRevisionsAfter = getFileRevisions(configAfter, fileToEdit);
+    const fileRevisionsAfter: Partial<IncrementalFileValueRevision>[] = getFileRevisions(
+      configAfter,
+      fileToEdit,
+    );
     await fsWriteFile(fileToEdit, beforeFileContent);
 
     assert.notStrictEqual(
@@ -280,10 +286,13 @@ describe('CLI Compress -> Incremental', () => {
     );
     const fileRevisionsBefore = getFileRevisions(configBefore, fileToEdit);
     assert.strictEqual(fileRevisionsBefore.length, 2);
-    const fileRevisionBefore = fileRevisionsBefore.find((revision) =>
-      deepEqual(revision.options, { level: 8 }),
+    const fileRevisionBefore: Partial<IncrementalFileValueRevision> = fileRevisionsBefore.find(
+      (revision) => deepEqual(revision.options, { level: 8 }),
     ) as IncrementalFileValueRevision;
-    const hashPath = path.resolve(cachePath, fileRevisionBefore.fileId);
+    const hashPath = path.resolve(
+      cachePath,
+      fileRevisionBefore.fileId as string,
+    );
     const hashContentBefore = await fsReadFile(hashPath);
 
     const compress3 = new Compress(COMPRESS_PATH, null, {
@@ -301,8 +310,8 @@ describe('CLI Compress -> Incremental', () => {
     );
     const fileRevisionsAfter = getFileRevisions(configAfter, fileToEdit);
     assert.strictEqual(fileRevisionsAfter.length, 2);
-    const fileRevisionAfter = fileRevisionsAfter.find((revision) =>
-      deepEqual(revision.options, { level: 8 }),
+    const fileRevisionAfter: Partial<IncrementalFileValueRevision> = fileRevisionsAfter.find(
+      (revision) => deepEqual(revision.options, { level: 8 }),
     ) as IncrementalFileValueRevision;
 
     assert.ok(!hashContentBefore.equals(hashContentAfter));
