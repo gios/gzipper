@@ -7,9 +7,9 @@ module.exports = {
     jasmine: true,
   },
   extends: [
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'prettier/@typescript-eslint',
-    'plugin:prettier/recommended',
+    'prettier',
   ],
   globals: {
     Atomics: 'readonly',
