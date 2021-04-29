@@ -3,7 +3,6 @@ import zlib from 'zlib';
 import { Compression } from './Compression';
 import { Logger } from '../logger/Logger';
 import { CompressOptions, BrotliOptions } from '../interfaces';
-import { LogLevel } from '../logger/LogLevel.enum';
 
 /**
  * Brotli compression
@@ -16,7 +15,6 @@ export class BrotliCompression extends Compression<BrotliOptions> {
    */
   constructor(options: CompressOptions, logger: Logger) {
     super(options, logger);
-    this.availability();
   }
 
   /**
@@ -87,17 +85,6 @@ export class BrotliCompression extends Compression<BrotliOptions> {
 
       case zlib.constants.BROTLI_PARAM_SIZE_HINT:
         return 'brotliSizeHint';
-    }
-  }
-
-  /**
-   * Check if brotli compression is exists on current Node.js version.
-   */
-  private availability(): void {
-    if (typeof zlib.createBrotliCompress !== 'function') {
-      const message = `Can't use brotli compression, Node.js >= v11.7.0 required.`;
-      this.logger.log(message, LogLevel.ERROR);
-      throw new Error(message);
     }
   }
 }

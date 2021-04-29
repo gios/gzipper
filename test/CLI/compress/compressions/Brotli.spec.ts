@@ -23,22 +23,6 @@ describeTest('CLI Compress -> Brotli compression', () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
   });
 
-  it('--brotli should emit error on compress error', () => {
-    const createBrotliCompress =
-      zlib.createBrotliCompress && zlib.createBrotliCompress.bind({});
-    try {
-      delete (zlib as any).createBrotliCompress;
-      new Compress(COMPRESS_PATH, null, { brotli: true, threshold: 0 });
-    } catch (err) {
-      assert.ok(err instanceof Error);
-      assert.strictEqual(
-        err.message,
-        `Can't use brotli compression, Node.js >= v11.7.0 required.`,
-      );
-    }
-    zlib.createBrotliCompress = createBrotliCompress;
-  });
-
   it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration with --verbose', async () => {
     const options = {
       brotli: true,

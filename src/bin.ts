@@ -21,7 +21,7 @@ export class Index {
       .alias('c')
       .description('compress selected path and optionally set output directory')
       .option('-v, --verbose', 'detailed level of logs')
-      .option('--incremental', '(beta) incremental compression')
+      .option('--incremental', 'incremental compression')
       .option(
         '-e, --exclude <extensions>',
         'exclude file extensions from compression, example: jpeg,jpg...',
@@ -53,7 +53,7 @@ export class Index {
         (value) => parseInt(value),
       )
       .option('--deflate', 'enable deflate compression')
-      .option('--brotli', 'enable brotli compression, Node.js >= v11.7.0')
+      .option('--brotli', 'enable brotli compression')
       .option(
         '--brotli-param-mode <value>',
         'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)',

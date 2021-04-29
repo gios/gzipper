@@ -10,7 +10,7 @@ The flexibility of the algorithms could be extended by many options flags, inclu
 
 You can enable `verbose` mode for better visual representation, customize your file output using `output-file-format` or compress with `incremental` flag if you have a lot of files that rarely change.
 
-By default `gzipper` compress **all the files** but you could use `include` or `exclude` options for better flexibility.
+By default `gzipper` compress **all the files** but you could use `include` or `exclude` options for flexibility.
 
 - [Gzipper](#gzipper)
   - [Install](#install)
@@ -82,7 +82,7 @@ compress selected path and optionally set output directory
 
 Options:
   -v, --verbose                 detailed level of logs
-  --incremental                 (beta) incremental compression
+  --incremental                 incremental compression
   -e, --exclude <extensions>    exclude file extensions from compression, example: jpeg,jpg...
   -i, --include <extensions>    include file extensions for compression, example: js,css,html...
   -t, --threshold <number>      exclude assets smaller than this byte size. 0 (default)
@@ -90,7 +90,7 @@ Options:
   --memory-level <number>       amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
   --strategy <number>           compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
   --deflate                     enable deflate compression
-  --brotli                      enable brotli compression, Node.js >= v11.7.0
+  --brotli                      enable brotli compression
   --brotli-param-mode <value>   default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
   --brotli-quality <number>     brotli compression quality 11 (default), 0 - 11
   --brotli-size-hint <number>   expected input size 0 (default)
@@ -214,7 +214,7 @@ try {
 
 | Option                                                      | ENV                                |
 | ----------------------------------------------------------- | ---------------------------------- |
-| [`--incremental`](#--incremental) (beta)                    | `GZIPPER_INCREMENTAL` (0 or 1)     |
+| [`--incremental`](#--incremental)                           | `GZIPPER_INCREMENTAL` (0 or 1)     |
 | [`-v, --verbose`](#-v---verbose)                            | `GZIPPER_VERBOSE` (0 or 1)         |
 | [`-e, --exclude <extensions>`](#-e---exclude-extensions)    | `GZIPPER_EXCLUDE`                  |
 | [`-i, --include <extensions>`](#-i---include-extensions)    | `GZIPPER_INCLUDE`                  |
@@ -291,7 +291,7 @@ Enable deflate compression.
 
 `gzipper c --brotli ./dist`
 
-Enable brotli compression, Node.js >= v11.7.0.
+Enable brotli compression.
 
 #### --brotli-param-mode <value>
 
@@ -408,4 +408,4 @@ I appreciate every contribution, just fork the repository and send the pull requ
 
 ## Support
 
-- Node.js >= 10
+- Node.js >= 12
