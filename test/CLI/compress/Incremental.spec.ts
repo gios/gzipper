@@ -74,7 +74,7 @@ describe('CLI Compress -> Incremental', () => {
     sinon.restore();
   });
 
-  it('should compile files and create .gzipper folder', async () => {
+  it('should compress files and create .gzipper folder', async () => {
     const options = { verbose: true, threshold: 0, incremental: true };
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinon.spy((compress as any).logger, 'log');

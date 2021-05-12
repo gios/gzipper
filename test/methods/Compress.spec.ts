@@ -27,7 +27,7 @@ describe('Methods Compress', () => {
     it("should log success message when filesCount isn't empty", async () => {
       const compress = new Compress(COMPRESS_PATH, null);
       const compressionLogFake = sinon.fake();
-      const compileFolderRecursively = sinon.fake.resolves(['one']);
+      const compressFolderRecursively = sinon.fake.resolves(['one']);
       const logSpy = sinon.spy((compress as any).logger, 'log');
 
       sinonSandbox.replace(
@@ -37,20 +37,20 @@ describe('Methods Compress', () => {
       );
       sinonSandbox.replace(
         compress,
-        'compileFolderRecursively' as any,
-        compileFolderRecursively,
+        'compressFolderRecursively' as any,
+        compressFolderRecursively,
       );
       await compress.run();
 
       const [message, level] = logSpy.args[0];
       assert.ok(compressionLogFake.calledOnce);
-      assert.ok(compileFolderRecursively.calledOnce);
+      assert.ok(compressFolderRecursively.calledOnce);
       assert.ok(/1 file has been compressed. (.+)/.test(message));
       assert.strictEqual(level, LogLevel.SUCCESS);
     });
   });
 
-  describe('compileFolderRecursively', () => {
+  describe('compressFolderRecursively', () => {
     let sinonSandbox: sinon.SinonSandbox;
 
     beforeEach(() => {
@@ -72,7 +72,7 @@ describe('Methods Compress', () => {
 
       const compressFile = sinon.fake();
       sinonSandbox.replace(compress, 'compressFile' as any, compressFile);
-      await (compress as any).compileFolderRecursively(process.cwd());
+      await (compress as any).compressFolderRecursively(process.cwd());
       assert.ok(compressFile.notCalled);
     });
 
@@ -92,7 +92,7 @@ describe('Methods Compress', () => {
     });
   });
 
-  describe('compileFolderRecursively', () => {
+  describe('compressFolderRecursively', () => {
     const tmpFilename = 'one.js';
     let sinonSandbox: sinon.SinonSandbox;
     let tmpInputFilePath: string;

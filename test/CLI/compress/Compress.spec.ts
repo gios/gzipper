@@ -93,9 +93,9 @@ describe('CLI Compress', () => {
 
   it('should throw on compress error', async () => {
     const compress = new Compress(COMPRESS_PATH, null);
-    const compileFolderRecursivelySpy = sinon.spy(
+    const compressFolderRecursivelySpy = sinon.spy(
       compress,
-      'compileFolderRecursively' as any,
+      'compressFolderRecursively' as any,
     );
     const logSpy = sinon.spy((compress as any).logger, 'log');
     sinonSandbox
@@ -107,7 +107,7 @@ describe('CLI Compress', () => {
     } catch (err) {
       assert.ok(err instanceof Error);
       assert.strictEqual(err.message, 'Compressing error.');
-      assert.ok(compileFolderRecursivelySpy.calledWithExactly(COMPRESS_PATH));
+      assert.ok(compressFolderRecursivelySpy.calledWithExactly(COMPRESS_PATH));
       assert.ok(
         logSpy.calledWithExactly(sinon.match.instanceOf(Error), LogLevel.ERROR),
       );

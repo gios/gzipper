@@ -32,7 +32,7 @@ export interface CompressedFile {
   afterSize: number;
   isCached: boolean;
   isSkipped: boolean;
-  removeCompiled: boolean;
+  removeCompressed: boolean;
 }
 
 export interface Cache {

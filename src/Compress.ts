@@ -93,7 +93,7 @@ export class Compress {
       }
       this.compressionLog();
       const hrtimeStart = process.hrtime();
-      files = await this.compileFolderRecursively(this.target);
+      files = await this.compressFolderRecursively(this.target);
       hrtime = process.hrtime(hrtimeStart);
       if (this.options.incremental) {
         await this.incremental.updateConfig();
@@ -136,9 +136,9 @@ export class Compress {
   }
 
   /**
-   * Compile files in folder recursively.
+   * Compress files in folder recursively.
    */
-  private async compileFolderRecursively(target: string): Promise<string[]> {
+  private async compressFolderRecursively(target: string): Promise<string[]> {
     const compressedFiles: string[] = [];
     const isFileTarget = (await this.nativeFs.lstat(target)).isFile();
     let filesList: string[];
@@ -157,7 +157,7 @@ export class Compress {
 
       if (fileStat.isDirectory()) {
         compressedFiles.push(
-          ...(await this.compileFolderRecursively(filePath)),
+          ...(await this.compressFolderRecursively(filePath)),
         );
       } else if (
         fileStat.isFile() &&
@@ -170,7 +170,7 @@ export class Compress {
         const hrtimeStart = process.hrtime();
         const fileInfo = await this.compressFile(file, target, this.outputPath);
 
-        if (!fileInfo.removeCompiled && !fileInfo.isSkipped) {
+        if (!fileInfo.removeCompressed && !fileInfo.isSkipped) {
           compressedFiles.push(filePath);
         }
 
@@ -259,9 +259,9 @@ export class Compress {
       const beforeSize = (await this.nativeFs.lstat(inputPath)).size;
       const afterSize = (await this.nativeFs.lstat(outputPath)).size;
 
-      const removeCompiled =
+      const removeCompressed =
         this.options.removeLarger && beforeSize < afterSize;
-      if (removeCompiled) {
+      if (removeCompressed) {
         await this.nativeFs.unlink(outputPath);
       }
       return {
@@ -269,7 +269,7 @@ export class Compress {
         afterSize,
         isCached,
         isSkipped,
-        removeCompiled,
+        removeCompressed,
       };
     }
 
