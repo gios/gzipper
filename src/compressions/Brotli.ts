@@ -1,7 +1,6 @@
 import zlib from 'zlib';
 
 import { Compression } from './Compression';
-import { Logger } from '../logger/Logger';
 import { CompressOptions, BrotliOptions } from '../interfaces';
 
 /**
@@ -13,8 +12,8 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   /**
    * Creates an instance of BrotliCompression
    */
-  constructor(options: CompressOptions, logger: Logger) {
-    super(options, logger);
+  constructor(options: CompressOptions) {
+    super(options);
   }
 
   /**

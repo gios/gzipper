@@ -116,11 +116,11 @@ export class Compress {
     | DeflateCompression
     | GzipCompression {
     if (this.options.brotli) {
-      return new BrotliCompression(this.options, this.logger);
+      return new BrotliCompression(this.options);
     } else if (this.options.deflate) {
-      return new DeflateCompression(this.options, this.logger);
+      return new DeflateCompression(this.options);
     } else {
-      return new GzipCompression(this.options, this.logger);
+      return new GzipCompression(this.options);
     }
   }
 
@@ -195,8 +195,10 @@ export class Compress {
         worker.terminate();
         resolve(result);
       });
-      worker.on('error', (error) => reject(error));
-      worker.on('exit', (exitCode) => reject(exitCode));
+      worker.on('error', (error) => {
+        worker.terminate();
+        reject(error);
+      });
     });
   }
 
