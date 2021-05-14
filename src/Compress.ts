@@ -146,7 +146,7 @@ export class Compress {
   }
 
   /**
-   * Create workers for parallel compression..
+   * Create workers for parallel compression.
    */
   private async createWorkers(): Promise<string[]> {
     const files = await this.getFilesToCompress();

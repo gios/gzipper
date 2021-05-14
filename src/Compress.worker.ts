@@ -28,6 +28,11 @@ class CompressWorker {
   private readonly chunk: string[] = workerData.chunk;
   private readonly target: string = workerData.target;
   private readonly outputPath: string = workerData.outputPath;
+  private readonly incremental = {
+    getFileChecksum: (a: any) => a,
+    setFile: (a: any, b: any, c: any) => a,
+    cacheFolder: 'aaa',
+  };
   private readonly service: CompressService;
   private readonly compressionInstance:
     | BrotliCompression

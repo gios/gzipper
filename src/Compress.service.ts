@@ -7,6 +7,9 @@ import { CompressOptions } from './interfaces';
 export class CompressService {
   private readonly options: CompressOptions;
 
+  /**
+   * Creates an instance of CompressService.
+   */
   constructor(options: CompressOptions) {
     this.options = options;
   }
