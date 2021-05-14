@@ -12,6 +12,7 @@ import {
   NO_PATH_MESSAGE,
   DEFAULT_OUTPUT_FORMAT_MESSAGE,
   INCREMENTAL_ENABLE_MESSAGE,
+  WORKER_STARTED,
 } from './constants';
 import { CompressOptions } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
@@ -176,10 +177,18 @@ export class Compress {
         },
       );
 
+      worker.on('online', () => {
+        this.logger.log(
+          `[${worker.threadId}] ${WORKER_STARTED}`,
+          LogLevel.INFO,
+        );
+      });
+
       worker.once('message', (result) => {
         worker.terminate();
         resolve(result);
       });
+
       worker.on('error', (error) => {
         worker.terminate();
         reject(error);
