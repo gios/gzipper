@@ -1,22 +1,20 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
-import { v4 } from 'uuid';
-import stream from 'stream';
+import { Worker } from 'worker_threads';
 
 import { Helpers } from './helpers';
 import { Logger } from './logger/Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
 import {
-  OUTPUT_FILE_FORMAT_REGEXP,
   NO_FILES_MESSAGE,
   NO_PATH_MESSAGE,
   DEFAULT_OUTPUT_FORMAT_MESSAGE,
   INCREMENTAL_ENABLE_MESSAGE,
   COMPRESSION_EXTENSIONS,
 } from './constants';
-import { CompressOptions, CompressedFile } from './interfaces';
+import { CompressOptions } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
@@ -29,11 +27,6 @@ export class Compress {
   private readonly nativeFs = {
     lstat: util.promisify(fs.lstat),
     readdir: util.promisify(fs.readdir),
-    exists: util.promisify(fs.exists),
-    unlink: util.promisify(fs.unlink),
-  };
-  private readonly nativeStream = {
-    pipeline: util.promisify(stream.pipeline),
   };
   private readonly logger: Logger;
   private readonly incremental!: Incremental;
@@ -45,10 +38,7 @@ export class Compress {
     | GzipCompression
     | DeflateCompression;
   private readonly target: string;
-  private readonly createCompression:
-    | ReturnType<BrotliCompression['getCompression']>
-    | ReturnType<GzipCompression['getCompression']>
-    | ReturnType<DeflateCompression['getCompression']>;
+
   /**
    * Creates an instance of Compress.
    */
@@ -73,7 +63,6 @@ export class Compress {
     this.target = path.resolve(process.cwd(), target);
     this.options = options;
     this.compressionInstance = this.getCompressionInstance();
-    this.createCompression = this.compressionInstance.getCompression();
   }
 
   /**
@@ -93,7 +82,7 @@ export class Compress {
       }
       this.compressionLog();
       const hrtimeStart = process.hrtime();
-      files = await this.compressFolderRecursively(this.target);
+      files = await this.createWorkers();
       hrtime = process.hrtime(hrtimeStart);
       if (this.options.incremental) {
         await this.incremental.updateConfig();
@@ -136,9 +125,9 @@ export class Compress {
   }
 
   /**
-   * Compress files in folder recursively.
+   * Returns available files to compress.
    */
-  private async compressFolderRecursively(target: string): Promise<string[]> {
+  private async getFilesToCompress(target = this.target): Promise<string[]> {
     const compressedFiles: string[] = [];
     const isFileTarget = (await this.nativeFs.lstat(target)).isFile();
     let filesList: string[];
@@ -156,9 +145,7 @@ export class Compress {
       const fileStat = await this.nativeFs.lstat(filePath);
 
       if (fileStat.isDirectory()) {
-        compressedFiles.push(
-          ...(await this.compressFolderRecursively(filePath)),
-        );
+        compressedFiles.push(...(await this.getFilesToCompress(filePath)));
       } else if (
         fileStat.isFile() &&
         this.isValidFileExtensions(path.extname(filePath).slice(1))
@@ -166,114 +153,51 @@ export class Compress {
         if (fileStat.size < this.options.threshold) {
           continue;
         }
-
-        const hrtimeStart = process.hrtime();
-        const fileInfo = await this.compressFile(file, target, this.outputPath);
-
-        if (!fileInfo.removeCompressed && !fileInfo.isSkipped) {
-          compressedFiles.push(filePath);
-        }
-
-        if (this.options.verbose) {
-          const hrTimeEnd = process.hrtime(hrtimeStart);
-          this.logger.log(
-            this.getCompressedFileMsg(
-              file,
-              fileInfo as CompressedFile,
-              hrTimeEnd,
-            ),
-          );
-        }
+        compressedFiles.push(filePath);
       }
     }
     return compressedFiles;
   }
 
   /**
-   * File compression.
+   * Create workers for parallel compression..
    */
-  private async compressFile(
-    filename: string,
-    target: string,
-    outputDir: string | undefined,
-  ): Promise<Partial<CompressedFile>> {
-    let isCached = false;
-    let isSkipped = false;
-    const inputPath = path.join(target, filename);
-    if (outputDir) {
-      const isFileTarget = (await this.nativeFs.lstat(this.target)).isFile();
-      target = isFileTarget
-        ? outputDir
-        : path.join(outputDir, path.relative(this.target, target));
-      await Helpers.createFolders(target);
-    }
-    const outputPath = this.getOutputPath(target, filename);
+  private async createWorkers(): Promise<string[]> {
+    const files = await this.getFilesToCompress();
+    const cpus = Helpers.getCPUs();
+    const size = Math.ceil(files.length / cpus);
+    const chunks = Helpers.chunkArray(files, size);
+    const workers = chunks.map((chunk) => this.runCompressWorker(chunk));
+    const results = await Promise.all(workers);
+    console.log('worker results ', results);
+    return files;
+  }
 
-    if (this.options.skipCompressed) {
-      if (await this.nativeFs.exists(outputPath)) {
-        isSkipped = true;
-        return { isCached, isSkipped };
-      }
-    }
-
-    if (this.options.incremental) {
-      const checksum = await this.incremental.getFileChecksum(inputPath);
-      const { isChanged, fileId } = await this.incremental.setFile(
-        inputPath,
-        checksum,
-        this.compressionInstance.compressionOptions,
+  /**
+   * Run compress worker
+   */
+  async runCompressWorker(chunk: string[]): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(
+        path.resolve(__dirname, './Compress.worker.js'),
+        {
+          workerData: {
+            chunk,
+            target: this.target,
+            outputPath: this.outputPath,
+            options: this.options,
+            logger: this.logger,
+          },
+        },
       );
 
-      const cachedFile = path.resolve(
-        this.incremental.cacheFolder,
-        fileId as string,
-      );
-
-      if (isChanged) {
-        await this.nativeStream.pipeline(
-          fs.createReadStream(inputPath),
-          this.createCompression(),
-          fs.createWriteStream(outputPath),
-        );
-
-        await this.nativeStream.pipeline(
-          fs.createReadStream(outputPath),
-          fs.createWriteStream(cachedFile),
-        );
-      } else {
-        await this.nativeStream.pipeline(
-          fs.createReadStream(cachedFile),
-          fs.createWriteStream(outputPath),
-        );
-        isCached = true;
-      }
-    } else {
-      await this.nativeStream.pipeline(
-        fs.createReadStream(inputPath),
-        this.createCompression(),
-        fs.createWriteStream(outputPath),
-      );
-    }
-
-    if (this.options.verbose || this.options.removeLarger) {
-      const beforeSize = (await this.nativeFs.lstat(inputPath)).size;
-      const afterSize = (await this.nativeFs.lstat(outputPath)).size;
-
-      const removeCompressed =
-        this.options.removeLarger && beforeSize < afterSize;
-      if (removeCompressed) {
-        await this.nativeFs.unlink(outputPath);
-      }
-      return {
-        beforeSize,
-        afterSize,
-        isCached,
-        isSkipped,
-        removeCompressed,
-      };
-    }
-
-    return { isCached, isSkipped };
+      worker.once('message', (result) => {
+        worker.terminate();
+        resolve(result);
+      });
+      worker.on('error', (error) => reject(error));
+      worker.on('exit', (exitCode) => reject(exitCode));
+    });
   }
 
   /**
@@ -286,41 +210,6 @@ export class Compress {
     if (!this.options.outputFileFormat) {
       this.logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
     }
-  }
-
-  /**
-   * Get output path which is based on [outputFileFormat].
-   */
-  private getOutputPath(target: string, file: string): string {
-    const artifactsMap = new Map<string, string | null>([
-      ['[filename]', path.parse(file).name],
-      ['[ext]', path.extname(file).slice(1)],
-      ['[compressExt]', this.compressionInstance.ext],
-    ]);
-    let filename = `${artifactsMap.get('[filename]')}.${artifactsMap.get(
-      '[ext]',
-    )}.${artifactsMap.get('[compressExt]')}`;
-
-    if (this.options.outputFileFormat) {
-      artifactsMap.set('[hash]', null);
-
-      filename = this.options.outputFileFormat.replace(
-        OUTPUT_FILE_FORMAT_REGEXP,
-        (artifact) => {
-          if (artifactsMap.has(artifact)) {
-            // Need to generate hash only if we have appropriate param
-            if (artifact === '[hash]') {
-              artifactsMap.set('[hash]', v4());
-            }
-            return artifactsMap.get(artifact) as string;
-          } else {
-            return artifact;
-          }
-        },
-      );
-    }
-
-    return `${path.join(target, filename)}`;
   }
 
   /**
@@ -343,29 +232,5 @@ export class Compress {
     }
 
     return true;
-  }
-
-  /**
-   * Returns information message about compressed file (size, time, cache, etc.)
-   */
-  private getCompressedFileMsg(
-    file: string,
-    fileInfo: CompressedFile,
-    hrtime: [number, number],
-  ): string {
-    if (fileInfo.isSkipped) {
-      return `File ${file} has been skipped`;
-    }
-
-    const getSize = `${Helpers.readableSize(
-      fileInfo.beforeSize,
-    )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
-    return fileInfo.isCached
-      ? `File ${file} has been retrieved from the cache ${getSize} (${Helpers.readableHrtime(
-          hrtime,
-        )})`
-      : `File ${file} has been compressed ${getSize} (${Helpers.readableHrtime(
-          hrtime,
-        )})`;
   }
 }
