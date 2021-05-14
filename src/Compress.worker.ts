@@ -24,10 +24,10 @@ class CompressWorker {
     pipeline: util.promisify(stream.pipeline),
   };
   private readonly options: CompressOptions = workerData.options;
-  private readonly logger: Logger = workerData.logger;
   private readonly chunk: string[] = workerData.chunk;
   private readonly target: string = workerData.target;
   private readonly outputPath: string = workerData.outputPath;
+  private readonly logger: Logger;
   private readonly incremental = {
     getFileChecksum: (a: any) => a,
     setFile: (a: any, b: any, c: any) => a,
@@ -40,6 +40,7 @@ class CompressWorker {
     | GzipCompression;
 
   constructor() {
+    this.logger = new Logger(this.options.verbose as boolean);
     this.service = new CompressService(this.options);
     this.compressionInstance = this.service.getCompressionInstance();
   }
@@ -51,23 +52,23 @@ class CompressWorker {
     const createCompression = this.compressionInstance.getCompression();
     const filesList: string[] = [];
 
-    for (const file of this.chunk) {
+    for (const filePath of this.chunk) {
       const hrtimeStart = process.hrtime();
       const fileInfo = await this.compressFile(
-        file,
-        path.dirname(file),
+        path.basename(filePath),
+        path.dirname(filePath),
         createCompression,
       );
 
       if (!fileInfo.removeCompressed && !fileInfo.isSkipped) {
-        filesList.push(file);
+        filesList.push(filePath);
       }
 
       if (this.options.verbose) {
         const hrTimeEnd = process.hrtime(hrtimeStart);
         this.logger.log(
           this.getCompressedFileMsg(
-            file,
+            filePath,
             fileInfo as CompressedFile,
             hrTimeEnd,
           ),

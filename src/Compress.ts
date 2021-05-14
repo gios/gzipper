@@ -172,7 +172,6 @@ export class Compress {
             target: this.target,
             outputPath: this.outputPath,
             options: this.options,
-            logger: this.logger,
           },
         },
       );
