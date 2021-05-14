@@ -12,6 +12,7 @@ import { Logger } from './logger/Logger';
 import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
 import { DeflateCompression } from './compressions/Deflate';
+import { CompressService } from './Compress.service';
 
 class CompressWorker {
   private readonly nativeFs = {
@@ -27,6 +28,16 @@ class CompressWorker {
   private readonly chunk: string[] = workerData.chunk;
   private readonly target: string = workerData.target;
   private readonly outputPath: string = workerData.outputPath;
+  private readonly service: CompressService;
+  private readonly compressionInstance:
+    | BrotliCompression
+    | DeflateCompression
+    | GzipCompression;
+
+  constructor() {
+    this.service = new CompressService(this.options);
+    this.compressionInstance = this.service.getCompressionInstance();
+  }
 
   /**
    * Compress files list.

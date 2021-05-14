@@ -12,13 +12,13 @@ import {
   NO_PATH_MESSAGE,
   DEFAULT_OUTPUT_FORMAT_MESSAGE,
   INCREMENTAL_ENABLE_MESSAGE,
-  COMPRESSION_EXTENSIONS,
 } from './constants';
 import { CompressOptions } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
 import { LogLevel } from './logger/LogLevel.enum';
+import { CompressService } from './Compress.service';
 
 /**
  * Compressing files.
@@ -38,6 +38,7 @@ export class Compress {
     | GzipCompression
     | DeflateCompression;
   private readonly target: string;
+  private readonly service: CompressService;
 
   /**
    * Creates an instance of Compress.
@@ -62,7 +63,8 @@ export class Compress {
     }
     this.target = path.resolve(process.cwd(), target);
     this.options = options;
-    this.compressionInstance = this.getCompressionInstance();
+    this.service = new CompressService(this.options);
+    this.compressionInstance = this.service.getCompressionInstance();
   }
 
   /**
@@ -109,22 +111,6 @@ export class Compress {
   }
 
   /**
-   * Return compression instance.
-   */
-  private getCompressionInstance():
-    | BrotliCompression
-    | DeflateCompression
-    | GzipCompression {
-    if (this.options.brotli) {
-      return new BrotliCompression(this.options);
-    } else if (this.options.deflate) {
-      return new DeflateCompression(this.options);
-    } else {
-      return new GzipCompression(this.options);
-    }
-  }
-
-  /**
    * Returns available files to compress.
    */
   private async getFilesToCompress(target = this.target): Promise<string[]> {
@@ -148,7 +134,7 @@ export class Compress {
         compressedFiles.push(...(await this.getFilesToCompress(filePath)));
       } else if (
         fileStat.isFile() &&
-        this.isValidFileExtensions(path.extname(filePath).slice(1))
+        this.service.isValidFileExtensions(path.extname(filePath).slice(1))
       ) {
         if (fileStat.size < this.options.threshold) {
           continue;
@@ -176,7 +162,7 @@ export class Compress {
   /**
    * Run compress worker
    */
-  async runCompressWorker(chunk: string[]): Promise<string[]> {
+  private async runCompressWorker(chunk: string[]): Promise<string[]> {
     return new Promise((resolve, reject) => {
       const worker = new Worker(
         path.resolve(__dirname, './Compress.worker.js'),
@@ -212,27 +198,5 @@ export class Compress {
     if (!this.options.outputFileFormat) {
       this.logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
     }
-  }
-
-  /**
-   * Returns if the file extension is valid.
-   */
-  private isValidFileExtensions(ext: string): boolean {
-    if (COMPRESSION_EXTENSIONS.includes(ext)) {
-      return false;
-    }
-
-    const excludeExtensions = this.options.exclude;
-    const includeExtensions = this.options.include;
-
-    if (includeExtensions?.length) {
-      return includeExtensions.includes(ext);
-    }
-
-    if (excludeExtensions?.length) {
-      return !excludeExtensions.includes(ext);
-    }
-
-    return true;
   }
 }
