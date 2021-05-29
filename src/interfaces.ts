@@ -59,3 +59,12 @@ export interface IncrementalFileValueRevision {
 export interface IncrementalConfig {
   files: Record<string, IncrementalFileValue>;
 }
+
+export interface ConfigValueOf {
+  writableContent: FileConfig;
+}
+
+export interface IncrementalValueOf {
+  config: ConfigValueOf;
+  filePaths: Record<string, IncrementalFileValue>;
+}

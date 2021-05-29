@@ -2,23 +2,40 @@ import path from 'path';
 import util from 'util';
 import fs from 'fs';
 
-import { FileConfig } from './interfaces';
+import { ConfigValueOf, FileConfig } from './interfaces';
 import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
 
 export class Config {
-  readonly configFile: string;
   private readonly nativeFs = {
     writeFile: util.promisify(fs.writeFile),
   };
-  private readonly writableContent: FileConfig = {} as FileConfig;
+  private readonly _configFile: string;
+  private _writableContent: FileConfig = {} as FileConfig;
+
+  get configFile(): string {
+    return this._configFile;
+  }
+
+  set writableContent(value: FileConfig) {
+    this._writableContent = value;
+  }
 
   /**
    * Creates an instance of Config.
    */
   constructor() {
-    this.configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
+    this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
     this.setWritableContentProperty('version', Helpers.getVersion());
+  }
+
+  /**
+   * overridden valueOf method.
+   */
+  valueOf(): ConfigValueOf {
+    return {
+      writableContent: this._writableContent,
+    };
   }
 
   /**
@@ -28,14 +45,14 @@ export class Config {
     T extends keyof FileConfig,
     K extends FileConfig[T]
   >(field: T, content: K): void {
-    this.writableContent[field] = content;
+    this._writableContent[field] = content;
   }
 
   /**
    * delete property from config file (.gzipperconfig).
    */
   deleteWritableContentProperty<T extends keyof FileConfig>(field: T): void {
-    delete this.writableContent[field];
+    delete this._writableContent[field];
   }
 
   /**
@@ -43,8 +60,8 @@ export class Config {
    */
   async writeConfig(): Promise<void> {
     await this.nativeFs.writeFile(
-      path.resolve(this.configFile),
-      JSON.stringify(this.writableContent, null, 2),
+      path.resolve(this._configFile),
+      JSON.stringify(this._writableContent, null, 2),
     );
   }
 }

@@ -5,7 +5,11 @@ import util from 'util';
 import stream from 'stream';
 import path from 'path';
 
-import { CompressedFile, CompressOptions } from './interfaces';
+import {
+  CompressedFile,
+  CompressOptions,
+  IncrementalValueOf,
+} from './interfaces';
 import { OUTPUT_FILE_FORMAT_REGEXP } from './constants';
 import { Helpers } from './helpers';
 import { Logger } from './logger/Logger';
@@ -13,6 +17,8 @@ import { BrotliCompression } from './compressions/Brotli';
 import { GzipCompression } from './compressions/Gzip';
 import { DeflateCompression } from './compressions/Deflate';
 import { CompressService } from './Compress.service';
+import { Incremental } from './Incremental';
+import { Config } from './Config';
 
 class CompressWorker {
   private readonly nativeFs = {
@@ -27,12 +33,10 @@ class CompressWorker {
   private readonly chunk: string[] = workerData.chunk;
   private readonly target: string = workerData.target;
   private readonly outputPath: string = workerData.outputPath;
+  private readonly incrementalValueOf: IncrementalValueOf =
+    workerData.incremental;
   private readonly logger: Logger;
-  private readonly incremental = {
-    getFileChecksum: (a: any) => a,
-    setFile: (a: any, b: any, c: any) => a,
-    cacheFolder: 'aaa',
-  };
+  private readonly incremental!: Incremental;
   private readonly service: CompressService;
   private readonly compressionInstance:
     | BrotliCompression
@@ -40,15 +44,22 @@ class CompressWorker {
     | GzipCompression;
 
   constructor() {
+    if (this.options.incremental) {
+      const config = new Config();
+      config.writableContent = this.incrementalValueOf.config.writableContent;
+      this.incrementalValueOf.config.writableContent;
+      this.incremental = new Incremental(config);
+      this.incremental.filePaths = this.incrementalValueOf.filePaths;
+    }
     this.logger = new Logger(this.options.verbose as boolean);
     this.service = new CompressService(this.options);
     this.compressionInstance = this.service.getCompressionInstance();
   }
 
   /**
-   * Compress files list.
+   * Compress files list and returns files and incremental data.
    */
-  async compressFiles(): Promise<string[]> {
+  async compressFiles(): Promise<[string[], IncrementalValueOf]> {
     const createCompression = this.compressionInstance.getCompression();
     const filesList: string[] = [];
 
@@ -76,7 +87,7 @@ class CompressWorker {
       }
     }
 
-    return filesList;
+    return [filesList, this.incremental.valueOf()];
   }
 
   /**
@@ -232,6 +243,6 @@ class CompressWorker {
 const compressWorker = new CompressWorker();
 
 (async function () {
-  const files = await compressWorker.compressFiles();
-  parentPort?.postMessage(files);
+  const [files, incrementalValueOf] = await compressWorker.compressFiles();
+  parentPort?.postMessage([files, incrementalValueOf]);
 })();

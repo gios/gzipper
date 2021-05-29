@@ -14,7 +14,7 @@ import {
   INCREMENTAL_ENABLE_MESSAGE,
   WORKER_STARTED,
 } from './constants';
-import { CompressOptions } from './interfaces';
+import { CompressOptions, IncrementalValueOf } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
@@ -149,21 +149,22 @@ export class Compress {
   /**
    * Create workers for parallel compression.
    */
-  private async createWorkers(): Promise<string[]> {
+  private async createWorkers(): Promise<any> {
     const files = await this.getFilesToCompress();
     const cpus = Helpers.getCPUs();
     const size = Math.ceil(files.length / cpus);
     const chunks = Helpers.chunkArray(files, size);
     const workers = chunks.map((chunk) => this.runCompressWorker(chunk));
     const results = await Promise.all(workers);
-    console.log('worker results ', results);
-    return files;
+    return results;
   }
 
   /**
    * Run compress worker
    */
-  private async runCompressWorker(chunk: string[]): Promise<string[]> {
+  private async runCompressWorker(
+    chunk: string[],
+  ): Promise<[string[], IncrementalValueOf]> {
     return new Promise((resolve, reject) => {
       const worker = new Worker(
         path.resolve(__dirname, './Compress.worker.js'),
@@ -173,6 +174,7 @@ export class Compress {
             target: this.target,
             outputPath: this.outputPath,
             options: this.options,
+            incremental: this.options.incremental && this.incremental.valueOf(),
           },
         },
       );
