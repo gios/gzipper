@@ -14,7 +14,7 @@ import {
   INCREMENTAL_ENABLE_MESSAGE,
   WORKER_STARTED,
 } from './constants';
-import { CompressOptions, IncrementalValueOf } from './interfaces';
+import { CompressOptions, WorkerMessage } from './interfaces';
 import { DeflateCompression } from './compressions/Deflate';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
@@ -79,13 +79,16 @@ export class Compress {
         await Helpers.createFolders(this.outputPath);
       }
       if (this.options.incremental) {
+        await this.config.readConfig();
         this.logger.log(INCREMENTAL_ENABLE_MESSAGE, LogLevel.INFO);
         await this.incremental.initCacheFolder();
         await this.incremental.readConfig();
       }
       this.compressionLog();
       const hrtimeStart = process.hrtime();
-      files = await this.createWorkers();
+      const workersResponse = await this.createWorkers();
+      files = workersResponse.files;
+      this.incremental.filePaths = workersResponse.filePaths;
       hrtime = process.hrtime(hrtimeStart);
       if (this.options.incremental) {
         await this.incremental.updateConfig();
@@ -149,22 +152,31 @@ export class Compress {
   /**
    * Create workers for parallel compression.
    */
-  private async createWorkers(): Promise<any> {
+  private async createWorkers(): Promise<WorkerMessage> {
     const files = await this.getFilesToCompress();
     const cpus = Helpers.getCPUs();
     const size = Math.ceil(files.length / cpus);
     const chunks = Helpers.chunkArray(files, size);
     const workers = chunks.map((chunk) => this.runCompressWorker(chunk));
     const results = await Promise.all(workers);
-    return results;
+    return results.reduce(
+      (accumulator, value) => {
+        return {
+          files: [...accumulator.files, ...value.files],
+          filePaths: { ...accumulator.filePaths, ...value.filePaths },
+        };
+      },
+      {
+        files: [],
+        filePaths: {},
+      } as WorkerMessage,
+    );
   }
 
   /**
    * Run compress worker
    */
-  private async runCompressWorker(
-    chunk: string[],
-  ): Promise<[string[], IncrementalValueOf]> {
+  private async runCompressWorker(chunk: string[]): Promise<WorkerMessage> {
     return new Promise((resolve, reject) => {
       const worker = new Worker(
         path.resolve(__dirname, './Compress.worker.js'),

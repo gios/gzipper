@@ -9,16 +9,17 @@ import { Helpers } from './helpers';
 export class Config {
   private readonly nativeFs = {
     writeFile: util.promisify(fs.writeFile),
+    exists: util.promisify(fs.exists),
   };
   private readonly _configFile: string;
-  private _writableContent: FileConfig = {} as FileConfig;
+  private _configContent: FileConfig = {} as FileConfig;
 
-  get configFile(): string {
-    return this._configFile;
+  get configContent(): Readonly<FileConfig> {
+    return this._configContent;
   }
 
-  set writableContent(value: FileConfig) {
-    this._writableContent = value;
+  set configContent(value: Readonly<FileConfig>) {
+    this._configContent = value;
   }
 
   /**
@@ -26,7 +27,7 @@ export class Config {
    */
   constructor() {
     this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
-    this.setWritableContentProperty('version', Helpers.getVersion());
+    this.setProperty('version', Helpers.getVersion());
   }
 
   /**
@@ -34,25 +35,35 @@ export class Config {
    */
   valueOf(): ConfigValueOf {
     return {
-      writableContent: this._writableContent,
+      configContent: this._configContent,
     };
+  }
+
+  /**
+   * Read config (.gzipperconfig).
+   */
+  async readConfig(): Promise<void> {
+    if (await this.nativeFs.exists(this._configFile)) {
+      const response = await Helpers.readFile(this._configFile);
+      this._configContent = JSON.parse(response.toString());
+    }
   }
 
   /**
    * set additional data for property to config file (.gzipperconfig).
    */
-  setWritableContentProperty<
-    T extends keyof FileConfig,
-    K extends FileConfig[T]
-  >(field: T, content: K): void {
-    this._writableContent[field] = content;
+  setProperty<T extends keyof FileConfig, K extends FileConfig[T]>(
+    field: T,
+    content: K,
+  ): void {
+    this._configContent[field] = content;
   }
 
   /**
    * delete property from config file (.gzipperconfig).
    */
-  deleteWritableContentProperty<T extends keyof FileConfig>(field: T): void {
-    delete this._writableContent[field];
+  deleteProperty<T extends keyof FileConfig>(field: T): void {
+    delete this._configContent[field];
   }
 
   /**
@@ -61,7 +72,7 @@ export class Config {
   async writeConfig(): Promise<void> {
     await this.nativeFs.writeFile(
       path.resolve(this._configFile),
-      JSON.stringify(this._writableContent, null, 2),
+      JSON.stringify(this._configContent, null, 2),
     );
   }
 }

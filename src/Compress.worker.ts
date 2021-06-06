@@ -9,6 +9,7 @@ import {
   CompressedFile,
   CompressOptions,
   IncrementalValueOf,
+  WorkerMessage,
 } from './interfaces';
 import { OUTPUT_FILE_FORMAT_REGEXP } from './constants';
 import { Helpers } from './helpers';
@@ -46,8 +47,7 @@ class CompressWorker {
   constructor() {
     if (this.options.incremental) {
       const config = new Config();
-      config.writableContent = this.incrementalValueOf.config.writableContent;
-      this.incrementalValueOf.config.writableContent;
+      config.configContent = this.incrementalValueOf.config.configContent;
       this.incremental = new Incremental(config);
       this.incremental.filePaths = this.incrementalValueOf.filePaths;
     }
@@ -59,7 +59,7 @@ class CompressWorker {
   /**
    * Compress files list and returns files and incremental data.
    */
-  async compressFiles(): Promise<[string[], IncrementalValueOf]> {
+  async compressFiles(): Promise<WorkerMessage> {
     const createCompression = this.compressionInstance.getCompression();
     const filesList: string[] = [];
 
@@ -87,7 +87,10 @@ class CompressWorker {
       }
     }
 
-    return [filesList, this.incremental.valueOf()];
+    return {
+      files: filesList,
+      filePaths: this.incremental.valueOf().filePaths,
+    };
   }
 
   /**
@@ -243,6 +246,6 @@ class CompressWorker {
 const compressWorker = new CompressWorker();
 
 (async function () {
-  const [files, incrementalValueOf] = await compressWorker.compressFiles();
-  parentPort?.postMessage([files, incrementalValueOf]);
+  const { files, filePaths } = await compressWorker.compressFiles();
+  parentPort?.postMessage({ files, filePaths });
 })();

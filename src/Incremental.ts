@@ -7,12 +7,7 @@ import deepEqual from 'deep-equal';
 
 import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
-import {
-  Cache,
-  FileConfig,
-  IncrementalFileValue,
-  IncrementalValueOf,
-} from './interfaces';
+import { Cache, IncrementalFileValue, IncrementalValueOf } from './interfaces';
 import { Config } from './Config';
 
 export class Incremental implements Cache {
@@ -61,12 +56,9 @@ export class Incremental implements Cache {
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    if (await this.nativeFs.exists(this.config.configFile)) {
-      const response = await Helpers.readFile(this.config.configFile);
-      const data: FileConfig = JSON.parse(response.toString());
-      if (data.incremental) {
-        this._filePaths = new Map(Object.entries(data.incremental.files));
-      }
+    const incrementalConfig = this.config.configContent.incremental;
+    if (incrementalConfig) {
+      this._filePaths = new Map(Object.entries(incrementalConfig.files));
     }
   }
 
@@ -74,7 +66,7 @@ export class Incremental implements Cache {
    * update config (.gzipperconfig).
    */
   async updateConfig(): Promise<void> {
-    this.config.setWritableContentProperty('incremental', {
+    this.config.setProperty('incremental', {
       files: Helpers.mapToJSON(this._filePaths),
     });
   }
@@ -203,7 +195,7 @@ export class Incremental implements Cache {
     };
 
     await recursiveRemove();
-    this.config.deleteWritableContentProperty('incremental');
+    this.config.deleteProperty('incremental');
     await this.config.writeConfig();
   }
 
