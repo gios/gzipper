@@ -39,11 +39,11 @@ describe('CLI Cache -> Purge', () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    const deleteWritableContentPropertySpy = sinon.spy(
+    const deleteWritableContentPropertySpy = sinonSandbox.spy(
       (incremental as any).config,
-      'deleteWritableContentProperty',
+      'deleteProperty',
     );
-    const writeConfigSpy = sinon.spy(
+    const writeConfigSpy = sinonSandbox.spy(
       (incremental as any).config,
       'writeConfig',
     );
@@ -60,11 +60,11 @@ describe('CLI Cache -> Purge', () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    const deleteWritableContentPropertySpy = sinon.spy(
+    const deleteWritableContentPropertySpy = sinonSandbox.spy(
       (incremental as any).config,
-      'deleteWritableContentProperty',
+      'deleteProperty',
     );
-    const writeConfigSpy = sinon.spy(
+    const writeConfigSpy = sinonSandbox.spy(
       (incremental as any).config,
       'writeConfig',
     );

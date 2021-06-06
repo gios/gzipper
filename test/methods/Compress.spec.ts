@@ -77,7 +77,8 @@ describe('Methods Compress', () => {
     });
 
     it('should print time in seconds if operation takes more than 1000ms', async () => {
-      const MESSAGE_VALIDATION = /File amigo\.js has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \([1-9]\d*s \d+\.\d+ms\)/;
+      const MESSAGE_VALIDATION =
+        /File amigo\.js has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \([1-9]\d*s \d+\.\d+ms\)/;
       const compress = new Compress(COMPRESS_PATH, null);
       const message = (compress as any).getCompressedFileMsg(
         'amigo.js',
@@ -215,7 +216,8 @@ describe('Methods Compress', () => {
         outputFileFormat: 'iron-[hash]-[filename].[compressExt].[ext].[wrong]',
         threshold: 0,
       });
-      (compress as any).outputFileFormatRegexp = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)|(\[wrong\]*)/g;
+      (compress as any).outputFileFormatRegexp =
+        /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)|(\[wrong\]*)/g;
       const response = (compress as any).getOutputPath(
         path.resolve(process.cwd(), 'amigo'),
         'test.js',

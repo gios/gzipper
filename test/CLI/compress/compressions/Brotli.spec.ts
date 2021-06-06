@@ -2,7 +2,6 @@ import assert from 'assert';
 import sinon from 'sinon';
 import zlib from 'zlib';
 
-import { disableBrotli } from '../../../helpers';
 import { Compress } from '../../../../src/Compress';
 import {
   COMPRESS_PATH,
@@ -12,9 +11,7 @@ import {
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 
-const describeTest = disableBrotli ? describe.skip : describe;
-
-describeTest('CLI Compress -> Brotli compression', () => {
+describe('CLI Compress -> Brotli compression', () => {
   beforeEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
   });
