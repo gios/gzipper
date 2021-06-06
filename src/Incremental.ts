@@ -7,7 +7,7 @@ import deepEqual from 'deep-equal';
 
 import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
-import { Cache, IncrementalFileValue, IncrementalValueOf } from './interfaces';
+import { Cache, IncrementalFileValue } from './interfaces';
 import { Config } from './Config';
 
 export class Incremental implements Cache {
@@ -18,12 +18,16 @@ export class Incremental implements Cache {
     lstat: util.promisify(fs.lstat),
     rmdir: util.promisify(fs.rmdir),
   };
-  private readonly config: Config;
+  private readonly config!: Config;
   private readonly _cacheFolder: string;
   private _filePaths = new Map<string, IncrementalFileValue>();
 
   get cacheFolder(): string {
     return this._cacheFolder;
+  }
+
+  get filePaths(): Record<string, IncrementalFileValue> {
+    return Object.fromEntries(this._filePaths);
   }
 
   set filePaths(value: Record<string, IncrementalFileValue>) {
@@ -33,23 +37,15 @@ export class Incremental implements Cache {
   /**
    * Creates an instance of Incremental.
    */
-  constructor(config: Config) {
-    this.config = config;
+  constructor(config?: Config) {
+    if (config) {
+      this.config = config;
+    }
     this._cacheFolder = path.resolve(
       process.cwd(),
       CONFIG_FOLDER,
       CACHE_FOLDER,
     );
-  }
-
-  /**
-   * overridden valueOf method.
-   */
-  valueOf(): IncrementalValueOf {
-    return {
-      config: this.config.valueOf(),
-      filePaths: Object.fromEntries(this._filePaths),
-    };
   }
 
   /**

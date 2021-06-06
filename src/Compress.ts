@@ -186,7 +186,8 @@ export class Compress {
             target: this.target,
             outputPath: this.outputPath,
             options: this.options,
-            incremental: this.options.incremental && this.incremental.valueOf(),
+            incrementalFilePaths:
+              this.options.incremental && this.incremental.filePaths,
           },
         },
       );

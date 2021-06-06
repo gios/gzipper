@@ -2,7 +2,7 @@ import path from 'path';
 import util from 'util';
 import fs from 'fs';
 
-import { ConfigValueOf, FileConfig } from './interfaces';
+import { FileConfig } from './interfaces';
 import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
 
@@ -28,15 +28,6 @@ export class Config {
   constructor() {
     this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
     this.setProperty('version', Helpers.getVersion());
-  }
-
-  /**
-   * overridden valueOf method.
-   */
-  valueOf(): ConfigValueOf {
-    return {
-      configContent: this._configContent,
-    };
   }
 
   /**

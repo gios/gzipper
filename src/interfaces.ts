@@ -60,16 +60,7 @@ export interface IncrementalConfig {
   files: Record<string, IncrementalFileValue>;
 }
 
-export interface ConfigValueOf {
-  configContent: FileConfig;
-}
-
-export interface IncrementalValueOf {
-  config: ConfigValueOf;
-  filePaths: Record<string, IncrementalFileValue>;
-}
-
 export interface WorkerMessage {
   files: string[];
-  filePaths: IncrementalValueOf['filePaths'];
+  filePaths: Record<string, IncrementalFileValue>;
 }

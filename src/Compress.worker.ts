@@ -8,7 +8,7 @@ import path from 'path';
 import {
   CompressedFile,
   CompressOptions,
-  IncrementalValueOf,
+  IncrementalFileValue,
   WorkerMessage,
 } from './interfaces';
 import { OUTPUT_FILE_FORMAT_REGEXP } from './constants';
@@ -19,7 +19,6 @@ import { GzipCompression } from './compressions/Gzip';
 import { DeflateCompression } from './compressions/Deflate';
 import { CompressService } from './Compress.service';
 import { Incremental } from './Incremental';
-import { Config } from './Config';
 
 class CompressWorker {
   private readonly nativeFs = {
@@ -34,8 +33,8 @@ class CompressWorker {
   private readonly chunk: string[] = workerData.chunk;
   private readonly target: string = workerData.target;
   private readonly outputPath: string = workerData.outputPath;
-  private readonly incrementalValueOf: IncrementalValueOf =
-    workerData.incremental;
+  private readonly incrementalFilePaths: Record<string, IncrementalFileValue> =
+    workerData.incrementalFilePaths;
   private readonly logger: Logger;
   private readonly incremental!: Incremental;
   private readonly service: CompressService;
@@ -46,10 +45,8 @@ class CompressWorker {
 
   constructor() {
     if (this.options.incremental) {
-      const config = new Config();
-      config.configContent = this.incrementalValueOf.config.configContent;
-      this.incremental = new Incremental(config);
-      this.incremental.filePaths = this.incrementalValueOf.filePaths;
+      this.incremental = new Incremental();
+      this.incremental.filePaths = this.incrementalFilePaths;
     }
     this.logger = new Logger(this.options.verbose as boolean);
     this.service = new CompressService(this.options);
@@ -89,7 +86,7 @@ class CompressWorker {
 
     return {
       files: filesList,
-      filePaths: this.incremental.valueOf().filePaths,
+      filePaths: this.incremental.filePaths,
     };
   }
 
