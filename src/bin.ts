@@ -172,9 +172,7 @@ export class Index {
 
   private async cacheSize(): Promise<void> {
     const logger = new Logger(true);
-
-    const config = new Config();
-    const incremental = new Incremental(config);
+    const incremental = new Incremental();
 
     try {
       const size = await incremental.cacheSize();

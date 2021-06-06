@@ -179,7 +179,12 @@ export class Compress {
   private async runCompressWorker(chunk: string[]): Promise<WorkerMessage> {
     return new Promise((resolve, reject) => {
       const worker = new Worker(
-        path.resolve(__dirname, './Compress.worker.js'),
+        path.resolve(
+          __dirname,
+          process.env.NODE_ENV !== 'testing'
+            ? './Compress.worker.js'
+            : '../test/workers/Compress.worker.import.js',
+        ),
         {
           workerData: {
             chunk,

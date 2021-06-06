@@ -352,7 +352,7 @@ describe('CLI Compress', () => {
       assert.strictEqual(
         call.returnValue,
         path.join(
-          fullPath,
+          fullPath as string,
           `${filename}.${(compress as any).compressionInstance.ext}`,
         ),
       );
