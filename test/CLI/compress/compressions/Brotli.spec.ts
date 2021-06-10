@@ -28,11 +28,7 @@ describe('CLI Compress -> Brotli compression', () => {
       brotliQuality: 10,
       brotliSizeHint: 5,
       threshold: 0,
-      verbose: true,
     };
-    if (typeof zlib.createBrotliCompress !== 'function') {
-      return;
-    }
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinon.spy(Logger, 'log');
     await compress.run();
@@ -58,25 +54,13 @@ describe('CLI Compress -> Brotli compression', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual(
-      logSpy.withArgs(
-        sinon.match(
-          /File \w+\.\w+ has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \(.+\)/,
-        ),
-      ).callCount,
-      files.length,
-    );
-    assert.ok(
-      (compress as any).createCompression() instanceof
-        (zlib as any).BrotliCompress,
-    );
     assert.strictEqual((compress as any).compressionInstance.ext, 'br');
     assert.strictEqual(
       Object.keys((compress as any).compressionInstance.compressionOptions)
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 6);
+    assert.strictEqual(Object.keys((compress as any).options).length, 5);
     assert.strictEqual(
       (compress as any).compressionInstance.compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
