@@ -15,7 +15,7 @@ export function filter(): (
     descriptor.value = function (...args: [string, LogLevel]): unknown {
       const [, level] = args;
       const shouldLog =
-        (this as Logger).verbose ||
+        Logger.verbose ||
         level === LogLevel.ERROR ||
         level === LogLevel.WARNING ||
         level === LogLevel.SUCCESS;

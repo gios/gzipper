@@ -263,7 +263,7 @@ describe('Index CLI', () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
+    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
     const cachePurgeStub = sinonSandbox.stub(
       Incremental.prototype,
       'cachePurge',
@@ -280,7 +280,7 @@ describe('Index CLI', () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
+    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
     const cachePurgeStub = sinonSandbox.stub(
       Incremental.prototype,
       'cachePurge',
@@ -297,7 +297,7 @@ describe('Index CLI', () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
+    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
     const readableSizeStub = sinonSandbox.stub(Helpers, 'readableSize');
     const cachePurgeStub = sinonSandbox.stub(
       Incremental.prototype,
@@ -318,7 +318,7 @@ describe('Index CLI', () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
+    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
     const cachePurgeStub = sinonSandbox.stub(
       Incremental.prototype,
       'cachePurge',
@@ -337,7 +337,7 @@ describe('Index CLI', () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger.prototype, 'log');
+    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
     const cachePurgeStub = sinonSandbox
       .stub(Incremental.prototype, 'cachePurge')
       .throws('Error');

@@ -35,7 +35,6 @@ class CompressWorker {
   private readonly outputPath: string = workerData.outputPath;
   private readonly incrementalFilePaths: Record<string, IncrementalFileValue> =
     workerData.incrementalFilePaths;
-  private readonly logger: Logger;
   private readonly incremental!: Incremental;
   private readonly service: CompressService;
   private readonly compressionInstance:
@@ -48,7 +47,7 @@ class CompressWorker {
       this.incremental = new Incremental();
       this.incremental.filePaths = this.incrementalFilePaths;
     }
-    this.logger = new Logger(this.options.verbose as boolean);
+    Logger.setVerboseMode(this.options.verbose as boolean);
     this.service = new CompressService(this.options);
     this.compressionInstance = this.service.getCompressionInstance();
   }
@@ -74,7 +73,7 @@ class CompressWorker {
 
       if (this.options.verbose) {
         const hrTimeEnd = process.hrtime(hrtimeStart);
-        this.logger.log(
+        Logger.log(
           this.getCompressedFileMsg(
             filePath,
             fileInfo as CompressedFile,

@@ -29,7 +29,6 @@ export class Compress {
     lstat: util.promisify(fs.lstat),
     readdir: util.promisify(fs.readdir),
   };
-  private readonly logger: Logger;
   private readonly incremental!: Incremental;
   private readonly config: Config;
   private readonly options: CompressOptions;
@@ -49,11 +48,11 @@ export class Compress {
     outputPath?: string | null,
     options: CompressOptions = {} as never,
   ) {
-    this.logger = new Logger(options.verbose as boolean);
+    Logger.setVerboseMode(options.verbose as boolean);
     this.config = new Config();
     if (!target) {
       const message = NO_PATH_MESSAGE;
-      this.logger.log(message, LogLevel.ERROR);
+      Logger.log(message, LogLevel.ERROR);
       throw new Error(message);
     }
     if (outputPath) {
@@ -80,7 +79,7 @@ export class Compress {
       }
       if (this.options.incremental) {
         await this.config.readConfig();
-        this.logger.log(INCREMENTAL_ENABLE_MESSAGE, LogLevel.INFO);
+        Logger.log(INCREMENTAL_ENABLE_MESSAGE, LogLevel.INFO);
         await this.incremental.initCacheFolder();
         await this.incremental.readConfig();
       }
@@ -95,20 +94,20 @@ export class Compress {
         await this.config.writeConfig();
       }
     } catch (error) {
-      this.logger.log(error, LogLevel.ERROR);
+      Logger.log(error, LogLevel.ERROR);
       throw new Error(error.message);
     }
 
     const filesCount = files.length;
     if (filesCount) {
-      this.logger.log(
+      Logger.log(
         `${filesCount} ${
           filesCount > 1 ? 'files have' : 'file has'
         } been compressed. (${Helpers.readableHrtime(hrtime)})`,
         LogLevel.SUCCESS,
       );
     } else {
-      this.logger.log(NO_FILES_MESSAGE, LogLevel.WARNING);
+      Logger.log(NO_FILES_MESSAGE, LogLevel.WARNING);
     }
 
     return files;
@@ -173,7 +172,7 @@ export class Compress {
         } as WorkerMessage,
       );
     } catch (error) {
-      this.logger.log(error.message, LogLevel.ERROR);
+      Logger.log(error.message, LogLevel.ERROR);
       throw new Error(error);
     }
   }
@@ -203,10 +202,7 @@ export class Compress {
       );
 
       worker.on('online', () => {
-        this.logger.log(
-          `[${worker.threadId}] ${WORKER_STARTED}`,
-          LogLevel.INFO,
-        );
+        Logger.log(`[${worker.threadId}] ${WORKER_STARTED}`, LogLevel.INFO);
       });
 
       worker.once('message', (result) => {
@@ -226,10 +222,10 @@ export class Compress {
    */
   private compressionLog(): void {
     const options = this.compressionInstance.readableOptions();
-    this.logger.log(`Compression ${options}`, LogLevel.INFO);
+    Logger.log(`Compression ${options}`, LogLevel.INFO);
 
     if (!this.options.outputFileFormat) {
-      this.logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
+      Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
     }
   }
 }

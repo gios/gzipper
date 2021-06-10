@@ -155,35 +155,35 @@ export class Index {
   }
 
   private async cachePurge(): Promise<void> {
-    const logger = new Logger(true);
+    Logger.setVerboseMode(true);
     const config = new Config();
     const incremental = new Incremental(config);
 
     try {
       await incremental.cachePurge();
-      logger.log(
+      Logger.log(
         'Cache has been purged, you are free to initialize a new one.',
         LogLevel.SUCCESS,
       );
     } catch (err) {
-      logger.log(err, LogLevel.ERROR);
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 
   private async cacheSize(): Promise<void> {
-    const logger = new Logger(true);
+    Logger.setVerboseMode(true);
     const incremental = new Incremental();
 
     try {
       const size = await incremental.cacheSize();
-      logger.log(
+      Logger.log(
         size
           ? `Cache size is ${Helpers.readableSize(size)}`
           : `Cache is empty, initialize a new one with --incremental option.`,
         LogLevel.INFO,
       );
     } catch (err) {
-      logger.log(err, LogLevel.ERROR);
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -192,7 +192,7 @@ export class Index {
     outputPath: string,
     options: CompressOptions,
   ): Promise<void> {
-    const logger = new Logger(true);
+    Logger.setVerboseMode(true);
     const compress = new Compress(
       target,
       outputPath,
@@ -202,7 +202,7 @@ export class Index {
     try {
       await compress.run();
     } catch (err) {
-      logger.log(err, LogLevel.ERROR);
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 
