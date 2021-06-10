@@ -88,9 +88,9 @@ export class Compress {
       const hrtimeStart = process.hrtime();
       const workersResponse = await this.createWorkers();
       files = workersResponse.files;
-      this.incremental.filePaths = workersResponse.filePaths;
       hrtime = process.hrtime(hrtimeStart);
       if (this.options.incremental) {
+        this.incremental.filePaths = workersResponse.filePaths;
         await this.incremental.updateConfig();
         await this.config.writeConfig();
       }
@@ -158,19 +158,24 @@ export class Compress {
     const size = Math.ceil(files.length / cpus);
     const chunks = Helpers.chunkArray(files, size);
     const workers = chunks.map((chunk) => this.runCompressWorker(chunk));
-    const results = await Promise.all(workers);
-    return results.reduce(
-      (accumulator, value) => {
-        return {
-          files: [...accumulator.files, ...value.files],
-          filePaths: { ...accumulator.filePaths, ...value.filePaths },
-        };
-      },
-      {
-        files: [],
-        filePaths: {},
-      } as WorkerMessage,
-    );
+    try {
+      const results = await Promise.all(workers);
+      return results.reduce(
+        (accumulator, value) => {
+          return {
+            files: [...accumulator.files, ...value.files],
+            filePaths: { ...accumulator.filePaths, ...value.filePaths },
+          };
+        },
+        {
+          files: [],
+          filePaths: {},
+        } as WorkerMessage,
+      );
+    } catch (error) {
+      this.logger.log(error.message, LogLevel.ERROR);
+      throw new Error(error);
+    }
   }
 
   /**

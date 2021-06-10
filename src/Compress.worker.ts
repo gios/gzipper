@@ -86,7 +86,7 @@ class CompressWorker {
 
     return {
       files: filesList,
-      filePaths: this.incremental.filePaths,
+      filePaths: this.incremental?.filePaths,
     };
   }
 
