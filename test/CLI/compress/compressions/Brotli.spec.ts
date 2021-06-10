@@ -12,16 +12,21 @@ import {
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 
-describe('CLI Compress -> Brotli compression', () => {
+describe.only('CLI Compress -> Brotli compression', () => {
+  let sinonSandbox: sinon.SinonSandbox;
+
   beforeEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    sinonSandbox = sinon.createSandbox();
   });
 
   afterEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    sinonSandbox.restore();
+    sinon.restore();
   });
 
-  it.only('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration with --verbose', async () => {
+  it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration with --verbose', async () => {
     const options = {
       brotli: true,
       brotliParamMode: 'text',
@@ -30,7 +35,7 @@ describe('CLI Compress -> Brotli compression', () => {
       threshold: 0,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy(Logger, 'log');
+    const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
@@ -48,7 +53,7 @@ describe('CLI Compress -> Brotli compression', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -91,7 +96,7 @@ describe('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
@@ -103,15 +108,11 @@ describe('CLI Compress -> Brotli compression', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
-    );
-    assert.ok(
-      (compress as any).createCompression() instanceof
-        (zlib as any).BrotliCompress,
     );
     assert.strictEqual((compress as any).compressionInstance.ext, 'br');
     assert.strictEqual(
@@ -138,7 +139,7 @@ describe('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
@@ -150,15 +151,11 @@ describe('CLI Compress -> Brotli compression', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
-    );
-    assert.ok(
-      (compress as any).createCompression() instanceof
-        (zlib as any).BrotliCompress,
     );
     assert.strictEqual((compress as any).compressionInstance.ext, 'br');
     assert.strictEqual(
@@ -185,7 +182,7 @@ describe('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.br']);
 
@@ -197,15 +194,11 @@ describe('CLI Compress -> Brotli compression', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
-    );
-    assert.ok(
-      (compress as any).createCompression() instanceof
-        (zlib as any).BrotliCompress,
     );
     assert.strictEqual((compress as any).compressionInstance.ext, 'br');
     assert.strictEqual(
