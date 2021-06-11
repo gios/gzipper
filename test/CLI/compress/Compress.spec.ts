@@ -287,7 +287,7 @@ describe('CLI Compress', () => {
     }
   });
 
-  it.only('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
+  it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
     const options = {
       outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
       threshold: 0,
@@ -310,7 +310,7 @@ describe('CLI Compress', () => {
     }
   });
 
-  it.only('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
+  it('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
     const options = {
       outputFileFormat: '[filename]-[hash]-55.[ext]',
       threshold: 0,
@@ -324,16 +324,15 @@ describe('CLI Compress', () => {
     for (const file of files) {
       const fileExt = path.extname(file);
       const fileName = path.basename(file, fileExt);
-
-      const execHash = new RegExp(`(?<=${fileName}-)(.*)(?=-55)`, 'g').exec(
-        fileName,
-      ) as RegExpExecArray;
-      const output = `${fileName}-${execHash[0]}-55${fileExt}`;
-      assert.ok(compressedFilesNames.includes(output));
+      assert.ok(
+        compressedFilesNames.find((file) =>
+          new RegExp(`${fileName}-.*-55${fileExt}`, 'g').test(file),
+        ),
+      );
     }
   });
 
-  it('should --include specific file extensions for compression (also exclude others)', async () => {
+  it.only('should --include specific file extensions for compression (also exclude others)', async () => {
     const options = {
       include: ['sunny'],
       threshold: 0,
