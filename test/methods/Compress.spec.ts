@@ -11,7 +11,7 @@ import { COMPRESS_PATH, RESOURCES_FOLDER_PATH } from '../utils';
 import { Compress } from '../../src/Compress';
 import { LogLevel } from '../../src/logger/LogLevel.enum';
 
-describe('Methods Compress', () => {
+describe.skip('Methods Compress', () => {
   describe('compress', () => {
     let sinonSandbox: sinon.SinonSandbox;
 

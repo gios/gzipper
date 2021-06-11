@@ -12,7 +12,7 @@ import {
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 
-describe.only('CLI Compress -> Brotli compression', () => {
+describe('CLI Compress -> Brotli compression', () => {
   let sinonSandbox: sinon.SinonSandbox;
 
   beforeEach(async () => {
@@ -26,7 +26,7 @@ describe.only('CLI Compress -> Brotli compression', () => {
     sinon.restore();
   });
 
-  it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration with --verbose', async () => {
+  it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
     const options = {
       brotli: true,
       brotliParamMode: 'text',
