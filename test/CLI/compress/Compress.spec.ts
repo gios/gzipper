@@ -245,13 +245,13 @@ describe('CLI Compress', () => {
     assert.strictEqual(Object.keys((compress as any).options).length, 0);
   });
 
-  it.only('should use default file format artifacts via --output-file-format', async () => {
+  it('should use default file format artifacts via --output-file-format', async () => {
     const options = { threshold: 0 };
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinonSandbox.spy(Logger, 'log');
-    const getOutputPathSpy = sinonSandbox.spy(compress, 'getOutputPath' as any);
+    const files = await getFiles(COMPRESS_PATH);
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.gz']);
+    const compressedFiles = await getFiles(COMPRESS_PATH, ['.gz']);
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
@@ -263,35 +263,30 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinonSandbox.match(
-          new RegExp(`${files.length} files have been compressed. (.+)`),
+          new RegExp(
+            `${compressedFiles.length} files have been compressed. (.+)`,
+          ),
         ),
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual(getOutputPathSpy.callCount, files.length);
     assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
     assert.strictEqual(
       Object.keys((compress as any).compressionInstance.compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
     assert.strictEqual((compress as any).options.outputFileFormat, undefined);
 
-    for (let index = 0; index < getOutputPathSpy.callCount; index++) {
-      const call = getOutputPathSpy.getCall(index);
-      const [fullPath, filename] = call.args;
-      assert.strictEqual(
-        call.returnValue,
-        path.join(
-          fullPath as string,
-          `${filename}.${(compress as any).compressionInstance.ext}`,
-        ),
-      );
+    for (const [index, compressedFile] of compressedFiles.entries()) {
+      const compressedFileName = path.basename(compressedFile, '.gz');
+      const fileName = path.basename(files[index]);
+      assert.strictEqual(fileName, compressedFileName);
     }
   });
 
-  it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
+  it.only('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
     const options = {
       outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
       threshold: 0,
