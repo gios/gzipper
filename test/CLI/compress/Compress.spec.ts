@@ -39,14 +39,14 @@ describe('CLI Compress', () => {
     sinon.restore();
   });
 
-  async function validateOutputPathOptions(
+  async function validateOutputFileFormat(
     options: CompressOptions,
-  ): Promise<[Compress, sinon.SinonSpy]> {
+  ): Promise<[Compress, string[], string[]]> {
     const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
-    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
-    const getOutputPathSpy = sinonSandbox.spy(compress, 'getOutputPath' as any);
+    const logSpy = sinonSandbox.spy(Logger, 'log');
+    const files = await getFiles(COMPRESS_PATH);
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH_TARGET);
+    const compressedFiles = await getFiles(COMPRESS_PATH_TARGET);
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
@@ -58,12 +58,13 @@ describe('CLI Compress', () => {
     assert.ok(
       logSpy.calledWithExactly(
         sinonSandbox.match(
-          new RegExp(`${files.length} files have been compressed. (.+)`),
+          new RegExp(
+            `${compressedFiles.length} files have been compressed. (.+)`,
+          ),
         ),
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual(getOutputPathSpy.callCount, files.length);
     assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
     assert.strictEqual(
       Object.keys((compress as any).compressionInstance.compressionOptions)
@@ -76,7 +77,7 @@ describe('CLI Compress', () => {
       options.outputFileFormat,
     );
 
-    return [compress, getOutputPathSpy];
+    return [compress, files, compressedFiles];
   }
 
   it('should throw an error if no path found', () => {
@@ -292,47 +293,43 @@ describe('CLI Compress', () => {
       threshold: 0,
     };
 
-    const [compress, getOutputPathSpy] = await validateOutputPathOptions(
+    const [compress, files, compressedFiles] = await validateOutputFileFormat(
       options,
     );
+    const compressedFilesNames = compressedFiles.map((file) =>
+      path.basename(file),
+    );
 
-    for (let index = 0; index < getOutputPathSpy.callCount; index++) {
-      const call = getOutputPathSpy.getCall(index);
-      const [fullPath, file] = call.args;
-      const filename = path.parse(file).name;
-      const ext = path.extname(file).slice(1);
-      assert.strictEqual(
-        call.returnValue,
-        path.join(
-          fullPath,
-          `test-${filename}-55-${filename}.${
-            (compress as any).compressionInstance.ext
-          }x.${ext}`,
-        ),
-      );
+    for (const file of files) {
+      const fileExt = path.extname(file);
+      const fileName = path.basename(file, fileExt);
+      const output = `test-${fileName}-55-${fileName}.${
+        (compress as any).compressionInstance.ext
+      }x${fileExt}`;
+      assert.ok(compressedFilesNames.includes(output));
     }
   });
 
-  it('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
+  it.only('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
     const options = {
       outputFileFormat: '[filename]-[hash]-55.[ext]',
       threshold: 0,
     };
 
-    const [, getOutputPathSpy] = await validateOutputPathOptions(options);
+    const [, files, compressedFiles] = await validateOutputFileFormat(options);
+    const compressedFilesNames = compressedFiles.map((file) =>
+      path.basename(file),
+    );
 
-    for (let index = 0; index < getOutputPathSpy.callCount; index++) {
-      const call = getOutputPathSpy.getCall(index);
-      const [fullPath, file] = call.args;
-      const filename = path.parse(file).name;
-      const ext = path.extname(file).slice(1);
-      const execHash = new RegExp(`(?<=${filename}-)(.*)(?=-55)`, 'g').exec(
-        call.returnValue,
+    for (const file of files) {
+      const fileExt = path.extname(file);
+      const fileName = path.basename(file, fileExt);
+
+      const execHash = new RegExp(`(?<=${fileName}-)(.*)(?=-55)`, 'g').exec(
+        fileName,
       ) as RegExpExecArray;
-      assert.strictEqual(
-        call.returnValue,
-        path.join(fullPath, `${filename}-${execHash[0]}-55.${ext}`),
-      );
+      const output = `${fileName}-${execHash[0]}-55${fileExt}`;
+      assert.ok(compressedFilesNames.includes(output));
     }
   });
 
