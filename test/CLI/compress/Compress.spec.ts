@@ -18,51 +18,9 @@ import {
 import { CompressOptions } from '../../../src/interfaces';
 import { NO_FILES_MESSAGE } from '../../../src/constants';
 import { LogLevel } from '../../../src/logger/LogLevel.enum';
+import { Logger } from '../../../src/logger/Logger';
 
 const fsLstat = util.promisify(fs.lstat);
-
-async function validateOutputPathOptions(
-  options: CompressOptions,
-): Promise<[Compress, sinon.SinonSpy]> {
-  const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
-  const logSpy = sinon.spy((compress as any).logger, 'log');
-  const getOutputPathSpy = sinon.spy(compress, 'getOutputPath' as any);
-  await compress.run();
-  const files = await getFiles(COMPRESS_PATH_TARGET);
-
-  assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
-  assert.ok(
-    logSpy.neverCalledWith(
-      'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO,
-    ),
-  );
-  assert.ok(
-    logSpy.calledWithExactly(
-      sinon.match(
-        new RegExp(`${files.length} files have been compressed. (.+)`),
-      ),
-      LogLevel.SUCCESS,
-    ),
-  );
-  assert.strictEqual(getOutputPathSpy.callCount, files.length);
-  assert.ok(
-    (compress as any).createCompression() instanceof (zlib as any).Gzip,
-  );
-  assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
-  assert.strictEqual(
-    Object.keys((compress as any).compressionInstance.compressionOptions)
-      .length,
-    0,
-  );
-  assert.strictEqual(Object.keys((compress as any).options).length, 2);
-  assert.strictEqual(
-    (compress as any).options.outputFileFormat,
-    options.outputFileFormat,
-  );
-
-  return [compress, getOutputPathSpy];
-}
 
 describe('CLI Compress', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -82,6 +40,49 @@ describe('CLI Compress', () => {
     sinon.restore();
   });
 
+  async function validateOutputPathOptions(
+    options: CompressOptions,
+  ): Promise<[Compress, sinon.SinonSpy]> {
+    const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
+    const getOutputPathSpy = sinonSandbox.spy(compress, 'getOutputPath' as any);
+    await compress.run();
+    const files = await getFiles(COMPRESS_PATH_TARGET);
+
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
+    assert.ok(
+      logSpy.neverCalledWith(
+        'Default output file format: [filename].[ext].[compressExt]',
+        LogLevel.INFO,
+      ),
+    );
+    assert.ok(
+      logSpy.calledWithExactly(
+        sinonSandbox.match(
+          new RegExp(`${files.length} files have been compressed. (.+)`),
+        ),
+        LogLevel.SUCCESS,
+      ),
+    );
+    assert.strictEqual(getOutputPathSpy.callCount, files.length);
+    assert.ok(
+      (compress as any).createCompression() instanceof (zlib as any).Gzip,
+    );
+    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual(
+      Object.keys((compress as any).compressionInstance.compressionOptions)
+        .length,
+      0,
+    );
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(
+      (compress as any).options.outputFileFormat,
+      options.outputFileFormat,
+    );
+
+    return [compress, getOutputPathSpy];
+  }
+
   it('should throw an error if no path found', () => {
     try {
       new Compress(null as any, null);
@@ -93,13 +94,10 @@ describe('CLI Compress', () => {
 
   it('should throw on compress error', async () => {
     const compress = new Compress(COMPRESS_PATH, null);
-    const compressFolderRecursivelySpy = sinon.spy(
-      compress,
-      'compressFolderRecursively' as any,
-    );
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const createWorkersSpy = sinonSandbox.spy(compress, 'createWorkers' as any);
+    const logSpy = sinonSandbox.spy(Logger, 'log');
     sinonSandbox
-      .stub(compress, 'compressFile' as any)
+      .stub(compress, 'runCompressWorker' as any)
       .rejects(new Error('Compressing error.'));
 
     try {
@@ -107,15 +105,18 @@ describe('CLI Compress', () => {
     } catch (err) {
       assert.ok(err instanceof Error);
       assert.strictEqual(err.message, 'Compressing error.');
-      assert.ok(compressFolderRecursivelySpy.calledWithExactly(COMPRESS_PATH));
+      assert.ok(createWorkersSpy.calledOnce);
       assert.ok(
-        logSpy.calledWithExactly(sinon.match.instanceOf(Error), LogLevel.ERROR),
+        logSpy.calledWithExactly(
+          sinonSandbox.match.instanceOf(Error),
+          LogLevel.ERROR,
+        ),
       );
       assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     }
   });
 
-  it('should print message about appropriate files', async () => {
+  it.only('should print message about appropriate files', async () => {
     const options = {
       threshold: 0,
       exclude: [
@@ -138,7 +139,7 @@ describe('CLI Compress', () => {
       ],
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
@@ -157,7 +158,7 @@ describe('CLI Compress', () => {
 
   it('should print message about empty folder', async () => {
     const compress = new Compress(EMPTY_FOLDER_PATH, null);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
@@ -177,7 +178,7 @@ describe('CLI Compress', () => {
   it('--verbose should print logs to console and use default configuration', async () => {
     const options = { verbose: true, threshold: 0 };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.gz']);
 
@@ -190,7 +191,7 @@ describe('CLI Compress', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -198,7 +199,7 @@ describe('CLI Compress', () => {
     );
     assert.strictEqual(
       logSpy.withArgs(
-        sinon.match(
+        sinonSandbox.match(
           /File \w+\.\w+ has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \(.+\)/,
         ),
       ).callCount,
@@ -219,7 +220,7 @@ describe('CLI Compress', () => {
   it('should compress a single file to a certain folder', async () => {
     const file = `${COMPRESS_PATH}${path.sep}index.txt`;
     const compress = new Compress(file, COMPRESS_PATH_TARGET);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
     const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
 
@@ -232,7 +233,7 @@ describe('CLI Compress', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(/1 file has been compressed\. \(.+\)/),
+        sinonSandbox.match(/1 file has been compressed\. \(.+\)/),
         LogLevel.SUCCESS,
       ),
     );
@@ -251,7 +252,7 @@ describe('CLI Compress', () => {
 
   it('should compress files to a certain folder with existing folder structure', async () => {
     const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH);
     const compressedFiles = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
@@ -272,7 +273,7 @@ describe('CLI Compress', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -305,8 +306,8 @@ describe('CLI Compress', () => {
   it('should use default file format artifacts via --output-file-format and print to console via --verbose flag', async () => {
     const options = { verbose: true, threshold: 0 };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
-    const getOutputPathSpy = sinon.spy(compress, 'getOutputPath' as any);
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
+    const getOutputPathSpy = sinonSandbox.spy(compress, 'getOutputPath' as any);
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.gz']);
 
@@ -319,7 +320,7 @@ describe('CLI Compress', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -327,7 +328,7 @@ describe('CLI Compress', () => {
     );
     assert.strictEqual(
       logSpy.withArgs(
-        sinon.match(
+        sinonSandbox.match(
           /File \w+\.\w+ has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \(.+\)/,
         ),
       ).callCount,
@@ -415,14 +416,14 @@ describe('CLI Compress', () => {
       threshold: 0,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.gz']);
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} file has been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -451,14 +452,14 @@ describe('CLI Compress', () => {
       return !(ext === '.jpeg' || ext === '.jpg');
     });
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.gz']);
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -486,7 +487,7 @@ describe('CLI Compress', () => {
 
     const filesBefore = await getFiles(COMPRESS_PATH, ['.gz']);
 
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
 
     const filesAfter = await getFiles(COMPRESS_PATH, ['.gz']);
@@ -494,7 +495,7 @@ describe('CLI Compress', () => {
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${filesAfter.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -528,14 +529,14 @@ describe('CLI Compress', () => {
       ++includedFiles;
     }
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
     const filesGzipped = await getFiles(COMPRESS_PATH, ['.gz']);
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${filesGzipped.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -560,14 +561,14 @@ describe('CLI Compress', () => {
       threshold: 0,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.gz']);
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
@@ -596,7 +597,7 @@ describe('CLI Compress', () => {
 
     const filesBefore = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
 
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
 
     const filesAfter = await getFiles(COMPRESS_PATH_TARGET, ['.gz']);
@@ -628,7 +629,7 @@ describe('CLI Compress', () => {
 
     const filesBefore = await getFiles(COMPRESS_PATH, ['.gz']);
 
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
 
     const filesAfter = await getFiles(COMPRESS_PATH, ['.gz']);
@@ -661,7 +662,7 @@ describe('CLI Compress', () => {
 
     const filesBefore = await getFiles(COMPRESS_PATH, ['.gz']);
 
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy((compress as any).logger, 'log');
     await compress.run();
 
     const filesAfter = await getFiles(COMPRESS_PATH, ['.gz']);
@@ -671,7 +672,8 @@ describe('CLI Compress', () => {
       logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
     );
     assert.strictEqual(
-      logSpy.withArgs(sinon.match(/File \w+\.\w+ has been skipped/)).callCount,
+      logSpy.withArgs(sinonSandbox.match(/File \w+\.\w+ has been skipped/))
+        .callCount,
       filesAfter.length,
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);

@@ -173,7 +173,7 @@ export class Compress {
       );
     } catch (error) {
       Logger.log(error.message, LogLevel.ERROR);
-      throw new Error(error);
+      throw new Error(error.message);
     }
   }
 
