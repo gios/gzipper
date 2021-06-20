@@ -83,4 +83,25 @@ export class Helpers {
   static getCPUs(): number {
     return os.cpus().length;
   }
+
+  /**
+   * Filter object by predicate.
+   */
+  static filterObject<T>(
+    obj: T,
+    predicate: (key: string, item: T[Extract<keyof T, string>]) => boolean,
+  ): T {
+    const result = {} as T;
+
+    for (const key in obj) {
+      if (
+        Object.prototype.hasOwnProperty.call(obj, key) &&
+        predicate(key, obj[key])
+      ) {
+        result[key] = obj[key];
+      }
+    }
+
+    return result;
+  }
 }

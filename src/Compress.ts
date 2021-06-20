@@ -196,7 +196,10 @@ export class Compress {
             outputPath: this.outputPath,
             options: this.options,
             incrementalFilePaths:
-              this.options.incremental && this.incremental.filePaths,
+              this.options.incremental &&
+              Helpers.filterObject(this.incremental.filePaths, (key) =>
+                chunk.includes(key),
+              ),
           },
         },
       );
