@@ -1,5 +1,6 @@
 import fs from 'fs';
 import util from 'util';
+import os from 'os';
 
 import * as pack from '../package.json';
 
@@ -63,5 +64,44 @@ export class Helpers {
       stream.on('end', () => resolve(data));
       stream.on('error', (err) => reject(err));
     });
+  }
+
+  /**
+   * Splits array into equal chunks.
+   */
+  static chunkArray<T>(array: T[], size: number): T[][] {
+    const result = [];
+    for (let i = 0; i < array.length; i += size) {
+      result.push(array.slice(i, i + size));
+    }
+    return result;
+  }
+
+  /**
+   * Returns number of CPU cores.
+   */
+  static getCPUs(): number {
+    return os.cpus().length;
+  }
+
+  /**
+   * Filter object by predicate.
+   */
+  static filterObject<T>(
+    obj: T,
+    predicate: (key: string, item: T[Extract<keyof T, string>]) => boolean,
+  ): T {
+    const result = {} as T;
+
+    for (const key in obj) {
+      if (
+        Object.prototype.hasOwnProperty.call(obj, key) &&
+        predicate(key, obj[key])
+      ) {
+        result[key] = obj[key];
+      }
+    }
+
+    return result;
   }
 }

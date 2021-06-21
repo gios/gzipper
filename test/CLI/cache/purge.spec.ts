@@ -32,18 +32,18 @@ describe('CLI Cache -> Purge', () => {
   });
 
   it('should purge cache if exists', async () => {
-    const options = { threshold: 0, incremental: true };
+    const options = { threshold: 0, incremental: true, workers: 1 };
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const compress = new Compress(COMPRESS_PATH, null, options);
     await compress.run();
     const config = new Config();
     const incremental = new Incremental(config);
 
-    const deleteWritableContentPropertySpy = sinon.spy(
+    const deleteWritableContentPropertySpy = sinonSandbox.spy(
       (incremental as any).config,
-      'deleteWritableContentProperty',
+      'deleteProperty',
     );
-    const writeConfigSpy = sinon.spy(
+    const writeConfigSpy = sinonSandbox.spy(
       (incremental as any).config,
       'writeConfig',
     );
@@ -60,11 +60,11 @@ describe('CLI Cache -> Purge', () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    const deleteWritableContentPropertySpy = sinon.spy(
+    const deleteWritableContentPropertySpy = sinonSandbox.spy(
       (incremental as any).config,
-      'deleteWritableContentProperty',
+      'deleteProperty',
     );
-    const writeConfigSpy = sinon.spy(
+    const writeConfigSpy = sinonSandbox.spy(
       (incremental as any).config,
       'writeConfig',
     );

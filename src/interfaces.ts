@@ -17,6 +17,7 @@ export interface CompressOptions {
   outputFileFormat?: string;
   removeLarger?: boolean;
   skipCompressed?: boolean;
+  workers?: number;
 }
 
 export type CompressionOptions = {
@@ -32,7 +33,7 @@ export interface CompressedFile {
   afterSize: number;
   isCached: boolean;
   isSkipped: boolean;
-  removeCompiled: boolean;
+  removeCompressed: boolean;
 }
 
 export interface Cache {
@@ -58,4 +59,9 @@ export interface IncrementalFileValueRevision {
 
 export interface IncrementalConfig {
   files: Record<string, IncrementalFileValue>;
+}
+
+export interface WorkerMessage {
+  files: string[];
+  filePaths: Record<string, IncrementalFileValue>;
 }

@@ -7,35 +7,54 @@ import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
 import { Helpers } from './helpers';
 
 export class Config {
-  readonly configFile: string;
   private readonly nativeFs = {
     writeFile: util.promisify(fs.writeFile),
+    exists: util.promisify(fs.exists),
   };
-  private readonly writableContent: FileConfig = {} as FileConfig;
+  private readonly _configFile: string;
+  private _configContent: FileConfig = {} as FileConfig;
+
+  get configContent(): Readonly<FileConfig> {
+    return this._configContent;
+  }
+
+  set configContent(value: Readonly<FileConfig>) {
+    this._configContent = value;
+  }
 
   /**
    * Creates an instance of Config.
    */
   constructor() {
-    this.configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
-    this.setWritableContentProperty('version', Helpers.getVersion());
+    this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
+    this.setProperty('version', Helpers.getVersion());
+  }
+
+  /**
+   * Read config (.gzipperconfig).
+   */
+  async readConfig(): Promise<void> {
+    if (await this.nativeFs.exists(this._configFile)) {
+      const response = await Helpers.readFile(this._configFile);
+      this._configContent = JSON.parse(response.toString());
+    }
   }
 
   /**
    * set additional data for property to config file (.gzipperconfig).
    */
-  setWritableContentProperty<
-    T extends keyof FileConfig,
-    K extends FileConfig[T]
-  >(field: T, content: K): void {
-    this.writableContent[field] = content;
+  setProperty<T extends keyof FileConfig, K extends FileConfig[T]>(
+    field: T,
+    content: K,
+  ): void {
+    this._configContent[field] = content;
   }
 
   /**
    * delete property from config file (.gzipperconfig).
    */
-  deleteWritableContentProperty<T extends keyof FileConfig>(field: T): void {
-    delete this.writableContent[field];
+  deleteProperty<T extends keyof FileConfig>(field: T): void {
+    delete this._configContent[field];
   }
 
   /**
@@ -43,8 +62,8 @@ export class Config {
    */
   async writeConfig(): Promise<void> {
     await this.nativeFs.writeFile(
-      path.resolve(this.configFile),
-      JSON.stringify(this.writableContent, null, 2),
+      path.resolve(this._configFile),
+      JSON.stringify(this._configContent, null, 2),
     );
   }
 }

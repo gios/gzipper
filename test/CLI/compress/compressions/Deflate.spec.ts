@@ -1,6 +1,5 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import zlib from 'zlib';
 
 import { Compress } from '../../../../src/Compress';
 import {
@@ -10,27 +9,33 @@ import {
   COMPRESSION_EXTENSIONS,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
+import { Logger } from '../../../../src/logger/Logger';
 
 describe('CLI Compress -> Deflate compression', () => {
+  let sinonSandbox: sinon.SinonSandbox;
+
   beforeEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    sinonSandbox = sinon.createSandbox();
   });
 
   afterEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    sinonSandbox.restore();
+    sinon.restore();
   });
 
-  it('--level, --memory-level, --strategy should change gzip configuration with --verbose', async () => {
+  it('--level, --memory-level, --strategy should change gzip configuration', async () => {
     const options = {
       deflate: true,
       level: 6,
       memoryLevel: 4,
       strategy: 2,
       threshold: 0,
-      verbose: true,
+      workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinon.spy((compress as any).logger, 'log');
+    const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.zz']);
 
@@ -48,22 +53,11 @@ describe('CLI Compress -> Deflate compression', () => {
     );
     assert.ok(
       logSpy.calledWithExactly(
-        sinon.match(
+        sinonSandbox.match(
           new RegExp(`${files.length} files have been compressed. (.+)`),
         ),
         LogLevel.SUCCESS,
       ),
-    );
-    assert.strictEqual(
-      logSpy.withArgs(
-        sinon.match(
-          /File \w+\.\w+ has been compressed \d+\.?\d+ \w+ -> \d+\.?\d+ \w+ \(.+\)/,
-        ),
-      ).callCount,
-      files.length,
-    );
-    assert.ok(
-      (compress as any).createCompression() instanceof (zlib as any).Deflate,
     );
     assert.strictEqual((compress as any).compressionInstance.ext, 'zz');
     assert.strictEqual(

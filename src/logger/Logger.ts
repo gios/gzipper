@@ -5,26 +5,27 @@ import { LogLevel } from './LogLevel.enum';
  * Custom logger.
  */
 export class Logger {
-  readonly verbose: boolean;
+  static verbose: boolean;
+
   /**
-   * Creates an instance of Logger.
+   * Set verbose mode.
    */
-  constructor(verbose: boolean) {
-    this.verbose = verbose;
+  static setVerboseMode(verbose: boolean): void {
+    Logger.verbose = verbose;
   }
 
   /**
    * Log message.
    */
   @filter()
-  log(message: string, level: LogLevel = LogLevel.DEBUG): void {
-    return this.logger(message, level);
+  static log(message: string, level: LogLevel = LogLevel.DEBUG): void {
+    return Logger.logger(message, level);
   }
 
   /**
    * Colorize messages depends on the level and return a wrapper.
    */
-  private logger(message: string, level: LogLevel): void {
+  private static logger(message: string, level: LogLevel): void {
     let colorfulMessage: string;
     const prefix = 'gzipper';
 

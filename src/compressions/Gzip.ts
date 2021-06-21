@@ -2,7 +2,6 @@ import zlib from 'zlib';
 
 import { Compression } from './Compression';
 import { CompressOptions, CompressionOptions } from '../interfaces';
-import { Logger } from '../logger/Logger';
 
 /**
  * Gzip compression
@@ -13,8 +12,8 @@ export class GzipCompression extends Compression<CompressionOptions> {
   /**
    * Creates an instance of GzipCompression.
    */
-  constructor(options: CompressOptions, logger: Logger) {
-    super(options, logger);
+  constructor(options: CompressOptions) {
+    super(options);
   }
 
   /**

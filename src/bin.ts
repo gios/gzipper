@@ -21,7 +21,7 @@ export class Index {
       .alias('c')
       .description('compress selected path and optionally set output directory')
       .option('-v, --verbose', 'detailed level of logs')
-      .option('--incremental', '(beta) incremental compression')
+      .option('--incremental', 'incremental compression')
       .option(
         '-e, --exclude <extensions>',
         'exclude file extensions from compression, example: jpeg,jpg...',
@@ -53,7 +53,7 @@ export class Index {
         (value) => parseInt(value),
       )
       .option('--deflate', 'enable deflate compression')
-      .option('--brotli', 'enable brotli compression, Node.js >= v11.7.0')
+      .option('--brotli', 'enable brotli compression')
       .option(
         '--brotli-param-mode <value>',
         'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)',
@@ -79,6 +79,11 @@ export class Index {
       .option(
         '--skip-compressed',
         'skip compressed files if they already exist',
+      )
+      .option(
+        '--workers <number>',
+        'numbers of workers which will be spawned, system CPU cores count (default)',
+        (value) => parseInt(value),
       )
       .action(this.compress.bind(this));
 
@@ -149,43 +154,42 @@ export class Index {
       skipCompressed: this.env.GZIPPER_SKIP_COMPRESSED
         ? !!parseInt(this.env.GZIPPER_SKIP_COMPRESSED as string)
         : options.skipCompressed,
+      workers: parseInt(this.env.GZIPPER_WORKERS as string) || options.workers,
     };
 
     await this.runCompress(target, outputPath, adjustedOptions);
   }
 
   private async cachePurge(): Promise<void> {
-    const logger = new Logger(true);
+    Logger.setVerboseMode(true);
     const config = new Config();
     const incremental = new Incremental(config);
 
     try {
       await incremental.cachePurge();
-      logger.log(
+      Logger.log(
         'Cache has been purged, you are free to initialize a new one.',
         LogLevel.SUCCESS,
       );
     } catch (err) {
-      logger.log(err, LogLevel.ERROR);
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 
   private async cacheSize(): Promise<void> {
-    const logger = new Logger(true);
-
-    const config = new Config();
-    const incremental = new Incremental(config);
+    Logger.setVerboseMode(true);
+    const incremental = new Incremental();
 
     try {
       const size = await incremental.cacheSize();
-      logger.log(
+      Logger.log(
         size
           ? `Cache size is ${Helpers.readableSize(size)}`
           : `Cache is empty, initialize a new one with --incremental option.`,
         LogLevel.INFO,
       );
     } catch (err) {
-      logger.log(err, LogLevel.ERROR);
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -194,7 +198,7 @@ export class Index {
     outputPath: string,
     options: CompressOptions,
   ): Promise<void> {
-    const logger = new Logger(true);
+    Logger.setVerboseMode(true);
     const compress = new Compress(
       target,
       outputPath,
@@ -204,7 +208,7 @@ export class Index {
     try {
       await compress.run();
     } catch (err) {
-      logger.log(err, LogLevel.ERROR);
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 

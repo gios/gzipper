@@ -10,7 +10,7 @@ The flexibility of the algorithms could be extended by many options flags, inclu
 
 You can enable `verbose` mode for better visual representation, customize your file output using `output-file-format` or compress with `incremental` flag if you have a lot of files that rarely change.
 
-By default `gzipper` compress **all the files** but you could use `include` or `exclude` options for better flexibility.
+By default `gzipper` compress **all the files** but you could use `include` or `exclude` options for flexibility.
 
 - [Gzipper](#gzipper)
   - [Install](#install)
@@ -39,6 +39,7 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--output-file-format](#--output-file-format)
       - [--remove-larger](#--remove-larger)
       - [--skip-compressed](#--skip-compressed)
+      - [--workers](#--workers)
     - [Cache](#cache-1)
       - [purge](#purge)
       - [size](#size)
@@ -82,7 +83,7 @@ compress selected path and optionally set output directory
 
 Options:
   -v, --verbose                 detailed level of logs
-  --incremental                 (beta) incremental compression
+  --incremental                 incremental compression
   -e, --exclude <extensions>    exclude file extensions from compression, example: jpeg,jpg...
   -i, --include <extensions>    include file extensions for compression, example: js,css,html...
   -t, --threshold <number>      exclude assets smaller than this byte size. 0 (default)
@@ -90,13 +91,14 @@ Options:
   --memory-level <number>       amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
   --strategy <number>           compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
   --deflate                     enable deflate compression
-  --brotli                      enable brotli compression, Node.js >= v11.7.0
+  --brotli                      enable brotli compression
   --brotli-param-mode <value>   default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
   --brotli-quality <number>     brotli compression quality 11 (default), 0 - 11
   --brotli-size-hint <number>   expected input size 0 (default)
   --output-file-format <value>  output file format with default artifacts [filename].[ext].[compressExt]
   --remove-larger               remove compressed files if they larger than uncompressed originals
   --skip-compressed             skip compressed files if they already exist
+  --workers                     numbers of workers which will be spawned, system CPU cores count (default)
   -h, --help                    display help for command
 ```
 
@@ -214,7 +216,7 @@ try {
 
 | Option                                                      | ENV                                |
 | ----------------------------------------------------------- | ---------------------------------- |
-| [`--incremental`](#--incremental) (beta)                    | `GZIPPER_INCREMENTAL` (0 or 1)     |
+| [`--incremental`](#--incremental)                           | `GZIPPER_INCREMENTAL` (0 or 1)     |
 | [`-v, --verbose`](#-v---verbose)                            | `GZIPPER_VERBOSE` (0 or 1)         |
 | [`-e, --exclude <extensions>`](#-e---exclude-extensions)    | `GZIPPER_EXCLUDE`                  |
 | [`-i, --include <extensions>`](#-i---include-extensions)    | `GZIPPER_INCLUDE`                  |
@@ -230,6 +232,7 @@ try {
 | [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`       |
 | [`--remove-larger`](#--remove-larger)                       | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
 | [`--skip-compressed`](#--skip-compressed)                   | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
+| [`--workers`](#--workers)                                   | `GZIPPER_WORKERS`                  |
 
 > ENV Variables have higher priority over CLI arguments.
 
@@ -291,7 +294,7 @@ Enable deflate compression.
 
 `gzipper c --brotli ./dist`
 
-Enable brotli compression, Node.js >= v11.7.0.
+Enable brotli compression.
 
 #### --brotli-param-mode <value>
 
@@ -379,6 +382,10 @@ Removes compressed files that larger than uncompressed originals in your directo
 
 Ignores compressed files that have already exist in your directory. Works only with default `--output-file-format`.
 
+#### --workers
+
+Spawn workers for parallel compression, be aware of workers number because every worker creates an additional thread. More info [there](https://nodesource.com/blog/worker-threads-nodejs/).
+
 ### Cache
 
 | Command           |
@@ -408,4 +415,4 @@ I appreciate every contribution, just fork the repository and send the pull requ
 
 ## Support
 
-- Node.js >= 10
+- Node.js >= 12
