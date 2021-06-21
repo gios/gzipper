@@ -179,7 +179,7 @@ describe('CLI Compress -> Incremental', () => {
     assert.deepStrictEqual(configBefore, configAfter);
   });
 
-  it.only('should update hash inside cache folder if file was changed', async () => {
+  it('should update hash inside cache folder if file was changed', async () => {
     const options = { threshold: 0, incremental: true };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
