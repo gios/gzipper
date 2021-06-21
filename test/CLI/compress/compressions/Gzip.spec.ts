@@ -31,6 +31,7 @@ describe('CLI Compress -> Gzip compression', () => {
       memoryLevel: 4,
       strategy: 2,
       threshold: 0,
+      workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinonSandbox.spy(Logger, 'log');
@@ -63,7 +64,7 @@ describe('CLI Compress -> Gzip compression', () => {
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 4);
+    assert.strictEqual(Object.keys((compress as any).options).length, 5);
     assert.strictEqual(
       (compress as any).compressionInstance.compressionOptions.level,
       6,

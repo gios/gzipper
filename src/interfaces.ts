@@ -17,6 +17,7 @@ export interface CompressOptions {
   outputFileFormat?: string;
   removeLarger?: boolean;
   skipCompressed?: boolean;
+  workers?: number;
 }
 
 export type CompressionOptions = {

@@ -80,6 +80,11 @@ export class Index {
         '--skip-compressed',
         'skip compressed files if they already exist',
       )
+      .option(
+        '--workers <number>',
+        'numbers of workers which will be spawned, system CPU cores count (default)',
+        (value) => parseInt(value),
+      )
       .action(this.compress.bind(this));
 
     const cache = this.commander
@@ -149,6 +154,7 @@ export class Index {
       skipCompressed: this.env.GZIPPER_SKIP_COMPRESSED
         ? !!parseInt(this.env.GZIPPER_SKIP_COMPRESSED as string)
         : options.skipCompressed,
+      workers: parseInt(this.env.GZIPPER_WORKERS as string) || options.workers,
     };
 
     await this.runCompress(target, outputPath, adjustedOptions);

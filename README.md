@@ -39,6 +39,7 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--output-file-format](#--output-file-format)
       - [--remove-larger](#--remove-larger)
       - [--skip-compressed](#--skip-compressed)
+      - [--workers](#--workers)
     - [Cache](#cache-1)
       - [purge](#purge)
       - [size](#size)
@@ -97,6 +98,7 @@ Options:
   --output-file-format <value>  output file format with default artifacts [filename].[ext].[compressExt]
   --remove-larger               remove compressed files if they larger than uncompressed originals
   --skip-compressed             skip compressed files if they already exist
+  --workers                     numbers of workers which will be spawned, system CPU cores count (default)
   -h, --help                    display help for command
 ```
 
@@ -230,6 +232,7 @@ try {
 | [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`       |
 | [`--remove-larger`](#--remove-larger)                       | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
 | [`--skip-compressed`](#--skip-compressed)                   | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
+| [`--workers`](#--workers)                                   | `GZIPPER_WORKERS`                  |
 
 > ENV Variables have higher priority over CLI arguments.
 
@@ -378,6 +381,10 @@ Removes compressed files that larger than uncompressed originals in your directo
 #### --skip-compressed
 
 Ignores compressed files that have already exist in your directory. Works only with default `--output-file-format`.
+
+#### --workers
+
+Spawn workers for parallel compression, be aware of workers number because every worker creates an additional thread. More info [there](https://nodesource.com/blog/worker-threads-nodejs/).
 
 ### Cache
 

@@ -32,6 +32,7 @@ describe('CLI Compress -> Deflate compression', () => {
       memoryLevel: 4,
       strategy: 2,
       threshold: 0,
+      workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinonSandbox.spy(Logger, 'log');
@@ -64,7 +65,7 @@ describe('CLI Compress -> Deflate compression', () => {
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 5);
+    assert.strictEqual(Object.keys((compress as any).options).length, 6);
     assert.strictEqual(
       (compress as any).compressionInstance.compressionOptions.level,
       6,
