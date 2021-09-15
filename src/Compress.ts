@@ -157,24 +157,19 @@ export class Compress {
     const size = Math.ceil(files.length / cpus);
     const chunks = Helpers.chunkArray(files, size);
     const workers = chunks.map((chunk) => this.runCompressWorker(chunk));
-    try {
-      const results = await Promise.all(workers);
-      return results.reduce(
-        (accumulator, value) => {
-          return {
-            files: [...accumulator.files, ...value.files],
-            filePaths: { ...accumulator.filePaths, ...value.filePaths },
-          };
-        },
-        {
-          files: [],
-          filePaths: {},
-        } as WorkerMessage,
-      );
-    } catch (error) {
-      Logger.log(error.message, LogLevel.ERROR);
-      throw new Error(error.message);
-    }
+    const results = await Promise.all(workers);
+    return results.reduce(
+      (accumulator, value) => {
+        return {
+          files: [...accumulator.files, ...value.files],
+          filePaths: { ...accumulator.filePaths, ...value.filePaths },
+        };
+      },
+      {
+        files: [],
+        filePaths: {},
+      } as WorkerMessage,
+    );
   }
 
   /**
@@ -201,6 +196,7 @@ export class Compress {
                 chunk.includes(key),
               ),
           },
+          execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
         },
       );
 
