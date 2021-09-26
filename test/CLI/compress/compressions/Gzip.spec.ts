@@ -10,6 +10,7 @@ import {
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
+import { CompressOptions } from '../../../../src/interfaces';
 
 describe('CLI Compress -> Gzip compression', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -26,10 +27,10 @@ describe('CLI Compress -> Gzip compression', () => {
   });
 
   it('--level, --memory-level, --strategy should change gzip configuration', async () => {
-    const options = {
-      level: 6,
-      memoryLevel: 4,
-      strategy: 2,
+    const options: CompressOptions = {
+      gzipLevel: 6,
+      gzipMemoryLevel: 4,
+      gzipStrategy: 2,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -63,7 +64,7 @@ describe('CLI Compress -> Gzip compression', () => {
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 5);
+    assert.strictEqual(Object.keys((compress as any).options).length, 4);
     assert.strictEqual(
       (compress as any).compressionInstance.compressionOptions.level,
       6,

@@ -71,7 +71,7 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
     assert.strictEqual(
       (compress as any).options.outputFileFormat,
       options.outputFileFormat,
@@ -116,7 +116,7 @@ describe('CLI Compress', () => {
   });
 
   it('should print message about appropriate files', async () => {
-    const options = {
+    const options: CompressOptions = {
       exclude: [
         'js',
         'css',
@@ -149,7 +149,7 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('should print message about empty folder', async () => {
@@ -167,7 +167,7 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
   });
 
   it('should compress a single file to a certain folder', async () => {
@@ -199,7 +199,7 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
   });
 
   it('should compress files to a certain folder with existing folder structure', async () => {
@@ -251,11 +251,11 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
   });
 
   it('should use default file format artifacts via --output-file-format', async () => {
-    const options = { workers: 1 };
+    const options: CompressOptions = { workers: 1 };
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinonSandbox.spy(Logger, 'log');
     const files = await getFiles(COMPRESS_PATH);
@@ -285,7 +285,7 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
     assert.strictEqual((compress as any).options.outputFileFormat, undefined);
 
     for (const [index, compressedFile] of compressedFiles.entries()) {
@@ -296,7 +296,7 @@ describe('CLI Compress', () => {
   });
 
   it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
-    const options = {
+    const options: CompressOptions = {
       outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
       workers: 1,
     };
@@ -319,7 +319,7 @@ describe('CLI Compress', () => {
   });
 
   it('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
-    const options = {
+    const options: CompressOptions = {
       outputFileFormat: '[filename]-[hash]-55.[ext]',
       workers: 1,
     };
@@ -341,7 +341,7 @@ describe('CLI Compress', () => {
   });
 
   it('should --include specific file extensions for compression (also exclude others)', async () => {
-    const options = {
+    const options: CompressOptions = {
       include: ['sunny'],
       workers: 1,
     };
@@ -366,11 +366,11 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('should --exclude file extensions from compression jpeg,jpg', async () => {
-    const options = {
+    const options: CompressOptions = {
       exclude: ['jpeg', 'jpg'],
       workers: 1,
     };
@@ -399,11 +399,11 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('should --exclude compression extensions', async () => {
-    const options = {
+    const options: CompressOptions = {
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -430,12 +430,12 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
   });
 
   it('should exclude file sizes smaller than 860 bytes from compression', async () => {
     const THRESHOLD = 860;
-    const options = {
+    const options: CompressOptions = {
       threshold: THRESHOLD,
       workers: 1,
     };
@@ -473,7 +473,7 @@ describe('CLI Compress', () => {
   });
 
   it('--remove-larger should remove compressed files', async () => {
-    const options = {
+    const options: CompressOptions = {
       removeLarger: true,
       workers: 1,
     };
@@ -498,11 +498,11 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('--skip-compressed should skip compressed files', async () => {
-    const options = {
+    const options: CompressOptions = {
       skipCompressed: true,
       workers: 1,
     };
@@ -527,11 +527,11 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('--skip-compressed should skip compressed files (same folder)', async () => {
-    const options = {
+    const options: CompressOptions = {
       skipCompressed: true,
       workers: 1,
     };
@@ -556,11 +556,11 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('--skip-compressed should skip compressed files with appropriate message', async () => {
-    const options = {
+    const options: CompressOptions = {
       skipCompressed: true,
       workers: 1,
     };
@@ -585,6 +585,6 @@ describe('CLI Compress', () => {
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 });
