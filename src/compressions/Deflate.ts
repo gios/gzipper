@@ -22,4 +22,25 @@ export class DeflateCompression extends Compression<CompressionOptions> {
   getCompression(): () => zlib.Deflate {
     return (): zlib.Deflate => zlib.createDeflate(this.compressionOptions);
   }
+
+  /**
+   * Build deflate compression options object.
+   */
+  protected selectCompression(): void {
+    const options: CompressionOptions = {};
+
+    if (this.options.deflateLevel !== undefined) {
+      options.level = this.options.deflateLevel;
+    }
+
+    if (this.options.deflateMemoryLevel !== undefined) {
+      options.memLevel = this.options.deflateMemoryLevel;
+    }
+
+    if (this.options.deflateStrategy !== undefined) {
+      options.strategy = this.options.deflateStrategy;
+    }
+
+    this.compressionOptions = options;
+  }
 }

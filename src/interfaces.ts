@@ -6,11 +6,14 @@ export interface CompressOptions {
   exclude?: string[];
   include?: string[];
   threshold: number;
-  level?: number;
-  memoryLevel?: number;
-  strategy?: number;
   deflate?: boolean;
   brotli?: boolean;
+  gzipLevel?: number;
+  gzipMemoryLevel?: number;
+  gzipStrategy?: number;
+  deflateLevel?: number;
+  deflateMemoryLevel?: number;
+  deflateStrategy?: number;
   brotliParamMode?: string;
   brotliQuality?: number;
   brotliSizeHint?: number;
