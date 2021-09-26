@@ -92,7 +92,6 @@ describe('CLI Compress', () => {
   it('should throw on compress error', async () => {
     const compress = new Compress(COMPRESS_PATH, null, {
       workers: 1,
-      threshold: 0,
     });
     const createWorkersSpy = sinonSandbox.spy(compress, 'createWorkers' as any);
     const logSpy = sinonSandbox.spy(Logger, 'log');
@@ -118,7 +117,6 @@ describe('CLI Compress', () => {
 
   it('should print message about appropriate files', async () => {
     const options = {
-      threshold: 0,
       exclude: [
         'js',
         'css',
@@ -157,7 +155,6 @@ describe('CLI Compress', () => {
   it('should print message about empty folder', async () => {
     const compress = new Compress(EMPTY_FOLDER_PATH, null, {
       workers: 1,
-      threshold: 0,
     });
     const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
@@ -177,7 +174,6 @@ describe('CLI Compress', () => {
     const file = `${COMPRESS_PATH}${path.sep}index.txt`;
     const compress = new Compress(file, COMPRESS_PATH_TARGET, {
       workers: 1,
-      threshold: 0,
     });
     const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
@@ -209,7 +205,6 @@ describe('CLI Compress', () => {
   it('should compress files to a certain folder with existing folder structure', async () => {
     const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, {
       workers: 1,
-      threshold: 0,
     });
     const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
@@ -260,7 +255,7 @@ describe('CLI Compress', () => {
   });
 
   it('should use default file format artifacts via --output-file-format', async () => {
-    const options = { workers: 1, threshold: 0 };
+    const options = { workers: 1 };
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinonSandbox.spy(Logger, 'log');
     const files = await getFiles(COMPRESS_PATH);
@@ -303,7 +298,6 @@ describe('CLI Compress', () => {
   it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
     const options = {
       outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
-      threshold: 0,
       workers: 1,
     };
 
@@ -327,7 +321,6 @@ describe('CLI Compress', () => {
   it('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
     const options = {
       outputFileFormat: '[filename]-[hash]-55.[ext]',
-      threshold: 0,
       workers: 1,
     };
 
@@ -350,7 +343,6 @@ describe('CLI Compress', () => {
   it('should --include specific file extensions for compression (also exclude others)', async () => {
     const options = {
       include: ['sunny'],
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -380,7 +372,6 @@ describe('CLI Compress', () => {
   it('should --exclude file extensions from compression jpeg,jpg', async () => {
     const options = {
       exclude: ['jpeg', 'jpg'],
-      threshold: 0,
       workers: 1,
     };
     const beforeFiles = (await getFiles(COMPRESS_PATH)).filter((file) => {
@@ -413,7 +404,6 @@ describe('CLI Compress', () => {
 
   it('should --exclude compression extensions', async () => {
     const options = {
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -485,7 +475,6 @@ describe('CLI Compress', () => {
   it('--remove-larger should remove compressed files', async () => {
     const options = {
       removeLarger: true,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -515,7 +504,6 @@ describe('CLI Compress', () => {
   it('--skip-compressed should skip compressed files', async () => {
     const options = {
       skipCompressed: true,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
@@ -545,7 +533,6 @@ describe('CLI Compress', () => {
   it('--skip-compressed should skip compressed files (same folder)', async () => {
     const options = {
       skipCompressed: true,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -575,7 +562,6 @@ describe('CLI Compress', () => {
   it('--skip-compressed should skip compressed files with appropriate message', async () => {
     const options = {
       skipCompressed: true,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);

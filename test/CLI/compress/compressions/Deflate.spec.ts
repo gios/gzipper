@@ -31,7 +31,6 @@ describe('CLI Compress -> Deflate compression', () => {
       level: 6,
       memoryLevel: 4,
       strategy: 2,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);

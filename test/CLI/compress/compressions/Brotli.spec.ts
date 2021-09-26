@@ -32,7 +32,6 @@ describe('CLI Compress -> Brotli compression', () => {
       brotliParamMode: 'text',
       brotliQuality: 10,
       brotliSizeHint: 5,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -91,7 +90,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options = {
       brotli: true,
       brotliParamMode: 'default',
-      threshold: 0,
       workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
@@ -135,7 +133,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options = {
       brotli: true,
       brotliParamMode: 'amigos',
-      threshold: 0,
       workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
@@ -179,7 +176,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options = {
       brotli: true,
       brotliParamMode: 'font',
-      threshold: 0,
       workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {

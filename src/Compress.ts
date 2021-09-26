@@ -46,7 +46,7 @@ export class Compress {
   constructor(
     target: string,
     outputPath?: string | null,
-    options: CompressOptions = {} as never,
+    options: CompressOptions = {},
   ) {
     Logger.setVerboseMode(options.verbose as boolean);
     this.config = new Config();
@@ -139,7 +139,7 @@ export class Compress {
         fileStat.isFile() &&
         this.service.isValidFileExtensions(path.extname(filePath).slice(1))
       ) {
-        if (fileStat.size < this.options.threshold) {
+        if (fileStat.size < (this.options.threshold ?? 0)) {
           continue;
         }
         compressedFiles.push(filePath);

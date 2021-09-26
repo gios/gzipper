@@ -33,7 +33,7 @@ describe('CLI Cache -> Size', () => {
   });
 
   it('should returns cache size if exists', async () => {
-    const options = { threshold: 0, incremental: true, workers: 1 };
+    const options = { incremental: true, workers: 1 };
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const compress = new Compress(COMPRESS_PATH, null, options);
     await compress.run();
