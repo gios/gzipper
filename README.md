@@ -85,24 +85,27 @@ Usage: gzipper compress|c [options] <path> [outputPath]
 compress selected path and optionally set output directory
 
 Options:
-  -v, --verbose                 detailed level of logs
-  --incremental                 incremental compression
-  -e, --exclude <extensions>    exclude file extensions from compression, example: jpeg,jpg...
-  -i, --include <extensions>    include file extensions for compression, example: js,css,html...
-  -t, --threshold <number>      exclude assets smaller than this byte size. 0 (default)
-  --deflate                     enable deflate compression
-  --brotli                      enable brotli compression
-  --level <number>              compression level 6 (default), 0 (no compression) - 9 (best compression)
-  --memory-level <number>       amount of memory that will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
-  --strategy <number>           compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
-  --brotli-param-mode <value>   default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
-  --brotli-quality <number>     brotli compression quality 11 (default), 0 - 11
-  --brotli-size-hint <number>   expected input size 0 (default)
-  --output-file-format <value>  output file format with default artifacts [filename].[ext].[compressExt]
-  --remove-larger               remove compressed files if they larger than uncompressed originals
-  --skip-compressed             skip compressed files if they already exist
-  --workers                     numbers of workers that will be spawned, system CPU cores count (default)
-  -h, --help                    display help for command
+  -v, --verbose                    detailed level of logs
+  --incremental                    incremental compression
+  -e, --exclude <extensions>       exclude file extensions from compression, example: jpeg,jpg...
+  -i, --include <extensions>       include file extensions for compression, example: js,css,html...
+  -t, --threshold <number>         exclude assets smaller than this byte size. 0 (default)
+  --deflate                        enable deflate compression
+  --brotli                         enable brotli compression
+  --gzip-level <number>            gzip compression level 6 (default), 0 (no compression) - 9 (best compression)
+  --gzip-memory-level <number>     amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+  --gzip-strategy <number>         gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+  --deflate-level <number>         deflate compression level 6 (default), 0 (no compression) - 9 (best compression)
+  --deflate-memory-level <number>  amount of memory which will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+  --deflate-strategy <number>      deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+  --brotli-param-mode <value>      default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
+  --brotli-quality <number>        brotli compression quality 11 (default), 0 - 11
+  --brotli-size-hint <number>      expected input size 0 (default)
+  --output-file-format <value>     output file format with default artifacts [filename].[ext].[compressExt]
+  --remove-larger                  remove compressed files if they larger than uncompressed originals
+  --skip-compressed                skip compressed files if they already exist
+  --workers <number>               numbers of workers which will be spawned, system CPU cores count (default)
+  -h, --help                       display help for command
 ```
 
 ### Cache
