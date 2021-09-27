@@ -220,25 +220,28 @@ try {
 
 ### Compress|c
 
-| Option                                                      | ENV                                |
-| ----------------------------------------------------------- | ---------------------------------- |
-| [`--incremental`](#--incremental)                           | `GZIPPER_INCREMENTAL` (0 or 1)     |
-| [`-v, --verbose`](#-v---verbose)                            | `GZIPPER_VERBOSE` (0 or 1)         |
-| [`-e, --exclude <extensions>`](#-e---exclude-extensions)    | `GZIPPER_EXCLUDE`                  |
-| [`-i, --include <extensions>`](#-i---include-extensions)    | `GZIPPER_INCLUDE`                  |
-| [`-t, --threshold <number>`](#-t---threshold-number)        | `GZIPPER_THRESHOLD`                |
-| [`--level <number>`](#--level-number)                       | `GZIPPER_LEVEL`                    |
-| [`--memory-level <number>`](#--memory-level-number)         | `GZIPPER_MEMORY_LEVEL`             |
-| [`--strategy <number>`](#--strategy-number)                 | `GZIPPER_STRATEGY`                 |
-| [`--deflate`](#--deflate)                                   | `GZIPPER_DEFLATE` (0 or 1)         |
-| [`--brotli`](#--brotli)                                     | `GZIPPER_BROTLI` (0 or 1)          |
-| [`--brotli-param-mode <value>`](#--brotli-param-mode-value) | `GZIPPER_BROTLI_PARAM_MODE`        |
-| [`--brotli-quality <number>`](#--brotli-quality-number)     | `GZIPPER_BROTLI_QUALITY`           |
-| [`--brotli-size-hint <number>`](#--brotli-size-hint-number) | `GZIPPER_BROTLI_SIZE_HINT`         |
-| [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`       |
-| [`--remove-larger`](#--remove-larger)                       | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
-| [`--skip-compressed`](#--skip-compressed)                   | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
-| [`--workers`](#--workers)                                   | `GZIPPER_WORKERS`                  |
+| Option                                                              | ENV                                |
+| ------------------------------------------------------------------- | ---------------------------------- |
+| [`--incremental`](#--incremental)                                   | `GZIPPER_INCREMENTAL` (0 or 1)     |
+| [`-v, --verbose`](#-v---verbose)                                    | `GZIPPER_VERBOSE` (0 or 1)         |
+| [`-e, --exclude <extensions>`](#-e---exclude-extensions)            | `GZIPPER_EXCLUDE`                  |
+| [`-i, --include <extensions>`](#-i---include-extensions)            | `GZIPPER_INCLUDE`                  |
+| [`-t, --threshold <number>`](#-t---threshold-number)                | `GZIPPER_THRESHOLD`                |
+| [`--deflate`](#--deflate)                                           | `GZIPPER_DEFLATE` (0 or 1)         |
+| [`--brotli`](#--brotli)                                             | `GZIPPER_BROTLI` (0 or 1)          |
+| [`--gzip-level <number>`](#--gzip-level-number)                     | `GZIPPER_GZIP_LEVEL`               |
+| [`--gzip-memory-level <number>`](#--gzip-memory-level-number)       | `GZIPPER_GZIP_MEMORY_LEVEL`        |
+| [`--gzip-strategy <number>`](#--gzip-strategy-number)               | `GZIPPER_GZIP_STRATEGY`            |
+| [`--deflate-level <number>`](#--deflate-level-number)               | `GZIPPER_DEFLATE_LEVEL`            |
+| [`--deflate-memory-level <number>`](#--deflate-memory-level-number) | `GZIPPER_DEFLATE_MEMORY_LEVEL`     |
+| [`--deflate-strategy <number>`](#--deflate-strategy-number)         | `GZIPPER_DEFLATE_STRATEGY`         |
+| [`--brotli-param-mode <value>`](#--brotli-param-mode-value)         | `GZIPPER_BROTLI_PARAM_MODE`        |
+| [`--brotli-quality <number>`](#--brotli-quality-number)             | `GZIPPER_BROTLI_QUALITY`           |
+| [`--brotli-size-hint <number>`](#--brotli-size-hint-number)         | `GZIPPER_BROTLI_SIZE_HINT`         |
+| [`--output-file-format <value>`](#--output-file-format)             | `GZIPPER_OUTPUT_FILE_FORMAT`       |
+| [`--remove-larger`](#--remove-larger)                               | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
+| [`--skip-compressed`](#--skip-compressed)                           | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
+| [`--workers`](#--workers)                                           | `GZIPPER_WORKERS`                  |
 
 > ENV Variables have higher priority over CLI arguments.
 
