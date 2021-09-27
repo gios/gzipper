@@ -6,6 +6,7 @@ export interface CompressOptions {
   exclude?: string[];
   include?: string[];
   threshold?: number;
+  gzip?: boolean;
   deflate?: boolean;
   brotli?: boolean;
   gzipLevel?: number;

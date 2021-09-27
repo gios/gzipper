@@ -28,6 +28,7 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [-e, --exclude <extensions>](#-e---exclude-extensions)
       - [-i, --include <extensions>](#-i---include-extensions)
       - [-t, --threshold <number>](#-t---threshold-number)
+      - [--gzip](#--gzip)
       - [--deflate](#--deflate)
       - [--brotli](#--brotli)
       - [--gzip-level <number>](#--gzip-level-number)
@@ -92,6 +93,7 @@ Options:
   -t, --threshold <number>         exclude assets smaller than this byte size. 0 (default)
   --deflate                        enable deflate compression
   --brotli                         enable brotli compression
+  --gzip                           enable gzip compression
   --gzip-level <number>            gzip compression level 6 (default), 0 (no compression) - 9 (best compression)
   --gzip-memory-level <number>     amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
   --gzip-strategy <number>         gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
@@ -227,6 +229,7 @@ try {
 | [`-e, --exclude <extensions>`](#-e---exclude-extensions)            | `GZIPPER_EXCLUDE`                  |
 | [`-i, --include <extensions>`](#-i---include-extensions)            | `GZIPPER_INCLUDE`                  |
 | [`-t, --threshold <number>`](#-t---threshold-number)                | `GZIPPER_THRESHOLD`                |
+| [`--gzip`](#--gzip)                                                 | `GZIPPER_GZIP` (0 or 1)            |
 | [`--deflate`](#--deflate)                                           | `GZIPPER_DEFLATE` (0 or 1)         |
 | [`--brotli`](#--brotli)                                             | `GZIPPER_BROTLI` (0 or 1)          |
 | [`--gzip-level <number>`](#--gzip-level-number)                     | `GZIPPER_GZIP_LEVEL`               |
@@ -274,6 +277,12 @@ Include file extensions for compression(exclude others), example: js,css,html...
 `gzipper c --threshold 900 ./dist`
 
 Exclude assets smaller than this byte size. 0 (default)
+
+#### --gzip
+
+`gzipper c --gzip ./dist`
+
+Enable gzip compression. (default behavior)
 
 #### --deflate
 

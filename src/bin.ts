@@ -39,6 +39,7 @@ export class Index {
       )
       .option('--deflate', 'enable deflate compression')
       .option('--brotli', 'enable brotli compression')
+      .option('--gzip', 'enable gzip compression')
       .option(
         '--gzip-level <number>',
         'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
@@ -147,6 +148,9 @@ export class Index {
       deflate: this.env.GZIPPER_DEFLATE
         ? !!parseInt(this.env.GZIPPER_DEFLATE as string)
         : options.deflate,
+      gzip: this.env.GZIPPER_GZIP
+        ? !!parseInt(this.env.GZIPPER_GZIP as string)
+        : options.gzip,
       gzipLevel:
         parseInt(this.env.GZIPPER_GZIP_LEVEL as string) || options.gzipLevel,
       gzipMemoryLevel:

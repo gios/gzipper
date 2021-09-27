@@ -587,4 +587,38 @@ describe('CLI Compress', () => {
     );
     assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
+
+  it.skip('--brotli --deflate --gzip should run simultaneously', async () => {
+    const options: CompressOptions = {
+      workers: 1,
+      gzip: true,
+      brotli: true,
+      deflate: true,
+      gzipMemoryLevel: 1,
+      deflateLevel: 3,
+      brotliQuality: 2,
+    };
+    const compress = new Compress(COMPRESS_PATH, null, options);
+    const logSpy = sinonSandbox.spy(Logger, 'log');
+    await compress.run();
+    const files = await getFiles(COMPRESS_PATH, ['.gz', '.br', '.zz']);
+
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
+    assert.ok(
+      logSpy.calledWithExactly(
+        sinonSandbox.match(
+          new RegExp(`${files.length} file has been compressed. (.+)`),
+        ),
+        LogLevel.SUCCESS,
+      ),
+    );
+    assert.strictEqual(files.length, 1);
+    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual(
+      Object.keys((compress as any).compressionInstance.compressionOptions)
+        .length,
+      3,
+    );
+    assert.strictEqual(Object.keys((compress as any).options).length, 6);
+  });
 });
