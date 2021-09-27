@@ -2,7 +2,7 @@ import { BrotliCompression } from './compressions/Brotli';
 import { DeflateCompression } from './compressions/Deflate';
 import { GzipCompression } from './compressions/Gzip';
 import { COMPRESSION_EXTENSIONS } from './constants';
-import { CompressOptions } from './interfaces';
+import { CompressionType, CompressOptions } from './interfaces';
 
 export class CompressService {
   private readonly options: CompressOptions;
@@ -15,19 +15,20 @@ export class CompressService {
   }
 
   /**
-   * Return compression instance.
+   * Return compression instances.
    */
-  public getCompressionInstance():
-    | BrotliCompression
-    | DeflateCompression
-    | GzipCompression {
+  public getCompressionInstances(): CompressionType[] {
+    const instances: CompressionType[] = [];
     if (this.options.brotli) {
-      return new BrotliCompression(this.options);
+      instances.push(new BrotliCompression(this.options));
     } else if (this.options.deflate) {
-      return new DeflateCompression(this.options);
+      instances.push(new DeflateCompression(this.options));
+    } else if (this.options.gzip) {
+      instances.push(new GzipCompression(this.options));
     } else {
-      return new GzipCompression(this.options);
+      instances.push(new GzipCompression(this.options));
     }
+    return instances;
   }
 
   /**

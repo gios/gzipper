@@ -588,7 +588,7 @@ describe('CLI Compress', () => {
     assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
-  it.skip('--brotli --deflate --gzip should run simultaneously', async () => {
+  it.only('--brotli --deflate --gzip should run simultaneously', async () => {
     const options: CompressOptions = {
       workers: 1,
       gzip: true,

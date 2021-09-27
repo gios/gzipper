@@ -1,5 +1,9 @@
 import zlib from 'zlib';
 
+import { BrotliCompression } from './compressions/Brotli';
+import { DeflateCompression } from './compressions/Deflate';
+import { GzipCompression } from './compressions/Gzip';
+
 export interface CompressOptions {
   verbose?: boolean;
   incremental?: boolean;
@@ -30,6 +34,11 @@ export type CompressionOptions = {
   strategy?: number;
 } & zlib.ZlibOptions;
 
+export type CompressionType =
+  | BrotliCompression
+  | DeflateCompression
+  | GzipCompression;
+
 export type BrotliOptions = { [key: number]: number };
 
 export interface CompressedFile {
@@ -58,6 +67,7 @@ export interface IncrementalFileValueRevision {
   lastChecksum: string;
   fileId: string;
   date: Date;
+  compressionType: string;
   options: CompressionOptions | BrotliOptions;
 }
 

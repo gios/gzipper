@@ -7,6 +7,7 @@ import path from 'path';
 
 import {
   CompressedFile,
+  CompressionType,
   CompressOptions,
   IncrementalFileValue,
   WorkerMessage,
@@ -14,9 +15,6 @@ import {
 import { OUTPUT_FILE_FORMAT_REGEXP } from './constants';
 import { Helpers } from './helpers';
 import { Logger } from './logger/Logger';
-import { BrotliCompression } from './compressions/Brotli';
-import { GzipCompression } from './compressions/Gzip';
-import { DeflateCompression } from './compressions/Deflate';
 import { CompressService } from './Compress.service';
 import { Incremental } from './Incremental';
 
@@ -37,10 +35,7 @@ class CompressWorker {
     workerData.incrementalFilePaths;
   private readonly incremental!: Incremental;
   private readonly service: CompressService;
-  private readonly compressionInstance:
-    | BrotliCompression
-    | DeflateCompression
-    | GzipCompression;
+  private readonly compressionInstances: CompressionType[];
 
   constructor() {
     if (this.options.incremental) {
@@ -49,37 +44,38 @@ class CompressWorker {
     }
     Logger.setVerboseMode(this.options.verbose as boolean);
     this.service = new CompressService(this.options);
-    this.compressionInstance = this.service.getCompressionInstance();
+    this.compressionInstances = this.service.getCompressionInstances();
   }
 
   /**
    * Compress files list and returns files and incremental data.
    */
   async compressFiles(): Promise<WorkerMessage> {
-    const createCompression = this.compressionInstance.getCompression();
     const filesList: string[] = [];
 
-    for (const filePath of this.chunk) {
-      const hrtimeStart = process.hrtime();
-      const fileInfo = await this.compressFile(
-        path.basename(filePath),
-        path.dirname(filePath),
-        createCompression,
-      );
-
-      if (!fileInfo.removeCompressed && !fileInfo.isSkipped) {
-        filesList.push(filePath);
-      }
-
-      if (this.options.verbose) {
-        const hrTimeEnd = process.hrtime(hrtimeStart);
-        Logger.log(
-          this.getCompressedFileMsg(
-            filePath,
-            fileInfo as CompressedFile,
-            hrTimeEnd,
-          ),
+    for (const compressionInstance of this.compressionInstances) {
+      for (const filePath of this.chunk) {
+        const hrtimeStart = process.hrtime();
+        const fileInfo = await this.compressFile(
+          path.basename(filePath),
+          path.dirname(filePath),
+          compressionInstance,
         );
+
+        if (!fileInfo.removeCompressed && !fileInfo.isSkipped) {
+          filesList.push(filePath);
+        }
+
+        if (this.options.verbose) {
+          const hrTimeEnd = process.hrtime(hrtimeStart);
+          Logger.log(
+            this.getCompressedFileMsg(
+              filePath,
+              fileInfo as CompressedFile,
+              hrTimeEnd,
+            ),
+          );
+        }
       }
     }
 
@@ -95,11 +91,9 @@ class CompressWorker {
   private async compressFile(
     filename: string,
     target: string,
-    createCompression:
-      | ReturnType<BrotliCompression['getCompression']>
-      | ReturnType<GzipCompression['getCompression']>
-      | ReturnType<DeflateCompression['getCompression']>,
+    compressionInstance: CompressionType,
   ): Promise<Partial<CompressedFile>> {
+    const createCompression = compressionInstance.getCompression();
     let isCached = false;
     let isSkipped = false;
     const inputPath = path.join(target, filename);
@@ -110,7 +104,11 @@ class CompressWorker {
         : path.join(this.outputPath, path.relative(this.target, target));
       await Helpers.createFolders(target);
     }
-    const outputPath = this.getOutputPath(target, filename);
+    const outputPath = this.getOutputPath(
+      target,
+      filename,
+      compressionInstance.ext,
+    );
 
     if (this.options.skipCompressed) {
       if (await this.nativeFs.exists(outputPath)) {
@@ -124,7 +122,8 @@ class CompressWorker {
       const { isChanged, fileId } = await this.incremental.setFile(
         inputPath,
         checksum,
-        this.compressionInstance.compressionOptions,
+        compressionInstance.compressionName,
+        compressionInstance.compressionOptions,
       );
 
       const cachedFile = path.resolve(
@@ -182,11 +181,11 @@ class CompressWorker {
   /**
    * Get output path which is based on [outputFileFormat].
    */
-  private getOutputPath(target: string, file: string): string {
+  private getOutputPath(target: string, file: string, ext: string): string {
     const artifactsMap = new Map<string, string | null>([
       ['[filename]', path.parse(file).name],
       ['[ext]', path.extname(file).slice(1)],
-      ['[compressExt]', this.compressionInstance.ext],
+      ['[compressExt]', ext],
     ]);
     let filename = `${artifactsMap.get('[filename]')}.${artifactsMap.get(
       '[ext]',
