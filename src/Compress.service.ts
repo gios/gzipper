@@ -21,11 +21,13 @@ export class CompressService {
     const instances: CompressionType[] = [];
     if (this.options.brotli) {
       instances.push(new BrotliCompression(this.options));
-    } else if (this.options.deflate) {
+    }
+
+    if (this.options.deflate) {
       instances.push(new DeflateCompression(this.options));
-    } else if (this.options.gzip) {
-      instances.push(new GzipCompression(this.options));
-    } else {
+    }
+
+    if (this.options.gzip || !instances.length) {
       instances.push(new GzipCompression(this.options));
     }
     return instances;

@@ -70,6 +70,7 @@ class CompressWorker {
           const hrTimeEnd = process.hrtime(hrtimeStart);
           Logger.log(
             this.getCompressedFileMsg(
+              compressionInstance,
               filePath,
               fileInfo as CompressedFile,
               hrTimeEnd,
@@ -217,24 +218,29 @@ class CompressWorker {
    * Returns information message about compressed file (size, time, cache, etc.)
    */
   private getCompressedFileMsg(
+    compressionInstance: CompressionType,
     file: string,
     fileInfo: CompressedFile,
     hrtime: [number, number],
   ): string {
+    const fileRelative = path.relative(this.target, file);
+    const compressionName = compressionInstance.compressionName;
     if (fileInfo.isSkipped) {
-      return `File ${file} has been skipped`;
+      return `File ${fileRelative} has been skipped.`;
     }
 
     const getSize = `${Helpers.readableSize(
       fileInfo.beforeSize,
     )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
-    return fileInfo.isCached
-      ? `File ${file} has been retrieved from the cache ${getSize} (${Helpers.readableHrtime(
-          hrtime,
-        )})`
-      : `File ${file} has been compressed ${getSize} (${Helpers.readableHrtime(
-          hrtime,
-        )})`;
+    const getTime = Helpers.readableHrtime(hrtime);
+    const fileMessage = fileInfo.isCached
+      ? `File ${fileRelative} has been retrieved from the cache.`
+      : `File ${fileRelative} has been compressed.`;
+
+    return `${fileMessage} \n
+      Algorithm: ${compressionName} \n
+      Size: ${getSize} \n
+      Time: ${getTime}`;
   }
 }
 
