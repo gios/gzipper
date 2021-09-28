@@ -1,4 +1,7 @@
-export const OUTPUT_FILE_FORMAT_REGEXP = /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;
+import { CompressionExtensions } from './enums';
+
+export const OUTPUT_FILE_FORMAT_REGEXP =
+  /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;
 export const NO_FILES_MESSAGE = 'No files for compression.';
 export const WORKER_STARTED = 'Worker has started.';
 export const NO_PATH_MESSAGE = `Can't find a path.`;
@@ -9,4 +12,8 @@ export const DEFAULT_OUTPUT_FORMAT_MESSAGE =
 export const CONFIG_FOLDER = '.gzipper';
 export const CACHE_FOLDER = 'cache';
 export const CONFIG_FILE = '.gzipperconfig';
-export const COMPRESSION_EXTENSIONS = ['gz', 'zz', 'br'];
+export const COMPRESSION_EXTENSIONS = [
+  CompressionExtensions.GZIP,
+  CompressionExtensions.DEFLATE,
+  CompressionExtensions.BROTLI,
+];

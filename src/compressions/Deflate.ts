@@ -2,13 +2,14 @@ import zlib from 'zlib';
 
 import { Compression } from './Compression';
 import { CompressOptions, CompressionOptions } from '../interfaces';
+import { CompressionExtensions, CompressionNames } from '../enums';
 
 /**
  * Deflate compression
  */
 export class DeflateCompression extends Compression<CompressionOptions> {
-  readonly compressionName = 'DEFLATE';
-  readonly ext = 'zz';
+  readonly compressionName = CompressionNames.DEFLATE;
+  readonly ext = CompressionExtensions.DEFLATE;
   /**
    * Creates an instance of GzipCompression.
    */

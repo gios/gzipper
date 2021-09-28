@@ -2,13 +2,14 @@ import zlib from 'zlib';
 
 import { Compression } from './Compression';
 import { CompressOptions, BrotliOptions } from '../interfaces';
+import { CompressionExtensions, CompressionNames } from '../enums';
 
 /**
  * Brotli compression
  */
 export class BrotliCompression extends Compression<BrotliOptions> {
-  readonly compressionName = 'BROTLI';
-  readonly ext = 'br';
+  readonly compressionName = CompressionNames.BROTLI;
+  readonly ext = CompressionExtensions.BROTLI;
   /**
    * Creates an instance of BrotliCompression
    */
@@ -64,9 +65,8 @@ export class BrotliCompression extends Compression<BrotliOptions> {
     }
 
     if (this.options.brotliSizeHint !== undefined) {
-      options[
-        zlib.constants.BROTLI_PARAM_SIZE_HINT
-      ] = this.options.brotliSizeHint;
+      options[zlib.constants.BROTLI_PARAM_SIZE_HINT] =
+        this.options.brotliSizeHint;
     }
     this.compressionOptions = options;
   }
