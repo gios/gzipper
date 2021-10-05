@@ -77,13 +77,13 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   protected getBrotliOptionName(index: string): string | undefined {
     switch (parseInt(index)) {
       case zlib.constants.BROTLI_PARAM_MODE:
-        return 'brotliParamMode';
+        return 'paramMode';
 
       case zlib.constants.BROTLI_PARAM_QUALITY:
-        return 'brotliQuality';
+        return 'quality';
 
       case zlib.constants.BROTLI_PARAM_SIZE_HINT:
-        return 'brotliSizeHint';
+        return 'sizeHint';
     }
   }
 }

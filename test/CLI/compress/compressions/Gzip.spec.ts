@@ -58,23 +58,23 @@ describe('CLI Compress -> Gzip compression', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       3,
     );
     assert.strictEqual(Object.keys((compress as any).options).length, 4);
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.level,
+      (compress as any).compressionInstances[0].compressionOptions.level,
       6,
     );
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.memLevel,
+      (compress as any).compressionInstances[0].compressionOptions.memLevel,
       4,
     );
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.strategy,
+      (compress as any).compressionInstances[0].compressionOptions.strategy,
       2,
     );
   });

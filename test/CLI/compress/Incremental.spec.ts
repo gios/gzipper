@@ -102,9 +102,9 @@ describe('CLI Compress -> Incremental', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );

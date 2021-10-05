@@ -18,6 +18,7 @@ import { CompressOptions } from '../../../src/interfaces';
 import { NO_FILES_MESSAGE } from '../../../src/constants';
 import { LogLevel } from '../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../src/logger/Logger';
+import { CompressionNames } from '../../../src/enums';
 
 const fsLstat = util.promisify(fs.lstat);
 
@@ -65,9 +66,9 @@ describe('CLI Compress', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -143,9 +144,9 @@ describe('CLI Compress', () => {
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(logSpy.calledWithExactly(NO_FILES_MESSAGE, LogLevel.WARNING));
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -161,9 +162,9 @@ describe('CLI Compress', () => {
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(logSpy.calledWithExactly(NO_FILES_MESSAGE, LogLevel.WARNING));
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -193,9 +194,9 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(compressedFiles.length, 1);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -245,9 +246,9 @@ describe('CLI Compress', () => {
         }),
       );
     }
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -279,9 +280,9 @@ describe('CLI Compress', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -312,7 +313,7 @@ describe('CLI Compress', () => {
       const fileExt = path.extname(file);
       const fileName = path.basename(file, fileExt);
       const output = `test-${fileName}-55-${fileName}.${
-        (compress as any).compressionInstance.ext
+        (compress as any).compressionInstances[0].ext
       }x${fileExt}`;
       assert.ok(compressedFilesNames.includes(output));
     }
@@ -360,9 +361,9 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(files.length, 1);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -393,9 +394,9 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(beforeFiles.length, files.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -424,9 +425,9 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -463,9 +464,9 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(filesGzipped.length, includedFiles);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -492,9 +493,9 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(files.length, 6);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -521,9 +522,9 @@ describe('CLI Compress', () => {
       logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -550,9 +551,9 @@ describe('CLI Compress', () => {
       logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -579,16 +580,16 @@ describe('CLI Compress', () => {
       logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
     assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
-  it.only('--brotli --deflate --gzip should run simultaneously', async () => {
+  it('--brotli --deflate --gzip should run simultaneously', async () => {
     const options: CompressOptions = {
       workers: 1,
       gzip: true,
@@ -601,24 +602,62 @@ describe('CLI Compress', () => {
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.gz', '.br', '.zz']);
 
-    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
+    const gzipFiles = await getFiles(COMPRESS_PATH, ['.gz']);
+    const brotliFiles = await getFiles(COMPRESS_PATH, ['.br']);
+    const deflateFiles = await getFiles(COMPRESS_PATH, ['.zz']);
+
+    const gzipInstance = (compress as any).compressionInstances.find(
+      (instance: any) => instance.compressionName === CompressionNames.GZIP,
+    );
+    assert.ok(
+      logSpy.calledWithExactly('Compression GZIP | memLevel: 1', LogLevel.INFO),
+    );
+    assert.strictEqual(gzipFiles.length, 21);
+    assert.strictEqual(gzipInstance.ext, 'gz');
+    assert.strictEqual(Object.keys(gzipInstance.compressionOptions).length, 1);
+
+    const brotliInstance = (compress as any).compressionInstances.find(
+      (instance: any) => instance.compressionName === CompressionNames.BROTLI,
+    );
+    assert.ok(
+      logSpy.calledWithExactly(
+        'Compression BROTLI | quality: 2',
+        LogLevel.INFO,
+      ),
+    );
+    assert.strictEqual(brotliFiles.length, 21);
+    assert.strictEqual(brotliInstance.ext, 'br');
+    assert.strictEqual(
+      Object.keys(brotliInstance.compressionOptions).length,
+      1,
+    );
+
+    const deflateInstance = (compress as any).compressionInstances.find(
+      (instance: any) => instance.compressionName === CompressionNames.DEFLATE,
+    );
+    assert.ok(
+      logSpy.calledWithExactly('Compression DEFLATE | level: 3', LogLevel.INFO),
+    );
+    assert.strictEqual(deflateFiles.length, 21);
+    assert.strictEqual(deflateInstance.ext, 'zz');
+    assert.strictEqual(
+      Object.keys(deflateInstance.compressionOptions).length,
+      1,
+    );
+
     assert.ok(
       logSpy.calledWithExactly(
         sinonSandbox.match(
-          new RegExp(`${files.length} file has been compressed. (.+)`),
+          new RegExp(
+            `${
+              gzipFiles.length + brotliFiles.length + deflateFiles.length
+            } files have been compressed. (.+)`,
+          ),
         ),
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual(files.length, 1);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
-    assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
-        .length,
-      3,
-    );
-    assert.strictEqual(Object.keys((compress as any).options).length, 6);
+    assert.strictEqual(Object.keys((compress as any).options).length, 7);
   });
 });

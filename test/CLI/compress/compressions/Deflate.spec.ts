@@ -59,23 +59,23 @@ describe('CLI Compress -> Deflate compression', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'zz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'zz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       3,
     );
     assert.strictEqual(Object.keys((compress as any).options).length, 5);
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.level,
+      (compress as any).compressionInstances[0].compressionOptions.level,
       6,
     );
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.memLevel,
+      (compress as any).compressionInstances[0].compressionOptions.memLevel,
       4,
     );
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.strategy,
+      (compress as any).compressionInstances[0].compressionOptions.strategy,
       2,
     );
   });

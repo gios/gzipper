@@ -17,6 +17,7 @@ import { Incremental } from './Incremental';
 import { Config } from './Config';
 import { LogLevel } from './logger/LogLevel.enum';
 import { CompressService } from './Compress.service';
+import { CompressionExtensions } from './enums';
 
 /**
  * Compressing files.
@@ -131,7 +132,9 @@ export class Compress {
         compressedFiles.push(...(await this.getFilesToCompress(filePath)));
       } else if (
         fileStat.isFile() &&
-        this.service.isValidFileExtensions(path.extname(filePath).slice(1))
+        this.service.isValidFileExtensions(
+          path.extname(filePath).slice(1) as CompressionExtensions,
+        )
       ) {
         if (fileStat.size < (this.options.threshold ?? 0)) {
           continue;

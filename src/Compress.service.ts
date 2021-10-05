@@ -2,6 +2,7 @@ import { BrotliCompression } from './compressions/Brotli';
 import { DeflateCompression } from './compressions/Deflate';
 import { GzipCompression } from './compressions/Gzip';
 import { COMPRESSION_EXTENSIONS } from './constants';
+import { CompressionExtensions } from './enums';
 import { CompressionType, CompressOptions } from './interfaces';
 
 export class CompressService {
@@ -36,7 +37,7 @@ export class CompressService {
   /**
    * Returns if the file extension is valid.
    */
-  public isValidFileExtensions(ext: string): boolean {
+  public isValidFileExtensions(ext: CompressionExtensions): boolean {
     if (COMPRESSION_EXTENSIONS.includes(ext)) {
       return false;
     }
