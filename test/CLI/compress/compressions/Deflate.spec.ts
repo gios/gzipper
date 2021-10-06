@@ -10,6 +10,7 @@ import {
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
+import { CompressOptions } from '../../../../src/interfaces';
 
 describe('CLI Compress -> Deflate compression', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -26,12 +27,11 @@ describe('CLI Compress -> Deflate compression', () => {
   });
 
   it('--level, --memory-level, --strategy should change gzip configuration', async () => {
-    const options = {
+    const options: CompressOptions = {
       deflate: true,
-      level: 6,
-      memoryLevel: 4,
-      strategy: 2,
-      threshold: 0,
+      deflateLevel: 6,
+      deflateMemoryLevel: 4,
+      deflateStrategy: 2,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -59,23 +59,23 @@ describe('CLI Compress -> Deflate compression', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'zz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'zz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 6);
+    assert.strictEqual(Object.keys((compress as any).options).length, 5);
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.level,
+      (compress as any).compressionInstances[0].compressionOptions.level,
       6,
     );
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.memLevel,
+      (compress as any).compressionInstances[0].compressionOptions.memLevel,
       4,
     );
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions.strategy,
+      (compress as any).compressionInstances[0].compressionOptions.strategy,
       2,
     );
   });

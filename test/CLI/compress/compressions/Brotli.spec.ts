@@ -11,6 +11,7 @@ import {
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
+import { CompressOptions } from '../../../../src/interfaces';
 
 describe('CLI Compress -> Brotli compression', () => {
   let sinonSandbox: sinon.SinonSandbox;
@@ -27,12 +28,11 @@ describe('CLI Compress -> Brotli compression', () => {
   });
 
   it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
-    const options = {
+    const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'text',
       brotliQuality: 10,
       brotliSizeHint: 5,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -42,7 +42,7 @@ describe('CLI Compress -> Brotli compression', () => {
 
     assert.ok(
       logSpy.calledWithExactly(
-        'Compression BROTLI | brotliParamMode: 1, brotliQuality: 10, brotliSizeHint: 5',
+        'Compression BROTLI | paramMode: 1, quality: 10, sizeHint: 5',
         LogLevel.INFO,
       ),
     );
@@ -60,27 +60,27 @@ describe('CLI Compress -> Brotli compression', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'br');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'br');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       3,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 6);
+    assert.strictEqual(Object.keys((compress as any).options).length, 5);
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
       zlib.constants.BROTLI_MODE_TEXT,
     );
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_QUALITY
       ],
       10,
     );
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_SIZE_HINT
       ],
       5,
@@ -88,10 +88,9 @@ describe('CLI Compress -> Brotli compression', () => {
   });
 
   it('--brotli-param-mode=default should change brotli configuration', async () => {
-    const options = {
+    const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'default',
-      threshold: 0,
       workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
@@ -104,7 +103,7 @@ describe('CLI Compress -> Brotli compression', () => {
 
     assert.ok(
       logSpy.calledWithExactly(
-        'Compression BROTLI | brotliParamMode: 0',
+        'Compression BROTLI | paramMode: 0',
         LogLevel.INFO,
       ),
     );
@@ -116,15 +115,15 @@ describe('CLI Compress -> Brotli compression', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'br');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'br');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       1,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 4);
+    assert.strictEqual(Object.keys((compress as any).options).length, 3);
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
       zlib.constants.BROTLI_MODE_GENERIC,
@@ -132,10 +131,9 @@ describe('CLI Compress -> Brotli compression', () => {
   });
 
   it('wrong value for --brotli-param-mode should change brotli configuration to brotliParamMode=default', async () => {
-    const options = {
+    const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'amigos',
-      threshold: 0,
       workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
@@ -148,7 +146,7 @@ describe('CLI Compress -> Brotli compression', () => {
 
     assert.ok(
       logSpy.calledWithExactly(
-        'Compression BROTLI | brotliParamMode: 0',
+        'Compression BROTLI | paramMode: 0',
         LogLevel.INFO,
       ),
     );
@@ -160,15 +158,15 @@ describe('CLI Compress -> Brotli compression', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'br');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'br');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       1,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 4);
+    assert.strictEqual(Object.keys((compress as any).options).length, 3);
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
       zlib.constants.BROTLI_MODE_GENERIC,
@@ -176,10 +174,9 @@ describe('CLI Compress -> Brotli compression', () => {
   });
 
   it('--brotli-param-mode=font should change brotli configuration', async () => {
-    const options = {
+    const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'font',
-      threshold: 0,
       workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
@@ -192,7 +189,7 @@ describe('CLI Compress -> Brotli compression', () => {
 
     assert.ok(
       logSpy.calledWithExactly(
-        'Compression BROTLI | brotliParamMode: 2',
+        'Compression BROTLI | paramMode: 2',
         LogLevel.INFO,
       ),
     );
@@ -204,15 +201,15 @@ describe('CLI Compress -> Brotli compression', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'br');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'br');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       1,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 4);
+    assert.strictEqual(Object.keys((compress as any).options).length, 3);
     assert.strictEqual(
-      (compress as any).compressionInstance.compressionOptions[
+      (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
       zlib.constants.BROTLI_MODE_FONT,

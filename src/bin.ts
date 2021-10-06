@@ -37,23 +37,39 @@ export class Index {
         'exclude assets smaller than this byte size. 0 (default)',
         (value) => parseInt(value),
       )
-      .option(
-        '--level <number>',
-        'compression level 6 (default), 0 (no compression) - 9 (best compression)',
-        (value) => parseInt(value),
-      )
-      .option(
-        '--memory-level <number>',
-        'amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
-        (value) => parseInt(value),
-      )
-      .option(
-        '--strategy <number>',
-        'compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
-        (value) => parseInt(value),
-      )
       .option('--deflate', 'enable deflate compression')
       .option('--brotli', 'enable brotli compression')
+      .option('--gzip', 'enable gzip compression')
+      .option(
+        '--gzip-level <number>',
+        'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
+        (value) => parseInt(value),
+      )
+      .option(
+        '--gzip-memory-level <number>',
+        'amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
+        (value) => parseInt(value),
+      )
+      .option(
+        '--gzip-strategy <number>',
+        'gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
+        (value) => parseInt(value),
+      )
+      .option(
+        '--deflate-level <number>',
+        'deflate compression level 6 (default), 0 (no compression) - 9 (best compression)',
+        (value) => parseInt(value),
+      )
+      .option(
+        '--deflate-memory-level <number>',
+        'amount of memory which will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
+        (value) => parseInt(value),
+      )
+      .option(
+        '--deflate-strategy <number>',
+        'deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
+        (value) => parseInt(value),
+      )
       .option(
         '--brotli-param-mode <value>',
         'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)',
@@ -126,18 +142,32 @@ export class Index {
         parseInt(this.env.GZIPPER_THRESHOLD as string) ||
         options.threshold ||
         0,
-      level: parseInt(this.env.GZIPPER_LEVEL as string) || options.level,
-      memoryLevel:
-        parseInt(this.env.GZIPPER_MEMORY_LEVEL as string) ||
-        options.memoryLevel,
-      strategy:
-        parseInt(this.env.GZIPPER_STRATEGY as string) || options.strategy,
       brotli: this.env.GZIPPER_BROTLI
         ? !!parseInt(this.env.GZIPPER_BROTLI as string)
         : options.brotli,
       deflate: this.env.GZIPPER_DEFLATE
         ? !!parseInt(this.env.GZIPPER_DEFLATE as string)
         : options.deflate,
+      gzip: this.env.GZIPPER_GZIP
+        ? !!parseInt(this.env.GZIPPER_GZIP as string)
+        : options.gzip,
+      gzipLevel:
+        parseInt(this.env.GZIPPER_GZIP_LEVEL as string) || options.gzipLevel,
+      gzipMemoryLevel:
+        parseInt(this.env.GZIPPER_GZIP_MEMORY_LEVEL as string) ||
+        options.gzipMemoryLevel,
+      gzipStrategy:
+        parseInt(this.env.GZIPPER_GZIP_STRATEGY as string) ||
+        options.gzipStrategy,
+      deflateLevel:
+        parseInt(this.env.GZIPPER_DEFLATE_LEVEL as string) ||
+        options.deflateLevel,
+      deflateMemoryLevel:
+        parseInt(this.env.GZIPPER_DEFLATE_MEMORY_LEVEL as string) ||
+        options.deflateMemoryLevel,
+      deflateStrategy:
+        parseInt(this.env.GZIPPER_DEFLATE_STRATEGY as string) ||
+        options.deflateStrategy,
       brotliParamMode:
         this.env.GZIPPER_BROTLI_PARAM_MODE || options.brotliParamMode,
       brotliQuality:

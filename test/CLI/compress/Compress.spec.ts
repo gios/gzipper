@@ -18,6 +18,7 @@ import { CompressOptions } from '../../../src/interfaces';
 import { NO_FILES_MESSAGE } from '../../../src/constants';
 import { LogLevel } from '../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../src/logger/Logger';
+import { CompressionNames } from '../../../src/enums';
 
 const fsLstat = util.promisify(fs.lstat);
 
@@ -65,13 +66,13 @@ describe('CLI Compress', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
     assert.strictEqual(
       (compress as any).options.outputFileFormat,
       options.outputFileFormat,
@@ -92,7 +93,6 @@ describe('CLI Compress', () => {
   it('should throw on compress error', async () => {
     const compress = new Compress(COMPRESS_PATH, null, {
       workers: 1,
-      threshold: 0,
     });
     const createWorkersSpy = sinonSandbox.spy(compress, 'createWorkers' as any);
     const logSpy = sinonSandbox.spy(Logger, 'log');
@@ -117,8 +117,7 @@ describe('CLI Compress', () => {
   });
 
   it('should print message about appropriate files', async () => {
-    const options = {
-      threshold: 0,
+    const options: CompressOptions = {
       exclude: [
         'js',
         'css',
@@ -145,39 +144,37 @@ describe('CLI Compress', () => {
 
     assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
     assert.ok(logSpy.calledWithExactly(NO_FILES_MESSAGE, LogLevel.WARNING));
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
-        .length,
-      0,
-    );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
-  });
-
-  it('should print message about empty folder', async () => {
-    const compress = new Compress(EMPTY_FOLDER_PATH, null, {
-      workers: 1,
-      threshold: 0,
-    });
-    const logSpy = sinonSandbox.spy(Logger, 'log');
-    await compress.run();
-
-    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
-    assert.ok(logSpy.calledWithExactly(NO_FILES_MESSAGE, LogLevel.WARNING));
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
-    assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
     assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
+  it('should print message about empty folder', async () => {
+    const compress = new Compress(EMPTY_FOLDER_PATH, null, {
+      workers: 1,
+    });
+    const logSpy = sinonSandbox.spy(Logger, 'log');
+    await compress.run();
+
+    assert.ok(logSpy.calledWithExactly('Compression GZIP | ', LogLevel.INFO));
+    assert.ok(logSpy.calledWithExactly(NO_FILES_MESSAGE, LogLevel.WARNING));
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
+    assert.strictEqual(
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
+        .length,
+      0,
+    );
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
+  });
+
   it('should compress a single file to a certain folder', async () => {
     const file = `${COMPRESS_PATH}${path.sep}index.txt`;
     const compress = new Compress(file, COMPRESS_PATH_TARGET, {
       workers: 1,
-      threshold: 0,
     });
     const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
@@ -197,19 +194,18 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(compressedFiles.length, 1);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
   });
 
   it('should compress files to a certain folder with existing folder structure', async () => {
     const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, {
       workers: 1,
-      threshold: 0,
     });
     const logSpy = sinonSandbox.spy(Logger, 'log');
     await compress.run();
@@ -250,17 +246,17 @@ describe('CLI Compress', () => {
         }),
       );
     }
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
   });
 
   it('should use default file format artifacts via --output-file-format', async () => {
-    const options = { workers: 1, threshold: 0 };
+    const options: CompressOptions = { workers: 1 };
     const compress = new Compress(COMPRESS_PATH, null, options);
     const logSpy = sinonSandbox.spy(Logger, 'log');
     const files = await getFiles(COMPRESS_PATH);
@@ -284,13 +280,13 @@ describe('CLI Compress', () => {
         LogLevel.SUCCESS,
       ),
     );
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
     assert.strictEqual((compress as any).options.outputFileFormat, undefined);
 
     for (const [index, compressedFile] of compressedFiles.entries()) {
@@ -301,9 +297,8 @@ describe('CLI Compress', () => {
   });
 
   it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
-    const options = {
+    const options: CompressOptions = {
       outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
-      threshold: 0,
       workers: 1,
     };
 
@@ -318,16 +313,15 @@ describe('CLI Compress', () => {
       const fileExt = path.extname(file);
       const fileName = path.basename(file, fileExt);
       const output = `test-${fileName}-55-${fileName}.${
-        (compress as any).compressionInstance.ext
+        (compress as any).compressionInstances[0].ext
       }x${fileExt}`;
       assert.ok(compressedFilesNames.includes(output));
     }
   });
 
   it('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
-    const options = {
+    const options: CompressOptions = {
       outputFileFormat: '[filename]-[hash]-55.[ext]',
-      threshold: 0,
       workers: 1,
     };
 
@@ -348,9 +342,8 @@ describe('CLI Compress', () => {
   });
 
   it('should --include specific file extensions for compression (also exclude others)', async () => {
-    const options = {
+    const options: CompressOptions = {
       include: ['sunny'],
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -368,19 +361,18 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(files.length, 1);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('should --exclude file extensions from compression jpeg,jpg', async () => {
-    const options = {
+    const options: CompressOptions = {
       exclude: ['jpeg', 'jpg'],
-      threshold: 0,
       workers: 1,
     };
     const beforeFiles = (await getFiles(COMPRESS_PATH)).filter((file) => {
@@ -402,18 +394,17 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(beforeFiles.length, files.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('should --exclude compression extensions', async () => {
-    const options = {
-      threshold: 0,
+    const options: CompressOptions = {
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -434,18 +425,18 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+    assert.strictEqual(Object.keys((compress as any).options).length, 1);
   });
 
   it('should exclude file sizes smaller than 860 bytes from compression', async () => {
     const THRESHOLD = 860;
-    const options = {
+    const options: CompressOptions = {
       threshold: THRESHOLD,
       workers: 1,
     };
@@ -473,9 +464,9 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(filesGzipped.length, includedFiles);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
@@ -483,9 +474,8 @@ describe('CLI Compress', () => {
   });
 
   it('--remove-larger should remove compressed files', async () => {
-    const options = {
+    const options: CompressOptions = {
       removeLarger: true,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -503,19 +493,18 @@ describe('CLI Compress', () => {
       ),
     );
     assert.strictEqual(files.length, 6);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('--skip-compressed should skip compressed files', async () => {
-    const options = {
+    const options: CompressOptions = {
       skipCompressed: true,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, COMPRESS_PATH_TARGET, options);
@@ -533,19 +522,18 @@ describe('CLI Compress', () => {
       logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('--skip-compressed should skip compressed files (same folder)', async () => {
-    const options = {
+    const options: CompressOptions = {
       skipCompressed: true,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -563,19 +551,18 @@ describe('CLI Compress', () => {
       logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
   });
 
   it('--skip-compressed should skip compressed files with appropriate message', async () => {
-    const options = {
+    const options: CompressOptions = {
       skipCompressed: true,
-      threshold: 0,
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -593,12 +580,84 @@ describe('CLI Compress', () => {
       logSpy.calledWithExactly('No files for compression.', LogLevel.WARNING),
     );
     assert.strictEqual(filesBefore.length, filesAfter.length);
-    assert.strictEqual((compress as any).compressionInstance.ext, 'gz');
+    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
     assert.strictEqual(
-      Object.keys((compress as any).compressionInstance.compressionOptions)
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
       0,
     );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
+    assert.strictEqual(Object.keys((compress as any).options).length, 2);
+  });
+
+  it('--brotli --deflate --gzip should run simultaneously', async () => {
+    const options: CompressOptions = {
+      workers: 1,
+      gzip: true,
+      brotli: true,
+      deflate: true,
+      gzipMemoryLevel: 1,
+      deflateLevel: 3,
+      brotliQuality: 2,
+    };
+    const compress = new Compress(COMPRESS_PATH, null, options);
+    const logSpy = sinonSandbox.spy(Logger, 'log');
+    await compress.run();
+
+    const gzipFiles = await getFiles(COMPRESS_PATH, ['.gz']);
+    const brotliFiles = await getFiles(COMPRESS_PATH, ['.br']);
+    const deflateFiles = await getFiles(COMPRESS_PATH, ['.zz']);
+
+    const gzipInstance = (compress as any).compressionInstances.find(
+      (instance: any) => instance.compressionName === CompressionNames.GZIP,
+    );
+    assert.ok(
+      logSpy.calledWithExactly('Compression GZIP | memLevel: 1', LogLevel.INFO),
+    );
+    assert.strictEqual(gzipFiles.length, 21);
+    assert.strictEqual(gzipInstance.ext, 'gz');
+    assert.strictEqual(Object.keys(gzipInstance.compressionOptions).length, 1);
+
+    const brotliInstance = (compress as any).compressionInstances.find(
+      (instance: any) => instance.compressionName === CompressionNames.BROTLI,
+    );
+    assert.ok(
+      logSpy.calledWithExactly(
+        'Compression BROTLI | quality: 2',
+        LogLevel.INFO,
+      ),
+    );
+    assert.strictEqual(brotliFiles.length, 21);
+    assert.strictEqual(brotliInstance.ext, 'br');
+    assert.strictEqual(
+      Object.keys(brotliInstance.compressionOptions).length,
+      1,
+    );
+
+    const deflateInstance = (compress as any).compressionInstances.find(
+      (instance: any) => instance.compressionName === CompressionNames.DEFLATE,
+    );
+    assert.ok(
+      logSpy.calledWithExactly('Compression DEFLATE | level: 3', LogLevel.INFO),
+    );
+    assert.strictEqual(deflateFiles.length, 21);
+    assert.strictEqual(deflateInstance.ext, 'zz');
+    assert.strictEqual(
+      Object.keys(deflateInstance.compressionOptions).length,
+      1,
+    );
+
+    assert.ok(
+      logSpy.calledWithExactly(
+        sinonSandbox.match(
+          new RegExp(
+            `${
+              gzipFiles.length + brotliFiles.length + deflateFiles.length
+            } files have been compressed. (.+)`,
+          ),
+        ),
+        LogLevel.SUCCESS,
+      ),
+    );
+    assert.strictEqual(Object.keys((compress as any).options).length, 7);
   });
 });

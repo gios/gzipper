@@ -3,4 +3,5 @@ module.exports = {
   timeout: 20000,
   recursive: true,
   spec: './test/**/*.spec.ts',
+  slow: 0,
 };

@@ -1,16 +1,24 @@
 import zlib from 'zlib';
 
+import { BrotliCompression } from './compressions/Brotli';
+import { DeflateCompression } from './compressions/Deflate';
+import { GzipCompression } from './compressions/Gzip';
+
 export interface CompressOptions {
   verbose?: boolean;
   incremental?: boolean;
   exclude?: string[];
   include?: string[];
-  threshold: number;
-  level?: number;
-  memoryLevel?: number;
-  strategy?: number;
+  threshold?: number;
+  gzip?: boolean;
   deflate?: boolean;
   brotli?: boolean;
+  gzipLevel?: number;
+  gzipMemoryLevel?: number;
+  gzipStrategy?: number;
+  deflateLevel?: number;
+  deflateMemoryLevel?: number;
+  deflateStrategy?: number;
   brotliParamMode?: string;
   brotliQuality?: number;
   brotliSizeHint?: number;
@@ -25,6 +33,11 @@ export type CompressionOptions = {
   memoryLevel?: number;
   strategy?: number;
 } & zlib.ZlibOptions;
+
+export type CompressionType =
+  | BrotliCompression
+  | DeflateCompression
+  | GzipCompression;
 
 export type BrotliOptions = { [key: number]: number };
 
@@ -54,6 +67,7 @@ export interface IncrementalFileValueRevision {
   lastChecksum: string;
   fileId: string;
   date: Date;
+  compressionType: string;
   options: CompressionOptions | BrotliOptions;
 }
 

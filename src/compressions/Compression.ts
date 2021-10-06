@@ -22,6 +22,11 @@ export abstract class Compression<T extends CompressionOptions> {
   abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip;
 
   /**
+   * Build compression options object [compressionOptions].
+   */
+  protected abstract selectCompression(): void;
+
+  /**
    * Returns human-readable compression options info.
    */
   readableOptions(
@@ -36,26 +41,5 @@ export abstract class Compression<T extends CompressionOptions> {
     }
 
     return `${this.compressionName} | ${options.slice(0, -2)}`;
-  }
-
-  /**
-   * Build compression options object [compressionOptions].
-   */
-  protected selectCompression(): void {
-    const options: T = {} as T;
-
-    if (this.options.level !== undefined) {
-      options.level = this.options.level;
-    }
-
-    if (this.options.memoryLevel !== undefined) {
-      options.memLevel = this.options.memoryLevel;
-    }
-
-    if (this.options.strategy !== undefined) {
-      options.strategy = this.options.strategy;
-    }
-
-    this.compressionOptions = options;
   }
 }

@@ -5,8 +5,6 @@ import { Worker } from 'worker_threads';
 
 import { Helpers } from './helpers';
 import { Logger } from './logger/Logger';
-import { BrotliCompression } from './compressions/Brotli';
-import { GzipCompression } from './compressions/Gzip';
 import {
   NO_FILES_MESSAGE,
   NO_PATH_MESSAGE,
@@ -14,12 +12,12 @@ import {
   INCREMENTAL_ENABLE_MESSAGE,
   WORKER_STARTED,
 } from './constants';
-import { CompressOptions, WorkerMessage } from './interfaces';
-import { DeflateCompression } from './compressions/Deflate';
+import { CompressionType, CompressOptions, WorkerMessage } from './interfaces';
 import { Incremental } from './Incremental';
 import { Config } from './Config';
 import { LogLevel } from './logger/LogLevel.enum';
 import { CompressService } from './Compress.service';
+import { CompressionExtensions } from './enums';
 
 /**
  * Compressing files.
@@ -33,10 +31,7 @@ export class Compress {
   private readonly config: Config;
   private readonly options: CompressOptions;
   private readonly outputPath: string | undefined;
-  private readonly compressionInstance:
-    | BrotliCompression
-    | GzipCompression
-    | DeflateCompression;
+  private readonly compressionInstances: CompressionType[];
   private readonly target: string;
   private readonly service: CompressService;
 
@@ -46,7 +41,7 @@ export class Compress {
   constructor(
     target: string,
     outputPath?: string | null,
-    options: CompressOptions = {} as never,
+    options: CompressOptions = {},
   ) {
     Logger.setVerboseMode(options.verbose as boolean);
     this.config = new Config();
@@ -64,7 +59,7 @@ export class Compress {
     this.target = path.resolve(process.cwd(), target);
     this.options = options;
     this.service = new CompressService(this.options);
-    this.compressionInstance = this.service.getCompressionInstance();
+    this.compressionInstances = this.service.getCompressionInstances();
   }
 
   /**
@@ -137,9 +132,11 @@ export class Compress {
         compressedFiles.push(...(await this.getFilesToCompress(filePath)));
       } else if (
         fileStat.isFile() &&
-        this.service.isValidFileExtensions(path.extname(filePath).slice(1))
+        this.service.isValidFileExtensions(
+          path.extname(filePath).slice(1) as CompressionExtensions,
+        )
       ) {
-        if (fileStat.size < this.options.threshold) {
+        if (fileStat.size < (this.options.threshold ?? 0)) {
           continue;
         }
         compressedFiles.push(filePath);
@@ -220,11 +217,12 @@ export class Compress {
    * Show message with compression params.
    */
   private compressionLog(): void {
-    const options = this.compressionInstance.readableOptions();
-    Logger.log(`Compression ${options}`, LogLevel.INFO);
-
     if (!this.options.outputFileFormat) {
       Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
+    }
+
+    for (const instance of this.compressionInstances) {
+      Logger.log(`Compression ${instance.readableOptions()}`, LogLevel.INFO);
     }
   }
 }

@@ -28,11 +28,15 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [-e, --exclude <extensions>](#-e---exclude-extensions)
       - [-i, --include <extensions>](#-i---include-extensions)
       - [-t, --threshold <number>](#-t---threshold-number)
-      - [--level <number>](#--level-number)
-      - [--memory-level <number>](#--memory-level-number)
-      - [--strategy <number>](#--strategy-number)
+      - [--gzip](#--gzip)
       - [--deflate](#--deflate)
       - [--brotli](#--brotli)
+      - [--gzip-level <number>](#--gzip-level-number)
+      - [--gzip-memory-level <number>](#--gzip-memory-level-number)
+      - [--gzip-strategy <number>](#--gzip-strategy-number)
+      - [--deflate-level <number>](#--deflate-level-number)
+      - [--deflate-memory-level <number>](#--deflate-memory-level-number)
+      - [--deflate-strategy <number>](#--deflate-strategy-number)
       - [--brotli-param-mode <value>](#--brotli-param-mode-value)
       - [--brotli-quality <number>](#--brotli-quality-number)
       - [--brotli-size-hint <number>](#--brotli-size-hint-number)
@@ -82,24 +86,28 @@ Usage: gzipper compress|c [options] <path> [outputPath]
 compress selected path and optionally set output directory
 
 Options:
-  -v, --verbose                 detailed level of logs
-  --incremental                 incremental compression
-  -e, --exclude <extensions>    exclude file extensions from compression, example: jpeg,jpg...
-  -i, --include <extensions>    include file extensions for compression, example: js,css,html...
-  -t, --threshold <number>      exclude assets smaller than this byte size. 0 (default)
-  --level <number>              compression level 6 (default), 0 (no compression) - 9 (best compression)
-  --memory-level <number>       amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
-  --strategy <number>           compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
-  --deflate                     enable deflate compression
-  --brotli                      enable brotli compression
-  --brotli-param-mode <value>   default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
-  --brotli-quality <number>     brotli compression quality 11 (default), 0 - 11
-  --brotli-size-hint <number>   expected input size 0 (default)
-  --output-file-format <value>  output file format with default artifacts [filename].[ext].[compressExt]
-  --remove-larger               remove compressed files if they larger than uncompressed originals
-  --skip-compressed             skip compressed files if they already exist
-  --workers                     numbers of workers which will be spawned, system CPU cores count (default)
-  -h, --help                    display help for command
+  -v, --verbose                    detailed level of logs
+  --incremental                    incremental compression
+  -e, --exclude <extensions>       exclude file extensions from compression, example: jpeg,jpg...
+  -i, --include <extensions>       include file extensions for compression, example: js,css,html...
+  -t, --threshold <number>         exclude assets smaller than this byte size. 0 (default)
+  --deflate                        enable deflate compression
+  --brotli                         enable brotli compression
+  --gzip                           enable gzip compression
+  --gzip-level <number>            gzip compression level 6 (default), 0 (no compression) - 9 (best compression)
+  --gzip-memory-level <number>     amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+  --gzip-strategy <number>         gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+  --deflate-level <number>         deflate compression level 6 (default), 0 (no compression) - 9 (best compression)
+  --deflate-memory-level <number>  amount of memory which will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+  --deflate-strategy <number>      deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+  --brotli-param-mode <value>      default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
+  --brotli-quality <number>        brotli compression quality 11 (default), 0 - 11
+  --brotli-size-hint <number>      expected input size 0 (default)
+  --output-file-format <value>     output file format with default artifacts [filename].[ext].[compressExt]
+  --remove-larger                  remove compressed files if they larger than uncompressed originals
+  --skip-compressed                skip compressed files if they already exist
+  --workers <number>               numbers of workers which will be spawned, system CPU cores count (default)
+  -h, --help                       display help for command
 ```
 
 ### Cache
@@ -214,25 +222,29 @@ try {
 
 ### Compress|c
 
-| Option                                                      | ENV                                |
-| ----------------------------------------------------------- | ---------------------------------- |
-| [`--incremental`](#--incremental)                           | `GZIPPER_INCREMENTAL` (0 or 1)     |
-| [`-v, --verbose`](#-v---verbose)                            | `GZIPPER_VERBOSE` (0 or 1)         |
-| [`-e, --exclude <extensions>`](#-e---exclude-extensions)    | `GZIPPER_EXCLUDE`                  |
-| [`-i, --include <extensions>`](#-i---include-extensions)    | `GZIPPER_INCLUDE`                  |
-| [`-t, --threshold <number>`](#-t---threshold-number)        | `GZIPPER_THRESHOLD`                |
-| [`--level <number>`](#--level-number)                       | `GZIPPER_LEVEL`                    |
-| [`--memory-level <number>`](#--memory-level-number)         | `GZIPPER_MEMORY_LEVEL`             |
-| [`--strategy <number>`](#--strategy-number)                 | `GZIPPER_STRATEGY`                 |
-| [`--deflate`](#--deflate)                                   | `GZIPPER_DEFLATE` (0 or 1)         |
-| [`--brotli`](#--brotli)                                     | `GZIPPER_BROTLI` (0 or 1)          |
-| [`--brotli-param-mode <value>`](#--brotli-param-mode-value) | `GZIPPER_BROTLI_PARAM_MODE`        |
-| [`--brotli-quality <number>`](#--brotli-quality-number)     | `GZIPPER_BROTLI_QUALITY`           |
-| [`--brotli-size-hint <number>`](#--brotli-size-hint-number) | `GZIPPER_BROTLI_SIZE_HINT`         |
-| [`--output-file-format <value>`](#--output-file-format)     | `GZIPPER_OUTPUT_FILE_FORMAT`       |
-| [`--remove-larger`](#--remove-larger)                       | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
-| [`--skip-compressed`](#--skip-compressed)                   | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
-| [`--workers`](#--workers)                                   | `GZIPPER_WORKERS`                  |
+| Option                                                              | ENV                                |
+| ------------------------------------------------------------------- | ---------------------------------- |
+| [`--incremental`](#--incremental)                                   | `GZIPPER_INCREMENTAL` (0 or 1)     |
+| [`-v, --verbose`](#-v---verbose)                                    | `GZIPPER_VERBOSE` (0 or 1)         |
+| [`-e, --exclude <extensions>`](#-e---exclude-extensions)            | `GZIPPER_EXCLUDE`                  |
+| [`-i, --include <extensions>`](#-i---include-extensions)            | `GZIPPER_INCLUDE`                  |
+| [`-t, --threshold <number>`](#-t---threshold-number)                | `GZIPPER_THRESHOLD`                |
+| [`--gzip`](#--gzip)                                                 | `GZIPPER_GZIP` (0 or 1)            |
+| [`--deflate`](#--deflate)                                           | `GZIPPER_DEFLATE` (0 or 1)         |
+| [`--brotli`](#--brotli)                                             | `GZIPPER_BROTLI` (0 or 1)          |
+| [`--gzip-level <number>`](#--gzip-level-number)                     | `GZIPPER_GZIP_LEVEL`               |
+| [`--gzip-memory-level <number>`](#--gzip-memory-level-number)       | `GZIPPER_GZIP_MEMORY_LEVEL`        |
+| [`--gzip-strategy <number>`](#--gzip-strategy-number)               | `GZIPPER_GZIP_STRATEGY`            |
+| [`--deflate-level <number>`](#--deflate-level-number)               | `GZIPPER_DEFLATE_LEVEL`            |
+| [`--deflate-memory-level <number>`](#--deflate-memory-level-number) | `GZIPPER_DEFLATE_MEMORY_LEVEL`     |
+| [`--deflate-strategy <number>`](#--deflate-strategy-number)         | `GZIPPER_DEFLATE_STRATEGY`         |
+| [`--brotli-param-mode <value>`](#--brotli-param-mode-value)         | `GZIPPER_BROTLI_PARAM_MODE`        |
+| [`--brotli-quality <number>`](#--brotli-quality-number)             | `GZIPPER_BROTLI_QUALITY`           |
+| [`--brotli-size-hint <number>`](#--brotli-size-hint-number)         | `GZIPPER_BROTLI_SIZE_HINT`         |
+| [`--output-file-format <value>`](#--output-file-format)             | `GZIPPER_OUTPUT_FILE_FORMAT`       |
+| [`--remove-larger`](#--remove-larger)                               | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
+| [`--skip-compressed`](#--skip-compressed)                           | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
+| [`--workers`](#--workers)                                           | `GZIPPER_WORKERS`                  |
 
 > ENV Variables have higher priority over CLI arguments.
 
@@ -266,23 +278,11 @@ Include file extensions for compression(exclude others), example: js,css,html...
 
 Exclude assets smaller than this byte size. 0 (default)
 
-#### --level <number>
+#### --gzip
 
-`gzipper c --level 8 ./dist`
+`gzipper c --gzip ./dist`
 
-Compression level 6 (default), 0 (no compression) - 9 (best compression)
-
-#### --memory-level <number>
-
-`gzipper c --memory-level 2 ./dist`
-
-Amount of memory which will be allocated for compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
-
-#### --strategy <number>
-
-`gzipper c --strategy 3 ./dist`
-
-Compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+Enable gzip compression. (default behavior)
 
 #### --deflate
 
@@ -295,6 +295,42 @@ Enable deflate compression.
 `gzipper c --brotli ./dist`
 
 Enable brotli compression.
+
+#### --gzip-level <number>
+
+`gzipper c --gzip-level 8 ./dist`
+
+Gzip compression level 6 (default), 0 (no compression) - 9 (best compression)
+
+#### --gzip-memory-level <number>
+
+`gzipper c --gzip-memory-level 2 ./dist`
+
+Amount of memory that will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+
+#### --gzip-strategy <number>
+
+`gzipper c --gzip-strategy 3 ./dist`
+
+Gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+
+#### --deflate-level <number>
+
+`gzipper c --deflate-level 8 ./dist`
+
+Deflate compression level 6 (default), 0 (no compression) - 9 (best compression)
+
+#### --deflate-memory-level <number>
+
+`gzipper c --deflate-memory-level 2 ./dist`
+
+Amount of memory that will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+
+#### --deflate-strategy <number>
+
+`gzipper c --deflate-strategy 3 ./dist`
+
+Deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
 
 #### --brotli-param-mode <value>
 
@@ -397,7 +433,7 @@ Spawn workers for parallel compression, be aware of workers number because every
 
 `gzipper cache purge`
 
-Removes all pre-compressed files from `cache` which was generated via `--incremental` flag.
+Removes all pre-compressed files from `cache` that was generated via `--incremental` flag.
 
 #### size
 

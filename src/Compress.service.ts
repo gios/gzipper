@@ -2,7 +2,8 @@ import { BrotliCompression } from './compressions/Brotli';
 import { DeflateCompression } from './compressions/Deflate';
 import { GzipCompression } from './compressions/Gzip';
 import { COMPRESSION_EXTENSIONS } from './constants';
-import { CompressOptions } from './interfaces';
+import { CompressionExtensions } from './enums';
+import { CompressionType, CompressOptions } from './interfaces';
 
 export class CompressService {
   private readonly options: CompressOptions;
@@ -15,25 +16,28 @@ export class CompressService {
   }
 
   /**
-   * Return compression instance.
+   * Return compression instances.
    */
-  public getCompressionInstance():
-    | BrotliCompression
-    | DeflateCompression
-    | GzipCompression {
+  public getCompressionInstances(): CompressionType[] {
+    const instances: CompressionType[] = [];
     if (this.options.brotli) {
-      return new BrotliCompression(this.options);
-    } else if (this.options.deflate) {
-      return new DeflateCompression(this.options);
-    } else {
-      return new GzipCompression(this.options);
+      instances.push(new BrotliCompression(this.options));
     }
+
+    if (this.options.deflate) {
+      instances.push(new DeflateCompression(this.options));
+    }
+
+    if (this.options.gzip || !instances.length) {
+      instances.push(new GzipCompression(this.options));
+    }
+    return instances;
   }
 
   /**
    * Returns if the file extension is valid.
    */
-  public isValidFileExtensions(ext: string): boolean {
+  public isValidFileExtensions(ext: CompressionExtensions): boolean {
     if (COMPRESSION_EXTENSIONS.includes(ext)) {
       return false;
     }

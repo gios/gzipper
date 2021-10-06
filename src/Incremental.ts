@@ -82,14 +82,17 @@ export class Incremental implements Cache {
   setFile(
     target: string,
     checksum: string,
+    compressionType: string,
     compressOptions: IncrementalFileValue['revisions'][number]['options'],
   ): {
     isChanged: boolean;
     fileId: string;
   } {
     const filePath = this._filePaths.get(target);
-    const selectedRevision = filePath?.revisions.find((revision) =>
-      deepEqual(revision.options, compressOptions),
+    const selectedRevision = filePath?.revisions.find(
+      (revision) =>
+        compressionType === revision.compressionType &&
+        deepEqual(revision.options, compressOptions),
     );
 
     if (!filePath) {
@@ -100,6 +103,7 @@ export class Incremental implements Cache {
             lastChecksum: checksum,
             fileId,
             date: new Date(),
+            compressionType,
             options: compressOptions,
           },
         ],
@@ -118,6 +122,7 @@ export class Incremental implements Cache {
           lastChecksum: checksum,
           fileId,
           date: new Date(),
+          compressionType,
           options: compressOptions,
         }),
       });
