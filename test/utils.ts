@@ -92,28 +92,24 @@ export async function getFiles(
   target: string,
   extensions: string[] = [],
 ): Promise<string[]> {
-  try {
-    const files: string[] = [];
-    const filesList = await readdir(target);
+  const files: string[] = [];
+  const filesList = await readdir(target);
 
-    for (const file of filesList) {
-      const filePath = path.resolve(target, file);
-      const isFile = (await lstat(filePath)).isFile();
-      const isDirectory = (await lstat(filePath)).isDirectory();
+  for (const file of filesList) {
+    const filePath = path.resolve(target, file);
+    const isFile = (await lstat(filePath)).isFile();
+    const isDirectory = (await lstat(filePath)).isDirectory();
 
-      if (isDirectory) {
-        files.push(...(await getFiles(filePath, extensions)));
-      } else if (isFile) {
-        if (extensions.length) {
-          filterByExtension(extensions, path.extname(filePath)) &&
-            files.push(filePath);
-        } else {
+    if (isDirectory) {
+      files.push(...(await getFiles(filePath, extensions)));
+    } else if (isFile) {
+      if (extensions.length) {
+        filterByExtension(extensions, path.extname(filePath)) &&
           files.push(filePath);
-        }
+      } else {
+        files.push(filePath);
       }
     }
-    return files;
-  } catch (error) {
-    throw new Error(error);
   }
+  return files;
 }
