@@ -18,14 +18,14 @@ export class Logger {
    * Log message.
    */
   @filter()
-  static log(message: string, level: LogLevel = LogLevel.DEBUG): void {
+  static log<T>(message: T, level: LogLevel = LogLevel.DEBUG): void {
     return Logger.logger(message, level);
   }
 
   /**
    * Colorize messages depends on the level and return a wrapper.
    */
-  private static logger(message: string, level: LogLevel): void {
+  private static logger<T>(message: T, level: LogLevel): void {
     let colorfulMessage: string;
     const prefix = 'gzipper';
 

@@ -89,8 +89,8 @@ export class Compress {
         await this.config.writeConfig();
       }
     } catch (error) {
-      Logger.log(error, LogLevel.ERROR);
-      throw new Error(error.message);
+      Logger.log(error as Error, LogLevel.ERROR);
+      throw new Error((error as Error).message);
     }
 
     const filesCount = files.length;
