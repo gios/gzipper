@@ -277,16 +277,25 @@ export class Index {
   }
 
   // Delete undefined and NaN options.
-  private filterOptions<T>(options: T): T {
-    for (const key in options) {
-      if (Object.prototype.hasOwnProperty.call(options, key)) {
-        if (options[key] === undefined || options[key] !== options[key]) {
-          delete options[key];
-        }
-      }
-    }
-
-    return options;
+  private filterOptions<T extends CompressOptions>(options: T): T {
+    return Object.keys(options)
+      .filter((key) => {
+        return (
+          Object.prototype.hasOwnProperty.call(options, key) &&
+          !(
+            (options as Record<string, unknown>)[key] === undefined ||
+            (options as Record<string, unknown>)[key] !==
+              (options as Record<string, unknown>)[key]
+          )
+        );
+      })
+      .reduce(
+        (obj, key) => ({
+          ...obj,
+          [key]: (options as Record<string, unknown>)[key],
+        }),
+        {} as T,
+      );
   }
 
   private optionToArray<T>(value: T): string[] | T {

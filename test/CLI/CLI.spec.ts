@@ -1,5 +1,4 @@
 import sinon from 'sinon';
-import assert from 'assert';
 
 import { Index } from '../../src/bin';
 import { Compress } from '../../src/Compress';
@@ -9,33 +8,19 @@ import { Incremental } from '../../src/Incremental';
 import { LogLevel } from '../../src/logger/LogLevel.enum';
 import { Helpers } from '../../src/helpers';
 
-describe.only('Index CLI', () => {
+describe('Index CLI', () => {
   let sinonSandbox: sinon.SinonSandbox;
-  let clock: sinon.SinonFakeTimers;
-
-  function compareValues(value1: unknown, value2: unknown): boolean {
-    if (Array.isArray(value1) && Array.isArray(value2)) {
-      return (
-        value1.length === value2.length &&
-        value1.every((value, index) => value === value2[index])
-      );
-    }
-
-    return value1 === value2;
-  }
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers();
     sinonSandbox = sinon.createSandbox();
   });
 
   afterEach(async () => {
-    clock.restore();
     sinonSandbox.restore();
     sinon.restore();
   });
 
-  it("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
+  it.only("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
     const cliArguments = [
       'node.exe',
       'index.js',
@@ -66,10 +51,7 @@ describe.only('Index CLI', () => {
       '5',
       '--brotli-size-hint',
       '77',
-      '--zopfli-num-iterations',
-      '10',
       '--zopfli-block-splitting',
-      '--zopfli-block-splitting-last',
       '--zopfli-block-splitting-max',
       '5',
       '--output-file-format',
@@ -87,12 +69,34 @@ describe.only('Index CLI', () => {
       .stub(Compress.prototype, 'run')
       .resolves([]);
     await index.exec();
-    assert.strictEqual(runCompressSpy.callCount, 1);
-    assert.strictEqual(compressRunStub.callCount, 1);
-    assert.strictEqual(filterOptionsSpy.callCount, 1);
-    const [target, outputPath, options] = runCompressSpy.args[0];
-    assert.strictEqual(target, 'folder_to_compress');
-    assert.strictEqual(outputPath, 'folder_to_compress_out');
+    const request: CompressOptions = {
+      verbose: true,
+      incremental: true,
+      exclude: ['png', 'jpg', 'js'],
+      include: ['png', 'wav'],
+      threshold: 500,
+      brotli: true,
+      deflate: true,
+      gzip: true,
+      zopfli: true,
+      gzipLevel: 7,
+      gzipMemoryLevel: 1,
+      gzipStrategy: undefined,
+      deflateLevel: undefined,
+      deflateMemoryLevel: undefined,
+      deflateStrategy: 3,
+      brotliParamMode: 'text',
+      brotliQuality: 5,
+      brotliSizeHint: 77,
+      zopfliNumIterations: undefined,
+      zopfliBlockSplitting: true,
+      zopfliBlockSplittingLast: undefined,
+      zopfliBlockSplittingMax: 5,
+      outputFileFormat: 'test-[filename].[ext].[compressExt]',
+      removeLarger: true,
+      skipCompressed: true,
+      workers: 2,
+    };
     const response: CompressOptions = {
       verbose: true,
       incremental: true,
@@ -110,83 +114,21 @@ describe.only('Index CLI', () => {
       brotliQuality: 5,
       brotliSizeHint: 77,
       outputFileFormat: 'test-[filename].[ext].[compressExt]',
-      zopfliNumIterations: 10,
       zopfliBlockSplitting: true,
-      zopfliBlockSplittingLast: true,
       zopfliBlockSplittingMax: 5,
       removeLarger: true,
       skipCompressed: true,
       workers: 2,
     };
-    assert.deepStrictEqual(filterOptionsSpy.args[0][0], response);
-    assert.ok(
-      Object.entries(response).every(([key, val]) =>
-        compareValues(options[key], val),
-      ),
-    );
-  });
-
-  it("compress <path> [outputPath] - should exec 'runCompress' with filtered options", async () => {
-    const cliArguments = [
-      'node.exe',
-      'index.js',
-      'compress',
+    sinonSandbox.assert.calledOnceWithExactly(
+      runCompressSpy,
       'folder_to_compress',
       'folder_to_compress_out',
-      '--verbose',
-      '--exclude',
-      'php,cc',
-      '--include',
-      'css',
-      '--threshold',
-      '800',
-      '--gzip-level',
-      '4',
-      '--gzip-memory-level',
-      '2',
-      '--gzip-strategy',
-      '4',
-      '--zopfli-num-iterations',
-      '10',
-      '--zopfli-block-splitting',
-      '--output-file-format',
-      'test-[filename]-out.[ext].[compressExt]',
-    ];
-    const index = new Index();
-    (index as any).argv = cliArguments;
-    const runCompressSpy = sinonSandbox.spy(index as any, 'runCompress');
-    const filterOptionsSpy = sinonSandbox.spy(index as any, 'filterOptions');
-    const compressRunStub = sinonSandbox
-      .stub(Compress.prototype, 'run')
-      .resolves([]);
-    await index.exec();
-    assert.strictEqual(runCompressSpy.callCount, 1);
-    assert.strictEqual(compressRunStub.callCount, 1);
-    assert.strictEqual(filterOptionsSpy.callCount, 1);
-    const [target, outputPath, options] = runCompressSpy.args[0];
-    assert.strictEqual(target, 'folder_to_compress');
-    assert.strictEqual(outputPath, 'folder_to_compress_out');
-    const response: CompressOptions = {
-      verbose: true,
-      exclude: ['php', 'cc'],
-      include: ['css'],
-      threshold: 800,
-      gzipLevel: 4,
-      gzipMemoryLevel: 2,
-      gzipStrategy: 4,
-      zopfliNumIterations: 10,
-      zopfliBlockSplitting: true,
-      outputFileFormat: 'test-[filename]-out.[ext].[compressExt]',
-    };
-    assert.deepStrictEqual(filterOptionsSpy.args[0][0], response);
-    assert.ok(
-      !Object.values(options).some((val) => val !== val || val === undefined),
+      request,
     );
-    assert.ok(
-      Object.entries(response).every(([key, val]) =>
-        compareValues(options[key], val),
-      ),
-    );
+    sinonSandbox.assert.match(compressRunStub.callCount, 1);
+    sinonSandbox.assert.calledOnceWithExactly(filterOptionsSpy, request);
+    sinonSandbox.assert.match(filterOptionsSpy.returnValues[0], response);
   });
 
   it("compress <path> [outputPath] - should exec 'runCompress' with overwrite options", async () => {
@@ -276,12 +218,34 @@ describe.only('Index CLI', () => {
       .stub(Compress.prototype, 'run')
       .resolves([]);
     await index.exec();
-    assert.strictEqual(runCompressSpy.callCount, 1);
-    assert.strictEqual(compressRunStub.callCount, 1);
-    assert.strictEqual(filterOptionsSpy.callCount, 1);
-    const [target, outputPath, options] = runCompressSpy.args[0];
-    assert.strictEqual(target, 'folder_to_compress');
-    assert.strictEqual(outputPath, 'folder_to_compress_out');
+    const request: CompressOptions = {
+      verbose: false,
+      incremental: false,
+      exclude: ['py', 'c'],
+      include: ['r', 'rs'],
+      threshold: 800,
+      brotli: false,
+      deflate: false,
+      gzip: false,
+      zopfli: false,
+      gzipLevel: 2,
+      gzipMemoryLevel: 2,
+      gzipStrategy: 4,
+      deflateLevel: 1,
+      deflateMemoryLevel: 1,
+      deflateStrategy: 3,
+      brotliParamMode: 'font',
+      brotliQuality: 3,
+      brotliSizeHint: 10,
+      zopfliNumIterations: 9,
+      zopfliBlockSplitting: false,
+      zopfliBlockSplittingLast: false,
+      zopfliBlockSplittingMax: 14,
+      outputFileFormat: '[filename]-[hash].[ext].[compressExt]',
+      removeLarger: false,
+      skipCompressed: false,
+      workers: 3,
+    };
     const response: CompressOptions = {
       incremental: false,
       verbose: false,
@@ -310,11 +274,15 @@ describe.only('Index CLI', () => {
       skipCompressed: false,
       workers: 3,
     };
-    assert.ok(
-      Object.entries(response).every(([key, val]) =>
-        compareValues(options[key], val),
-      ),
+    sinonSandbox.assert.calledOnceWithExactly(
+      runCompressSpy,
+      'folder_to_compress',
+      'folder_to_compress_out',
+      request,
     );
+    sinonSandbox.assert.match(compressRunStub.callCount, 1);
+    sinonSandbox.assert.calledOnceWithExactly(filterOptionsSpy, request);
+    sinonSandbox.assert.match(filterOptionsSpy.returnValues[0], response);
   });
 
   it("cache purge should exec 'cachePurge' and throw the SUCCESS message", async () => {
@@ -328,10 +296,10 @@ describe.only('Index CLI', () => {
     );
     const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.SUCCESS);
-    assert.strictEqual(cachePurgeStub.callCount, 1);
-    assert.strictEqual(cacheSizeStub.callCount, 0);
+    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
+    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.SUCCESS);
+    sinonSandbox.assert.match(cachePurgeStub.callCount, 1);
+    sinonSandbox.assert.match(cacheSizeStub.callCount, 0);
   });
 
   it("cache size should exec 'cacheSize' and throw the info message", async () => {
@@ -345,10 +313,10 @@ describe.only('Index CLI', () => {
     );
     const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.INFO);
-    assert.strictEqual(cachePurgeStub.callCount, 0);
-    assert.strictEqual(cacheSizeStub.callCount, 1);
+    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
+    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.INFO);
+    sinonSandbox.assert.match(cachePurgeStub.callCount, 0);
+    sinonSandbox.assert.match(cacheSizeStub.callCount, 1);
   });
 
   it("cache size should exec 'cacheSize', 'readableSize' and throw the info message", async () => {
@@ -365,11 +333,11 @@ describe.only('Index CLI', () => {
       .stub(Incremental.prototype, 'cacheSize')
       .resolves(12);
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.INFO);
-    assert.strictEqual(cachePurgeStub.callCount, 0);
-    assert.strictEqual(cacheSizeStub.callCount, 1);
-    assert.strictEqual(readableSizeStub.callCount, 1);
+    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
+    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.INFO);
+    sinonSandbox.assert.match(cachePurgeStub.callCount, 0);
+    sinonSandbox.assert.match(cacheSizeStub.callCount, 1);
+    sinonSandbox.assert.match(readableSizeStub.callCount, 1);
   });
 
   it('cache size should throw the error message', async () => {
@@ -385,10 +353,10 @@ describe.only('Index CLI', () => {
       .stub(Incremental.prototype, 'cacheSize')
       .throws('Error');
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.ERROR);
-    assert.strictEqual(cachePurgeStub.callCount, 0);
-    assert.strictEqual(cacheSizeStub.callCount, 1);
+    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
+    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.ERROR);
+    sinonSandbox.assert.match(cachePurgeStub.callCount, 0);
+    sinonSandbox.assert.match(cacheSizeStub.callCount, 1);
   });
 
   it('cache purge should throw the error message', async () => {
@@ -402,9 +370,9 @@ describe.only('Index CLI', () => {
     const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
 
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.ERROR);
-    assert.strictEqual(cachePurgeStub.callCount, 1);
-    assert.strictEqual(cacheSizeStub.callCount, 0);
+    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
+    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.ERROR);
+    sinonSandbox.assert.match(cachePurgeStub.callCount, 1);
+    sinonSandbox.assert.match(cacheSizeStub.callCount, 0);
   });
 });
