@@ -2,7 +2,6 @@ import fs from 'fs';
 import util from 'util';
 import sinon from 'sinon';
 import path from 'path';
-import assert from 'assert';
 
 import {
   clear,
@@ -49,12 +48,13 @@ describe('CLI Cache -> Purge', () => {
       'writeConfig',
     );
     await incremental.cachePurge();
-    assert.ok(
-      deleteWritableContentPropertySpy.calledOnceWithExactly('incremental'),
+    sinonSandbox.assert.calledOnceWithExactly(
+      deleteWritableContentPropertySpy,
+      'incremental',
     );
-    assert.ok(writeConfigSpy.calledOnce);
+    sinonSandbox.assert.calledOnce(writeConfigSpy);
     const cacheExists = await fsExists(cachePath);
-    assert.ok(!cacheExists);
+    sinonSandbox.assert.match(cacheExists, false);
   });
 
   it("should throw error if cache doesn't exists", async () => {
@@ -69,11 +69,15 @@ describe('CLI Cache -> Purge', () => {
       (incremental as any).config,
       'writeConfig',
     );
-    assert.rejects(async () => await incremental.cachePurge(), {
-      name: 'Error',
-      message: 'No cache found.',
-    });
-    assert.ok(deleteWritableContentPropertySpy.notCalled);
-    assert.ok(writeConfigSpy.notCalled);
+    try {
+      await incremental.cachePurge();
+    } catch (err) {
+      sinonSandbox.assert.match(err, {
+        name: 'Error',
+        message: 'No cache found.',
+      });
+    }
+    sinonSandbox.assert.notCalled(deleteWritableContentPropertySpy);
+    sinonSandbox.assert.notCalled(writeConfigSpy);
   });
 });

@@ -2,7 +2,6 @@ import fs from 'fs';
 import util from 'util';
 import sinon from 'sinon';
 import path from 'path';
-import assert from 'assert';
 
 import {
   clear,
@@ -42,19 +41,24 @@ describe('CLI Cache -> Size', () => {
     const incremental = new Incremental(config);
 
     const size = await incremental.cacheSize();
-    assert.ok(size);
+    sinonSandbox.assert.match(size, sinon.match.number);
+    // !sinonSandbox.assert.match(size, 0);
     const cacheExists = await fsExists(cachePath);
-    assert.ok(cacheExists);
+    sinonSandbox.assert.match(cacheExists, true);
   });
 
   it("should throw error if cache doesn't exists", async () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    assert.rejects(async () => await incremental.cacheSize(), {
-      name: 'Error',
-      message: 'No cache found.',
-    });
+    try {
+      await incremental.cacheSize();
+    } catch (err) {
+      sinonSandbox.assert.match(err, {
+        name: 'Error',
+        message: 'No cache found.',
+      });
+    }
   });
 
   it('should return 0 if cache is empty', async () => {
@@ -64,6 +68,6 @@ describe('CLI Cache -> Size', () => {
 
     await createFolder(cachePath);
     const size = await incremental.cacheSize();
-    assert.strictEqual(size, 0);
+    sinonSandbox.assert.match(size, 0);
   });
 });
