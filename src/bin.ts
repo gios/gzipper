@@ -40,6 +40,7 @@ export class Index {
       .option('--deflate', 'enable deflate compression')
       .option('--brotli', 'enable brotli compression')
       .option('--gzip', 'enable gzip compression')
+      .option('--zopfli', 'enable zopfli compression')
       .option(
         '--gzip-level <number>',
         'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
@@ -82,6 +83,24 @@ export class Index {
       .option(
         '--brotli-size-hint <number>',
         'expected input size 0 (default)',
+        (value) => parseInt(value),
+      )
+      .option(
+        '--zopfli-num-iterations <number>',
+        'maximum amount of times to rerun forward and backward pass to optimize LZ77 compression cost',
+        (value) => parseInt(value),
+      )
+      .option(
+        '--zopfli-block-splitting',
+        'splits the data in multiple deflate blocks with optimal choice for the block boundaries',
+      )
+      .option(
+        '--zopfli-block-splitting-last',
+        'chooses the optimal block split points only after doing the iterative LZ77 compression',
+      )
+      .option(
+        '--zopfli-block-splitting-max <number>',
+        'maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)',
         (value) => parseInt(value),
       )
       .option(
@@ -151,6 +170,9 @@ export class Index {
       gzip: this.env.GZIPPER_GZIP
         ? !!parseInt(this.env.GZIPPER_GZIP as string)
         : options.gzip,
+      zopfli: this.env.GZIPPER_ZOPFLI
+        ? !!parseInt(this.env.GZIPPER_ZOPFLI as string)
+        : options.zopfli,
       gzipLevel:
         parseInt(this.env.GZIPPER_GZIP_LEVEL as string) || options.gzipLevel,
       gzipMemoryLevel:
@@ -176,6 +198,18 @@ export class Index {
       brotliSizeHint:
         parseInt(this.env.GZIPPER_BROTLI_SIZE_HINT as string) ||
         options.brotliSizeHint,
+      zopfliNumIterations:
+        parseInt(this.env.GZIPPER_ZOPFLI_NUM_ITERATIONS as string) ||
+        options.zopfliNumIterations,
+      zopfliBlockSplitting: this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING
+        ? !!parseInt(this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING as string)
+        : options.zopfliBlockSplitting,
+      zopfliBlockSplittingLast: this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING_LAST
+        ? !!parseInt(this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING_LAST as string)
+        : options.zopfliBlockSplittingLast,
+      zopfliBlockSplittingMax:
+        parseInt(this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING_MAX as string) ||
+        options.zopfliBlockSplittingMax,
       outputFileFormat:
         this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
       removeLarger: this.env.GZIPPER_REMOVE_LARGER

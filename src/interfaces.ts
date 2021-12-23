@@ -13,6 +13,7 @@ export interface CompressOptions {
   gzip?: boolean;
   deflate?: boolean;
   brotli?: boolean;
+  zopfli?: boolean;
   gzipLevel?: number;
   gzipMemoryLevel?: number;
   gzipStrategy?: number;
@@ -22,6 +23,10 @@ export interface CompressOptions {
   brotliParamMode?: string;
   brotliQuality?: number;
   brotliSizeHint?: number;
+  zopfliNumIterations?: number;
+  zopfliBlockSplitting?: boolean;
+  zopfliBlockSplittingLast?: boolean;
+  zopfliBlockSplittingMax?: number;
   outputFileFormat?: string;
   removeLarger?: boolean;
   skipCompressed?: boolean;

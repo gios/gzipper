@@ -31,6 +31,7 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--gzip](#--gzip)
       - [--deflate](#--deflate)
       - [--brotli](#--brotli)
+      - [--zopfli](#--zopfli)
       - [--gzip-level <number>](#--gzip-level-number)
       - [--gzip-memory-level <number>](#--gzip-memory-level-number)
       - [--gzip-strategy <number>](#--gzip-strategy-number)
@@ -40,6 +41,10 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--brotli-param-mode <value>](#--brotli-param-mode-value)
       - [--brotli-quality <number>](#--brotli-quality-number)
       - [--brotli-size-hint <number>](#--brotli-size-hint-number)
+      - [--zopfli-num-iterations <number>](#--zopfli-num-iterations-number)
+      - [--zopfli-block-splitting](#--zopfli-block-splitting)
+      - [--zopfli-block-splitting-last](#--zopfli-block-splitting-last)
+      - [--zopfli-block-splitting-max <number>](#--zopfli-block-splitting-max-number)
       - [--output-file-format](#--output-file-format)
       - [--remove-larger](#--remove-larger)
       - [--skip-compressed](#--skip-compressed)
@@ -86,28 +91,33 @@ Usage: gzipper compress|c [options] <path> [outputPath]
 compress selected path and optionally set output directory
 
 Options:
-  -v, --verbose                    detailed level of logs
-  --incremental                    incremental compression
-  -e, --exclude <extensions>       exclude file extensions from compression, example: jpeg,jpg...
-  -i, --include <extensions>       include file extensions for compression, example: js,css,html...
-  -t, --threshold <number>         exclude assets smaller than this byte size. 0 (default)
-  --deflate                        enable deflate compression
-  --brotli                         enable brotli compression
-  --gzip                           enable gzip compression
-  --gzip-level <number>            gzip compression level 6 (default), 0 (no compression) - 9 (best compression)
-  --gzip-memory-level <number>     amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
-  --gzip-strategy <number>         gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
-  --deflate-level <number>         deflate compression level 6 (default), 0 (no compression) - 9 (best compression)
-  --deflate-memory-level <number>  amount of memory which will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
-  --deflate-strategy <number>      deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
-  --brotli-param-mode <value>      default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
-  --brotli-quality <number>        brotli compression quality 11 (default), 0 - 11
-  --brotli-size-hint <number>      expected input size 0 (default)
-  --output-file-format <value>     output file format with default artifacts [filename].[ext].[compressExt]
-  --remove-larger                  remove compressed files if they larger than uncompressed originals
-  --skip-compressed                skip compressed files if they already exist
-  --workers <number>               numbers of workers which will be spawned, system CPU cores count (default)
-  -h, --help                       display help for command
+  -v, --verbose                          detailed level of logs
+  --incremental                          incremental compression
+  -e, --exclude <extensions>             exclude file extensions from compression, example: jpeg,jpg...
+  -i, --include <extensions>             include file extensions for compression, example: js,css,html...
+  -t, --threshold <number>               exclude assets smaller than this byte size. 0 (default)
+  --deflate                              enable deflate compression
+  --brotli                               enable brotli compression
+  --gzip                                 enable gzip compression
+  --zopfli                               enable zopfli compression
+  --gzip-level <number>                  gzip compression level 6 (default), 0 (no compression) - 9 (best compression)
+  --gzip-memory-level <number>           amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+  --gzip-strategy <number>               gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+  --deflate-level <number>               deflate compression level 6 (default), 0 (no compression) - 9 (best compression)
+  --deflate-memory-level <number>        amount of memory which will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
+  --deflate-strategy <number>            deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
+  --brotli-param-mode <value>            default, text (for UTF-8 text), font (for WOFF 2.0 fonts)
+  --brotli-quality <number>              brotli compression quality 11 (default), 0 - 11
+  --brotli-size-hint <number>            expected input size 0 (default)
+  --zopfli-num-iterations <number>       maximum amount of times to rerun forward and backward pass to optimize LZ77 compression cost
+  --zopfli-block-splitting               splits the data in multiple deflate blocks with optimal choice for the block boundaries
+  --zopfli-block-splitting-last          chooses the optimal block split points only after doing the iterative LZ77 compression
+  --zopfli-block-splitting-max <number>  maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)
+  --output-file-format <value>           output file format with default artifacts [filename].[ext].[compressExt]
+  --remove-larger                        remove compressed files if they larger than uncompressed originals
+  --skip-compressed                      skip compressed files if they already exist
+  --workers <number>                     numbers of workers which will be spawned, system CPU cores count (default)
+  -h, --help                             display help for command
 ```
 
 ### Cache
@@ -141,7 +151,7 @@ Commands:
   ```json
     "scripts": {
       "gzipper": "gzipper",
-      "compress": "gzipper compress ./dist"
+      "compress": "gzipper compress ./src"
     }
   ```
 
@@ -149,7 +159,7 @@ Commands:
 
   ```json
     "scripts": {
-      "compress": "npx gzipper compress ./dist"
+      "compress": "npx gzipper compress ./src"
     }
   ```
 
@@ -157,23 +167,23 @@ Commands:
 
 ```json
   "scripts": {
-    "build": "ng build && gzipper compress ./dist"
+    "build": "ng build && gzipper compress ./src"
   }
 ```
 
-- Compress files to a certain directory `./gzipped` (folders structure inside `dist` will be saved)
+- Compress files to a certain directory `./dist` (folders structure inside `src` will be saved)
 
 ```json
   "scripts": {
-    "build": "ng build && gzipper compress ./dist ./gzipped"
+    "compress": "gzipper compress ./src ./dist"
   }
 ```
 
-- Compress files to very deep folder `./very/deep/folder` (all folders will be automatically created if not exist)
+- Compress files to very deep folder `./very/deep/folder/dist` (all folders will be automatically created if not exist)
 
 ```json
   "scripts": {
-    "build": "ng build && gzipper compress ./dist ./very/deep/folder"
+    "compress": "gzipper compress ./src ./very/deep/folder/dist"
   }
 ```
 
@@ -181,7 +191,7 @@ Commands:
 
 ```json
   "scripts": {
-    "build": "ng build && gzipper compress ./dist/awesomeness.txt"
+    "compress": "gzipper compress ./src/awesomeness.txt"
   }
 ```
 
@@ -189,7 +199,11 @@ Commands:
 
 ```javascript
 const { Compress } = require('gzipper');
-const gzip = new Compress('./test', './dist', { verbose: true });
+const gzip = new Compress('./src', './dist', {
+  verbose: true,
+  brotli: true,
+  deflate: true,
+});
 
 try {
   const files = await gzip.run();
@@ -199,156 +213,172 @@ try {
 }
 ```
 
-- Run multiple algorithms at the same time.
-
-```javascript
-const { Compress } = require('gzipper');
-const gzip = new Compress('./test');
-const brotli = new Compress('./test', null, { brotli: true });
-
-try {
-  const [gzipFiles, brotliFiles] = await Promise.all([
-    gzip.run(),
-    brotli.run(),
-  ]);
-  console.info('Compressed gzip files: ', gzipFiles);
-  console.info('Compressed brotli files: ', brotliFiles);
-} catch (err) {
-  console.error(err);
-}
-```
-
 ## Options
 
 ### Compress|c
 
-| Option                                                              | ENV                                |
-| ------------------------------------------------------------------- | ---------------------------------- |
-| [`--incremental`](#--incremental)                                   | `GZIPPER_INCREMENTAL` (0 or 1)     |
-| [`-v, --verbose`](#-v---verbose)                                    | `GZIPPER_VERBOSE` (0 or 1)         |
-| [`-e, --exclude <extensions>`](#-e---exclude-extensions)            | `GZIPPER_EXCLUDE`                  |
-| [`-i, --include <extensions>`](#-i---include-extensions)            | `GZIPPER_INCLUDE`                  |
-| [`-t, --threshold <number>`](#-t---threshold-number)                | `GZIPPER_THRESHOLD`                |
-| [`--gzip`](#--gzip)                                                 | `GZIPPER_GZIP` (0 or 1)            |
-| [`--deflate`](#--deflate)                                           | `GZIPPER_DEFLATE` (0 or 1)         |
-| [`--brotli`](#--brotli)                                             | `GZIPPER_BROTLI` (0 or 1)          |
-| [`--gzip-level <number>`](#--gzip-level-number)                     | `GZIPPER_GZIP_LEVEL`               |
-| [`--gzip-memory-level <number>`](#--gzip-memory-level-number)       | `GZIPPER_GZIP_MEMORY_LEVEL`        |
-| [`--gzip-strategy <number>`](#--gzip-strategy-number)               | `GZIPPER_GZIP_STRATEGY`            |
-| [`--deflate-level <number>`](#--deflate-level-number)               | `GZIPPER_DEFLATE_LEVEL`            |
-| [`--deflate-memory-level <number>`](#--deflate-memory-level-number) | `GZIPPER_DEFLATE_MEMORY_LEVEL`     |
-| [`--deflate-strategy <number>`](#--deflate-strategy-number)         | `GZIPPER_DEFLATE_STRATEGY`         |
-| [`--brotli-param-mode <value>`](#--brotli-param-mode-value)         | `GZIPPER_BROTLI_PARAM_MODE`        |
-| [`--brotli-quality <number>`](#--brotli-quality-number)             | `GZIPPER_BROTLI_QUALITY`           |
-| [`--brotli-size-hint <number>`](#--brotli-size-hint-number)         | `GZIPPER_BROTLI_SIZE_HINT`         |
-| [`--output-file-format <value>`](#--output-file-format)             | `GZIPPER_OUTPUT_FILE_FORMAT`       |
-| [`--remove-larger`](#--remove-larger)                               | `GZIPPER_REMOVE_LARGER` (0 or 1)   |
-| [`--skip-compressed`](#--skip-compressed)                           | `GZIPPER_SKIP_COMPRESSED` (0 or 1) |
-| [`--workers`](#--workers)                                           | `GZIPPER_WORKERS`                  |
+| Option                                                                        | ENV                                            |
+| ----------------------------------------------------------------------------- | ---------------------------------------------- |
+| [`--incremental`](#--incremental)                                             | `GZIPPER_INCREMENTAL` (0 or 1)                 |
+| [`-v, --verbose`](#-v---verbose)                                              | `GZIPPER_VERBOSE` (0 or 1)                     |
+| [`-e, --exclude <extensions>`](#-e---exclude-extensions)                      | `GZIPPER_EXCLUDE`                              |
+| [`-i, --include <extensions>`](#-i---include-extensions)                      | `GZIPPER_INCLUDE`                              |
+| [`-t, --threshold <number>`](#-t---threshold-number)                          | `GZIPPER_THRESHOLD`                            |
+| [`--gzip`](#--gzip)                                                           | `GZIPPER_GZIP` (0 or 1)                        |
+| [`--deflate`](#--deflate)                                                     | `GZIPPER_DEFLATE` (0 or 1)                     |
+| [`--brotli`](#--brotli)                                                       | `GZIPPER_BROTLI` (0 or 1)                      |
+| [`--zopfli`](#--zopfli)                                                       | `GZIPPER_ZOPFLI` (0 or 1)                      |
+| [`--gzip-level <number>`](#--gzip-level-number)                               | `GZIPPER_GZIP_LEVEL`                           |
+| [`--gzip-memory-level <number>`](#--gzip-memory-level-number)                 | `GZIPPER_GZIP_MEMORY_LEVEL`                    |
+| [`--gzip-strategy <number>`](#--gzip-strategy-number)                         | `GZIPPER_GZIP_STRATEGY`                        |
+| [`--deflate-level <number>`](#--deflate-level-number)                         | `GZIPPER_DEFLATE_LEVEL`                        |
+| [`--deflate-memory-level <number>`](#--deflate-memory-level-number)           | `GZIPPER_DEFLATE_MEMORY_LEVEL`                 |
+| [`--deflate-strategy <number>`](#--deflate-strategy-number)                   | `GZIPPER_DEFLATE_STRATEGY`                     |
+| [`--brotli-param-mode <value>`](#--brotli-param-mode-value)                   | `GZIPPER_BROTLI_PARAM_MODE`                    |
+| [`--brotli-quality <number>`](#--brotli-quality-number)                       | `GZIPPER_BROTLI_QUALITY`                       |
+| [`--brotli-size-hint <number>`](#--brotli-size-hint-number)                   | `GZIPPER_BROTLI_SIZE_HINT`                     |
+| [--zopfli-num-iterations <number>](#--zopfli-num-iterations-number)           | `GZIPPER_ZOPFLI_NUM_ITERATIONS`                |
+| [--zopfli-block-splitting](#--zopfli-block-splitting)                         | `GZIPPER_ZOPFLI_BLOCK_SPLITTING` (0 or 1)      |
+| [--zopfli-block-splitting-last](#--zopfli-block-splitting-last)               | `GZIPPER_ZOPFLI_BLOCK_SPLITTING_LAST` (0 or 1) |
+| [--zopfli-block-splitting-max <number>](#--zopfli-block-splitting-max-number) | `GZIPPER_ZOPFLI_BLOCK_SPLITTING_MAX`           |
+| [`--output-file-format <value>`](#--output-file-format)                       | `GZIPPER_OUTPUT_FILE_FORMAT`                   |
+| [`--remove-larger`](#--remove-larger)                                         | `GZIPPER_REMOVE_LARGER` (0 or 1)               |
+| [`--skip-compressed`](#--skip-compressed)                                     | `GZIPPER_SKIP_COMPRESSED` (0 or 1)             |
+| [`--workers`](#--workers)                                                     | `GZIPPER_WORKERS`                              |
 
 > ENV Variables have higher priority over CLI arguments.
 
 #### --incremental
 
-`gzipper c --incremental ./dist`
+`gzipper c ./src --incremental`
 
 A special type of compression that significantly decreases the time of compression (_on the second run_) if you have a lot of big and rarely updated files. It creates a `.gzipper` folder with pre-compressed files (`cache`) and config that stores all necessary metadata (`.gzipperconfig`).
 
 #### -v, --verbose
 
-`gzipper c --verbose ./dist`
+`gzipper c ./src --verbose`
 
 Get more information about executed work. (_Could increase time of compression because of gathering additional metrics_)
 
 #### -e, --exclude <extensions>
 
-`gzipper c --exclude jpeg,png,ico ./dist`
+`gzipper c ./src --exclude jpeg,png,ico`
 
 Exclude file extensions from compression (compression extensions like gz, zz, br, etc. excluded by default), example: jpeg,jpg...
 
 #### -i, --include <extensions>
 
-`gzipper c --include jpeg,png,ico ./dist`
+`gzipper c ./src --include jpeg,png,ico`
 
 Include file extensions for compression(exclude others), example: js,css,html...
 
 #### -t, --threshold <number>
 
-`gzipper c --threshold 900 ./dist`
+`gzipper c ./src --threshold 900`
 
 Exclude assets smaller than this byte size. 0 (default)
 
 #### --gzip
 
-`gzipper c --gzip ./dist`
+`gzipper c ./src --gzip`
 
 Enable gzip compression. (default behavior)
 
 #### --deflate
 
-`gzipper c --deflate ./dist`
+`gzipper c ./src --deflate`
 
 Enable deflate compression.
 
 #### --brotli
 
-`gzipper c --brotli ./dist`
+`gzipper c ./src --brotli`
 
 Enable brotli compression.
 
+#### --zopfli
+
+`gzipper c ./src --zopfli`
+
+Enable zopfli compression.
+
 #### --gzip-level <number>
 
-`gzipper c --gzip-level 8 ./dist`
+`gzipper c ./src --gzip-level 8`
 
 Gzip compression level 6 (default), 0 (no compression) - 9 (best compression)
 
 #### --gzip-memory-level <number>
 
-`gzipper c --gzip-memory-level 2 ./dist`
+`gzipper c ./src --gzip-memory-level 2`
 
 Amount of memory that will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
 
 #### --gzip-strategy <number>
 
-`gzipper c --gzip-strategy 3 ./dist`
+`gzipper c ./src --gzip-strategy 3`
 
 Gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
 
 #### --deflate-level <number>
 
-`gzipper c --deflate-level 8 ./dist`
+`gzipper c ./src --deflate-level 8`
 
 Deflate compression level 6 (default), 0 (no compression) - 9 (best compression)
 
 #### --deflate-memory-level <number>
 
-`gzipper c --deflate-memory-level 2 ./dist`
+`gzipper c ./src --deflate-memory-level 2`
 
 Amount of memory that will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
 
 #### --deflate-strategy <number>
 
-`gzipper c --deflate-strategy 3 ./dist`
+`gzipper c ./src --deflate-strategy 3`
 
 Deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
 
 #### --brotli-param-mode <value>
 
-`gzipper c --brotli-param-mode text ./dist`
+`gzipper c ./src --brotli-param-mode text`
 
 Available values are default, text (for UTF-8 text), font (for WOFF 2.0 fonts), only for `--brotli`
 
 #### --brotli-quality <number>
 
-`gzipper c --brotli-quality 10 ./dist`
+`gzipper c ./src --brotli-quality 10`
 
 Brotli compression quality 11 (default), 0 - 11, only for `--brotli`
 
 #### --brotli-size-hint <number>
 
-`gzipper c --brotli-size-hint 6 ./dist`
+`gzipper c ./src --brotli-size-hint 6`
 
 Expected input size 0 (default), only for `--brotli`
+
+#### --zopfli-num-iterations <number>
+
+`gzipper c ./src --zopfli-num-iterations 15`
+
+Maximum amount of times to rerun forward and backward pass to optimize LZ77 compression cost. Good values: 10, 15 for small files, 5 for files over several MB in size or it will be too slow, only for `--zopfli`
+
+#### --zopfli-block-splitting
+
+`gzipper c ./src --zopfli-block-splitting`
+
+If true, splits the data in multiple deflate blocks with optimal choice for the block boundaries. Block splitting gives better compression, only for `--zopfli`
+
+#### --zopfli-block-splitting-last
+
+`gzipper c ./src --zopfli-block-splitting-last`
+
+If true, chooses the optimal block split points only after doing the iterative LZ77 compression. If false, chooses the block split points first, then does iterative LZ77 on each individual block. Depending on the file, either first or last gives the best compression, only for `--zopfli`
+
+#### --zopfli-block-splitting-max <number>
+
+`gzipper c ./src --zopfli-block-splitting-max 5`
+
+Maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files), only for `--zopfli`
 
 #### --output-file-format
 
@@ -368,7 +398,7 @@ xml
 index.js
 ```
 
-- `gzipper c --output-file-format [filename].[compressExt].[ext] ./dist`
+- `gzipper c ./src --output-file-format [filename].[compressExt].[ext]`
 
 ```
 img
@@ -382,7 +412,7 @@ xml
 index.gz.js
 ```
 
-- `gzipper c --output-file-format test-[filename]-[hash].[compressExt].[ext] ./dist`
+- `gzipper c ./src --output-file-format test-[filename]-[hash].[compressExt].[ext]`
 
 ```
 img
@@ -396,7 +426,7 @@ xml
 test-index-067c1e2d-0e12-4b57-980b-97c880c24d57.gz.js
 ```
 
-- `gzipper c --output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt] ./dist`
+- `gzipper c ./src --output-file-format [filename]-[hash]-[filename]-tmp.[ext].[compressExt]`
 
 ```
 img
