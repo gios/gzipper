@@ -20,7 +20,7 @@ describe('Index CLI', () => {
     sinon.restore();
   });
 
-  it.only("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
+  it("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
     const cliArguments = [
       'node.exe',
       'index.js',
