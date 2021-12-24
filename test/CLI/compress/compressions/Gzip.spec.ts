@@ -1,6 +1,3 @@
-import assert from 'assert';
-import sinon from 'sinon';
-
 import { Compress } from '../../../../src/Compress';
 import {
   COMPRESS_PATH,
@@ -13,17 +10,13 @@ import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
 describe('CLI Compress -> Gzip compression', () => {
-  let sinonSandbox: sinon.SinonSandbox;
-
   beforeEach(async () => {
+    jest.restoreAllMocks();
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
-    sinonSandbox = sinon.createSandbox();
   });
 
   afterEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
-    sinonSandbox.restore();
-    sinon.restore();
   });
 
   it('--level, --memory-level, --strategy should change gzip configuration', async () => {
@@ -34,48 +27,40 @@ describe('CLI Compress -> Gzip compression', () => {
       workers: 1,
     };
     const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinonSandbox.spy(Logger, 'log');
+    const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(COMPRESS_PATH, ['.gz']);
 
-    assert.ok(
-      logSpy.calledWithExactly(
-        'Compression GZIP | level: 6, memLevel: 4, strategy: 2',
-        LogLevel.INFO,
-      ),
+    expect(logSpy).toHaveBeenNthCalledWith(
+      1,
+      'Compression GZIP | level: 6, memLevel: 4, strategy: 2',
+      LogLevel.INFO,
     );
-    assert.ok(
-      logSpy.calledWithExactly(
-        'Default output file format: [filename].[ext].[compressExt]',
-        LogLevel.INFO,
-      ),
+    expect(logSpy).toHaveBeenNthCalledWith(
+      2,
+      'Default output file format: [filename].[ext].[compressExt]',
+      LogLevel.INFO,
     );
-    assert.ok(
-      logSpy.calledWithExactly(
-        sinonSandbox.match(
-          new RegExp(`${files.length} files have been compressed. (.+)`),
-        ),
-        LogLevel.SUCCESS,
+    expect(logSpy).toHaveBeenLastCalledWith(
+      expect.stringMatching(
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
+      LogLevel.SUCCESS,
     );
-    assert.strictEqual((compress as any).compressionInstances[0].ext, 'gz');
-    assert.strictEqual(
+    expect((compress as any).compressionInstances[0].ext).toBe('gz');
+    expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
-      3,
-    );
-    assert.strictEqual(Object.keys((compress as any).options).length, 4);
-    assert.strictEqual(
+    ).toBe(3);
+    expect(Object.keys((compress as any).options).length).toBe(4);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions.level,
-      6,
-    );
-    assert.strictEqual(
+    ).toBe(6);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions.memLevel,
-      4,
-    );
-    assert.strictEqual(
+    ).toBe(4);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions.strategy,
-      2,
-    );
+    ).toBe(2);
   });
 });

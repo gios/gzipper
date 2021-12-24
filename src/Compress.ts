@@ -217,12 +217,12 @@ export class Compress {
    * Show message with compression params.
    */
   private compressionLog(): void {
-    if (!this.options.outputFileFormat) {
-      Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
-    }
-
     for (const instance of this.compressionInstances) {
       Logger.log(`Compression ${instance.readableOptions()}`, LogLevel.INFO);
+    }
+
+    if (!this.options.outputFileFormat) {
+      Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
     }
   }
 }
