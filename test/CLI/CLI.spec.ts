@@ -1,5 +1,3 @@
-import sinon from 'sinon';
-
 import { Index } from '../../src/bin';
 import { Compress } from '../../src/Compress';
 import { CompressOptions } from '../../src/interfaces';
@@ -9,18 +7,11 @@ import { LogLevel } from '../../src/logger/LogLevel.enum';
 import { Helpers } from '../../src/helpers';
 
 describe('Index CLI', () => {
-  let sinonSandbox: sinon.SinonSandbox;
-
   beforeEach(() => {
-    sinonSandbox = sinon.createSandbox();
+    jest.restoreAllMocks();
   });
 
-  afterEach(async () => {
-    sinonSandbox.restore();
-    sinon.restore();
-  });
-
-  it("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
+  test("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
     const cliArguments = [
       'node.exe',
       'index.js',
@@ -63,11 +54,11 @@ describe('Index CLI', () => {
     ];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const runCompressSpy = sinonSandbox.spy(index as any, 'runCompress');
-    const filterOptionsSpy = sinonSandbox.spy(index as any, 'filterOptions');
-    const compressRunStub = sinonSandbox
-      .stub(Compress.prototype, 'run')
-      .resolves([]);
+    const runCompressSpy = jest.spyOn(index as any, 'runCompress');
+    const filterOptionsSpy = jest.spyOn(index as any, 'filterOptions');
+    const compressRunSpy = jest
+      .spyOn(Compress.prototype, 'run')
+      .mockResolvedValueOnce([]);
     await index.exec();
     const request: CompressOptions = {
       verbose: true,
@@ -120,18 +111,19 @@ describe('Index CLI', () => {
       skipCompressed: true,
       workers: 2,
     };
-    sinonSandbox.assert.calledOnceWithExactly(
-      runCompressSpy,
+    expect(runCompressSpy).toHaveBeenCalledTimes(1);
+    expect(runCompressSpy).toHaveBeenCalledWith(
       'folder_to_compress',
       'folder_to_compress_out',
       request,
     );
-    sinonSandbox.assert.match(compressRunStub.callCount, 1);
-    sinonSandbox.assert.calledOnceWithExactly(filterOptionsSpy, request);
-    sinonSandbox.assert.match(filterOptionsSpy.returnValues[0], response);
+    expect(compressRunSpy).toHaveBeenCalledTimes(1);
+    expect(filterOptionsSpy).toHaveBeenCalledTimes(1);
+    expect(filterOptionsSpy).toHaveBeenCalledWith(request);
+    expect(filterOptionsSpy).toHaveReturnedWith(response);
   });
 
-  it("compress <path> [outputPath] - should exec 'runCompress' with overwrite options", async () => {
+  test("compress <path> [outputPath] - should exec 'runCompress' with overwrite options", async () => {
     const envArguments = {
       GZIPPER_INCREMENTAL: '0',
       GZIPPER_VERBOSE: '0',
@@ -212,11 +204,11 @@ describe('Index CLI', () => {
     const index = new Index();
     (index as any).argv = cliArguments;
     (index as any).env = envArguments;
-    const runCompressSpy = sinonSandbox.spy(index as any, 'runCompress');
-    const filterOptionsSpy = sinonSandbox.spy(index as any, 'filterOptions');
-    const compressRunStub = sinonSandbox
-      .stub(Compress.prototype, 'run')
-      .resolves([]);
+    const runCompressSpy = jest.spyOn(index as any, 'runCompress');
+    const filterOptionsSpy = jest.spyOn(index as any, 'filterOptions');
+    const compressRunSpy = jest
+      .spyOn(Compress.prototype, 'run')
+      .mockResolvedValueOnce([]);
     await index.exec();
     const request: CompressOptions = {
       verbose: false,
@@ -274,105 +266,106 @@ describe('Index CLI', () => {
       skipCompressed: false,
       workers: 3,
     };
-    sinonSandbox.assert.calledOnceWithExactly(
-      runCompressSpy,
+    expect(runCompressSpy).toHaveBeenCalledTimes(1);
+    expect(runCompressSpy).toHaveBeenCalledWith(
       'folder_to_compress',
       'folder_to_compress_out',
       request,
     );
-    sinonSandbox.assert.match(compressRunStub.callCount, 1);
-    sinonSandbox.assert.calledOnceWithExactly(filterOptionsSpy, request);
-    sinonSandbox.assert.match(filterOptionsSpy.returnValues[0], response);
+    expect(compressRunSpy).toHaveBeenCalledTimes(1);
+    expect(filterOptionsSpy).toHaveBeenCalledTimes(1);
+    expect(filterOptionsSpy).toHaveBeenCalledWith(request);
+    expect(filterOptionsSpy).toHaveReturnedWith(response);
   });
 
-  it("cache purge should exec 'cachePurge' and throw the SUCCESS message", async () => {
+  test("cache purge should exec 'cachePurge' and throw the SUCCESS message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const cachePurgeStub = sinonSandbox.stub(
-      Incremental.prototype,
-      'cachePurge',
-    );
-    const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const cachePurgeSpy = jest
+      .spyOn(Incremental.prototype, 'cachePurge')
+      .mockResolvedValueOnce();
+    const cacheSizeSpy = jest.spyOn(Incremental.prototype, 'cacheSize');
     await index.exec();
-    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
-    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.SUCCESS);
-    sinonSandbox.assert.match(cachePurgeStub.callCount, 1);
-    sinonSandbox.assert.match(cacheSizeStub.callCount, 0);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith(
+      'Cache has been purged, you are free to initialize a new one.',
+      LogLevel.SUCCESS,
+    );
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(1);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(0);
   });
 
-  it("cache size should exec 'cacheSize' and throw the info message", async () => {
+  test("cache size should exec 'cacheSize' and throw the info message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const cachePurgeStub = sinonSandbox.stub(
-      Incremental.prototype,
-      'cachePurge',
-    );
-    const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const cachePurgeSpy = jest.spyOn(Incremental.prototype, 'cachePurge');
+    const cacheSizeSpy = jest
+      .spyOn(Incremental.prototype, 'cacheSize')
+      .mockResolvedValueOnce(0);
     await index.exec();
-    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
-    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.INFO);
-    sinonSandbox.assert.match(cachePurgeStub.callCount, 0);
-    sinonSandbox.assert.match(cacheSizeStub.callCount, 1);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith(
+      'Cache is empty, initialize a new one with --incremental option.',
+      LogLevel.INFO,
+    );
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("cache size should exec 'cacheSize', 'readableSize' and throw the info message", async () => {
+  test("cache size should exec 'cacheSize', 'readableSize' and throw the info message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const readableSizeStub = sinonSandbox.stub(Helpers, 'readableSize');
-    const cachePurgeStub = sinonSandbox.stub(
-      Incremental.prototype,
-      'cachePurge',
-    );
-    const cacheSizeStub = sinonSandbox
-      .stub(Incremental.prototype, 'cacheSize')
-      .resolves(12);
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const readableSizeSpy = jest.spyOn(Helpers, 'readableSize');
+    const cachePurgeSpy = jest.spyOn(Incremental.prototype, 'cachePurge');
+    const cacheSizeSpy = jest
+      .spyOn(Incremental.prototype, 'cacheSize')
+      .mockResolvedValueOnce(12);
     await index.exec();
-    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
-    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.INFO);
-    sinonSandbox.assert.match(cachePurgeStub.callCount, 0);
-    sinonSandbox.assert.match(cacheSizeStub.callCount, 1);
-    sinonSandbox.assert.match(readableSizeStub.callCount, 1);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith(
+      'Cache size is 12 B',
+      LogLevel.INFO,
+    );
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(1);
+    expect(readableSizeSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('cache size should throw the error message', async () => {
+  test('cache size should throw the error message', async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const cachePurgeStub = sinonSandbox.stub(
-      Incremental.prototype,
-      'cachePurge',
-    );
-    const cacheSizeStub = sinonSandbox
-      .stub(Incremental.prototype, 'cacheSize')
-      .throws('Error');
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const cachePurgeSpy = jest.spyOn(Incremental.prototype, 'cachePurge');
+    const cacheSizeSpy = jest
+      .spyOn(Incremental.prototype, 'cacheSize')
+      .mockRejectedValueOnce('Error');
     await index.exec();
-    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
-    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.ERROR);
-    sinonSandbox.assert.match(cachePurgeStub.callCount, 0);
-    sinonSandbox.assert.match(cacheSizeStub.callCount, 1);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith('Error', LogLevel.ERROR);
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('cache purge should throw the error message', async () => {
+  test('cache purge should throw the error message', async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const cachePurgeStub = sinonSandbox
-      .stub(Incremental.prototype, 'cachePurge')
-      .throws('Error');
-    const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
-
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const cachePurgeSpy = jest
+      .spyOn(Incremental.prototype, 'cachePurge')
+      .mockRejectedValueOnce('Error');
+    const cacheSizeSpy = jest.spyOn(Incremental.prototype, 'cacheSize');
     await index.exec();
-    sinonSandbox.assert.match(loggerLogStub.callCount, 1);
-    sinonSandbox.assert.match(loggerLogStub.args[0][1], LogLevel.ERROR);
-    sinonSandbox.assert.match(cachePurgeStub.callCount, 1);
-    sinonSandbox.assert.match(cacheSizeStub.callCount, 0);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith('Error', LogLevel.ERROR);
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(1);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(0);
   });
 });
