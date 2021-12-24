@@ -1,6 +1,5 @@
 import fs from 'fs';
 import util from 'util';
-import sinon from 'sinon';
 import path from 'path';
 
 import {
@@ -17,21 +16,17 @@ import { CompressOptions } from '../../../src/interfaces';
 const fsExists = util.promisify(fs.exists);
 
 describe('CLI Cache -> Purge', () => {
-  let sinonSandbox: sinon.SinonSandbox;
-
   beforeEach(async () => {
+    jest.restoreAllMocks();
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
-    sinonSandbox = sinon.createSandbox();
   });
 
   afterEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
     await clear(GZIPPER_CONFIG_FOLDER, true);
-    sinonSandbox.restore();
-    sinon.restore();
   });
 
-  it('should purge cache if exists', async () => {
+  test('should purge cache if exists', async () => {
     const options: CompressOptions = { incremental: true, workers: 1 };
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -39,45 +34,42 @@ describe('CLI Cache -> Purge', () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    const deleteWritableContentPropertySpy = sinonSandbox.spy(
+    const deleteWritableContentPropertySpy = jest.spyOn(
       (incremental as any).config,
       'deleteProperty',
     );
-    const writeConfigSpy = sinonSandbox.spy(
+    const writeConfigSpy = jest.spyOn(
       (incremental as any).config,
       'writeConfig',
     );
     await incremental.cachePurge();
-    sinonSandbox.assert.calledOnceWithExactly(
-      deleteWritableContentPropertySpy,
+    expect(deleteWritableContentPropertySpy).toHaveBeenCalledTimes(1);
+    expect(deleteWritableContentPropertySpy).toHaveBeenCalledWith(
       'incremental',
     );
-    sinonSandbox.assert.calledOnce(writeConfigSpy);
+    expect(writeConfigSpy).toHaveBeenCalledTimes(1);
     const cacheExists = await fsExists(cachePath);
-    sinonSandbox.assert.match(cacheExists, false);
+    expect(cacheExists).toBeFalsy();
   });
 
-  it("should throw error if cache doesn't exists", async () => {
+  test("should throw error if cache doesn't exists", async () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    const deleteWritableContentPropertySpy = sinonSandbox.spy(
+    const deleteWritableContentPropertySpy = jest.spyOn(
       (incremental as any).config,
       'deleteProperty',
     );
-    const writeConfigSpy = sinonSandbox.spy(
+    const writeConfigSpy = jest.spyOn(
       (incremental as any).config,
       'writeConfig',
     );
-    try {
-      await incremental.cachePurge();
-    } catch (err) {
-      sinonSandbox.assert.match(err, {
-        name: 'Error',
-        message: 'No cache found.',
-      });
-    }
-    sinonSandbox.assert.notCalled(deleteWritableContentPropertySpy);
-    sinonSandbox.assert.notCalled(writeConfigSpy);
+
+    expect(incremental.cachePurge()).rejects.toThrowError({
+      name: 'Error',
+      message: 'No cache found.',
+    });
+    expect(deleteWritableContentPropertySpy).toHaveBeenCalledTimes(0);
+    expect(writeConfigSpy).toHaveBeenCalledTimes(0);
   });
 });

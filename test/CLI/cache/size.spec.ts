@@ -1,6 +1,5 @@
 import fs from 'fs';
 import util from 'util';
-import sinon from 'sinon';
 import path from 'path';
 
 import {
@@ -18,18 +17,14 @@ import { CompressOptions } from '../../../src/interfaces';
 const fsExists = util.promisify(fs.exists);
 
 describe('CLI Cache -> Size', () => {
-  let sinonSandbox: sinon.SinonSandbox;
-
   beforeEach(async () => {
+    jest.restoreAllMocks();
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
-    sinonSandbox = sinon.createSandbox();
   });
 
   afterEach(async () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
     await clear(GZIPPER_CONFIG_FOLDER, true);
-    sinonSandbox.restore();
-    sinon.restore();
   });
 
   it('should returns cache size if exists', async () => {
@@ -41,24 +36,19 @@ describe('CLI Cache -> Size', () => {
     const incremental = new Incremental(config);
 
     const size = await incremental.cacheSize();
-    sinonSandbox.assert.match(size, sinon.match.number);
-    // !sinonSandbox.assert.match(size, 0);
+    expect(size).toBeGreaterThan(0);
     const cacheExists = await fsExists(cachePath);
-    sinonSandbox.assert.match(cacheExists, true);
+    expect(cacheExists).toBeTruthy();
   });
 
   it("should throw error if cache doesn't exists", async () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    try {
-      await incremental.cacheSize();
-    } catch (err) {
-      sinonSandbox.assert.match(err, {
-        name: 'Error',
-        message: 'No cache found.',
-      });
-    }
+    expect(incremental.cacheSize()).rejects.toThrowError({
+      name: 'Error',
+      message: 'No cache found.',
+    });
   });
 
   it('should return 0 if cache is empty', async () => {
@@ -68,6 +58,6 @@ describe('CLI Cache -> Size', () => {
 
     await createFolder(cachePath);
     const size = await incremental.cacheSize();
-    sinonSandbox.assert.match(size, 0);
+    expect(size).toBe(0);
   });
 });
