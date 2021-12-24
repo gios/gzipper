@@ -47,7 +47,7 @@ describe('CLI Compress -> Brotli compression', () => {
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       3,
-      expect.stringMatching(/[\d+] Worker has started./),
+      expect.stringMatching(/\[\d+\] Worker has started./),
       LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(

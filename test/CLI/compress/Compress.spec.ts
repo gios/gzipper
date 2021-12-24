@@ -195,6 +195,11 @@ describe('CLI Compress', () => {
       'Default output file format: [filename].[ext].[compressExt]',
       LogLevel.INFO,
     );
+    expect(logSpy).toHaveBeenNthCalledWith(
+      3,
+      expect.stringMatching(/\[\d+\] Worker has started./),
+      LogLevel.INFO,
+    );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(/1 file has been compressed\. \(.+\)/),
       LogLevel.SUCCESS,
@@ -205,7 +210,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options)).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('should compress files to a certain folder with existing folder structure', async () => {
@@ -395,7 +400,7 @@ describe('CLI Compress', () => {
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files has been compressed. (.+)`),
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
       LogLevel.SUCCESS,
     );
@@ -427,7 +432,7 @@ describe('CLI Compress', () => {
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${filesAfter.length} files has been compressed. (.+)`),
+        new RegExp(`${filesAfter.length} files have been compressed. (.+)`),
       ),
       LogLevel.SUCCESS,
     );
@@ -631,8 +636,7 @@ describe('CLI Compress', () => {
       (instance: any) => instance.compressionName === CompressionNames.GZIP,
     );
 
-    expect(logSpy).toHaveBeenNthCalledWith(
-      1,
+    expect(logSpy).toHaveBeenCalledWith(
       'Compression GZIP | memLevel: 1',
       LogLevel.INFO,
     );
@@ -643,8 +647,7 @@ describe('CLI Compress', () => {
     const brotliInstance = (compress as any).compressionInstances.find(
       (instance: any) => instance.compressionName === CompressionNames.BROTLI,
     );
-    expect(logSpy).toHaveBeenNthCalledWith(
-      1,
+    expect(logSpy).toHaveBeenCalledWith(
       'Compression BROTLI | quality: 2',
       LogLevel.INFO,
     );
@@ -655,8 +658,7 @@ describe('CLI Compress', () => {
     const deflateInstance = (compress as any).compressionInstances.find(
       (instance: any) => instance.compressionName === CompressionNames.DEFLATE,
     );
-    expect(logSpy).toHaveBeenNthCalledWith(
-      1,
+    expect(logSpy).toHaveBeenCalledWith(
       'Compression DEFLATE | level: 3',
       LogLevel.INFO,
     );
