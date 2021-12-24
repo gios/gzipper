@@ -19,7 +19,7 @@ describe('CLI Compress -> Gzip compression', () => {
     await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
   });
 
-  it('--level, --memory-level, --strategy should change gzip configuration', async () => {
+  test('--level, --memory-level, --strategy should change gzip configuration', async () => {
     const options: CompressOptions = {
       gzipLevel: 6,
       gzipMemoryLevel: 4,

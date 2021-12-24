@@ -65,7 +65,7 @@ describe('CLI Cache -> Purge', () => {
       'writeConfig',
     );
 
-    expect(incremental.cachePurge()).rejects.toThrowError({
+    await expect(incremental.cachePurge()).rejects.toThrowError({
       name: 'Error',
       message: 'No cache found.',
     });

@@ -27,7 +27,7 @@ describe('CLI Cache -> Size', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  it('should returns cache size if exists', async () => {
+  test('should returns cache size if exists', async () => {
     const options: CompressOptions = { incremental: true, workers: 1 };
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const compress = new Compress(COMPRESS_PATH, null, options);
@@ -41,17 +41,17 @@ describe('CLI Cache -> Size', () => {
     expect(cacheExists).toBeTruthy();
   });
 
-  it("should throw error if cache doesn't exists", async () => {
+  test("should throw error if cache doesn't exists", async () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    expect(incremental.cacheSize()).rejects.toThrowError({
+    await expect(incremental.cacheSize()).rejects.toThrowError({
       name: 'Error',
       message: 'No cache found.',
     });
   });
 
-  it('should return 0 if cache is empty', async () => {
+  test('should return 0 if cache is empty', async () => {
     const config = new Config();
     const incremental = new Incremental(config);
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
