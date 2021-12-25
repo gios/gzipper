@@ -1,22 +1,26 @@
 import { Compress } from '../../../../src/Compress';
 import {
-  COMPRESS_PATH,
   getFiles,
   clear,
-  COMPRESSION_EXTENSIONS,
+  GZIPPER_CONFIG_FOLDER,
+  generatePaths,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
 describe('CLI Compress -> Gzip compression', () => {
+  let testPath: string;
+  let compressTestPath: string;
+
   beforeEach(async () => {
     jest.restoreAllMocks();
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    [testPath, compressTestPath] = await generatePaths();
   });
 
   afterEach(async () => {
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(testPath, true);
+    await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
   test('--level, --memory-level, --strategy should change gzip configuration', async () => {
@@ -26,10 +30,10 @@ describe('CLI Compress -> Gzip compression', () => {
       gzipStrategy: 2,
       workers: 1,
     };
-    const compress = new Compress(COMPRESS_PATH, null, options);
+    const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.gz']);
+    const files = await getFiles(compressTestPath, ['.gz']);
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,

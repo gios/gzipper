@@ -1,8 +1,10 @@
 import path from 'path';
 import fs from 'fs';
 import util from 'util';
+import { v4 } from 'uuid';
 
 const unlink = util.promisify(fs.unlink);
+const copyFile = util.promisify(fs.copyFile);
 const mkdir = util.promisify(fs.mkdir);
 const lstat = util.promisify(fs.lstat);
 const exists = util.promisify(fs.exists);
@@ -11,20 +13,10 @@ const rmdir = util.promisify(fs.rmdir);
 
 export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, './resources');
 export const GZIPPER_CONFIG_FOLDER = path.resolve(process.cwd(), './.gzipper');
-
-export const EMPTY_FOLDER_PATH = path.resolve(
-  RESOURCES_FOLDER_PATH,
-  './empty_folder',
-);
 export const COMPRESS_PATH = path.resolve(
   RESOURCES_FOLDER_PATH,
   './folder_to_compress',
 );
-export const COMPRESS_PATH_TARGET = path.resolve(
-  RESOURCES_FOLDER_PATH,
-  './compress_target',
-);
-
 export const COMPRESSION_EXTENSIONS = ['.gz', '.br', '.zz'];
 
 function filterByExtension(extensions: string[], ext: string): boolean {
@@ -34,6 +26,20 @@ function filterByExtension(extensions: string[], ext: string): boolean {
     }
     return fileExtension === ext;
   });
+}
+
+export async function generatePaths(): Promise<string[]> {
+  const tmpDir = path.resolve(RESOURCES_FOLDER_PATH, `./tmp-${v4()}`);
+  const compressPath = path.resolve(tmpDir, `./tmp-compress-${v4()}`);
+  const emptyFolderPath = path.resolve(tmpDir, `./tmp-empty-folder-${v4()}`);
+  const compressTargetPath = path.resolve(
+    tmpDir,
+    `./tmp-compress-target-${v4()}`,
+  );
+  await copyFolder(COMPRESS_PATH, compressPath);
+  await createFolder(compressTargetPath);
+  await createFolder(emptyFolderPath);
+  return [tmpDir, compressPath, compressTargetPath, emptyFolderPath];
 }
 
 export async function clearDirectory(
@@ -112,4 +118,25 @@ export async function getFiles(
     }
   }
   return files;
+}
+
+export async function copyFolder(
+  target: string,
+  destination: string,
+): Promise<void> {
+  const filesList = await readdir(target);
+
+  for (const file of filesList) {
+    const targetFilePath = path.resolve(target, file);
+    const destinationFilePath = path.resolve(destination, file);
+    const isFile = (await lstat(targetFilePath)).isFile();
+    const isDirectory = (await lstat(targetFilePath)).isDirectory();
+
+    if (isDirectory) {
+      await createFolder(destinationFilePath);
+      await copyFolder(targetFilePath, destinationFilePath);
+    } else if (isFile) {
+      await copyFile(targetFilePath, destinationFilePath);
+    }
+  }
 }

@@ -4,11 +4,11 @@ import util from 'util';
 import deepEqual from 'deep-equal';
 
 import {
-  COMPRESSION_EXTENSIONS,
-  COMPRESS_PATH,
   clear,
   getFiles,
   GZIPPER_CONFIG_FOLDER,
+  generatePaths,
+  COMPRESSION_EXTENSIONS,
 } from '../../utils';
 import { Compress } from '../../../src/Compress';
 import { LogLevel } from '../../../src/logger/LogLevel.enum';
@@ -59,22 +59,25 @@ function validateConfig(config: FileConfig, files: string[]): boolean {
 }
 
 describe('CLI Compress -> Incremental', () => {
+  let testPath: string;
+  let compressTestPath: string;
+
   beforeEach(async () => {
     jest.restoreAllMocks();
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    [testPath, compressTestPath] = await generatePaths();
   });
 
   afterEach(async () => {
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(testPath, true);
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
   test('should compress files and create .gzipper folder', async () => {
     const options: CompressOptions = { incremental: true, workers: 1 };
-    const compress = new Compress(COMPRESS_PATH, null, options);
+    const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.gz']);
+    const files = await getFiles(compressTestPath, ['.gz']);
 
     const exists = await fsExists(path.resolve(process.cwd(), './.gzipper'));
     expect(exists).toBeTruthy();
@@ -109,8 +112,8 @@ describe('CLI Compress -> Incremental', () => {
 
   test('should generate .gzipperconfig', async () => {
     const options: CompressOptions = { incremental: true, workers: 1 };
-    const compress = new Compress(COMPRESS_PATH, null, options);
-    const files = await getFiles(COMPRESS_PATH);
+    const compress = new Compress(compressTestPath, null, options);
+    const files = await getFiles(compressTestPath);
     await compress.run();
 
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
@@ -124,11 +127,11 @@ describe('CLI Compress -> Incremental', () => {
   test('should retrieve all files from cache', async () => {
     const options: CompressOptions = { incremental: true, workers: 1 };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
-    const compress = new Compress(COMPRESS_PATH, null, options);
+    const compress = new Compress(compressTestPath, null, options);
 
     await compress.run();
     const configBefore = JSON.parse((await fsReadFile(configPath)).toString());
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     await compress.run();
     const configAfter = JSON.parse((await fsReadFile(configPath)).toString());
 
@@ -138,11 +141,11 @@ describe('CLI Compress -> Incremental', () => {
   test('should update "lastChecksum" and "date" revision if file was changed', async () => {
     const options: CompressOptions = { incremental: true, workers: 1 };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
-    const compress = new Compress(COMPRESS_PATH, null, options);
-    const fileToEdit = path.resolve(COMPRESS_PATH, './index.txt');
+    const compress = new Compress(compressTestPath, null, options);
+    const fileToEdit = path.resolve(compressTestPath, './index.txt');
 
     await compress.run();
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const configBefore: FileConfig = JSON.parse(
       (await fsReadFile(configPath)).toString(),
     );
@@ -176,11 +179,11 @@ describe('CLI Compress -> Incremental', () => {
     const options: CompressOptions = { incremental: true, workers: 1 };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
-    const compress = new Compress(COMPRESS_PATH, null, options);
-    const fileToEdit = path.resolve(COMPRESS_PATH, './index.txt');
+    const compress = new Compress(compressTestPath, null, options);
+    const fileToEdit = path.resolve(compressTestPath, './index.txt');
 
     await compress.run();
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const config: FileConfig = JSON.parse(
       (await fsReadFile(configPath)).toString(),
     );
@@ -200,16 +203,16 @@ describe('CLI Compress -> Incremental', () => {
   test('should add new revision if compress options were changed', async () => {
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
-    const files = await getFiles(COMPRESS_PATH);
+    const files = await getFiles(compressTestPath);
 
-    const compress1 = new Compress(COMPRESS_PATH, null, {
+    const compress1 = new Compress(compressTestPath, null, {
       incremental: true,
       workers: 1,
     });
     await compress1.run();
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(compressTestPath, COMPRESSION_EXTENSIONS);
 
-    const compress2 = new Compress(COMPRESS_PATH, null, {
+    const compress2 = new Compress(compressTestPath, null, {
       incremental: true,
       gzipLevel: 8,
       workers: 1,
@@ -234,22 +237,22 @@ describe('CLI Compress -> Incremental', () => {
   test('should update certain revision if file was changed', async () => {
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
-    const fileToEdit = path.resolve(COMPRESS_PATH, './index.txt');
+    const fileToEdit = path.resolve(compressTestPath, './index.txt');
 
-    const compress1 = new Compress(COMPRESS_PATH, null, {
+    const compress1 = new Compress(compressTestPath, null, {
       incremental: true,
       workers: 1,
     });
     await compress1.run();
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(compressTestPath, COMPRESSION_EXTENSIONS);
 
-    const compress2 = new Compress(COMPRESS_PATH, null, {
+    const compress2 = new Compress(compressTestPath, null, {
       incremental: true,
       gzipLevel: 8,
       workers: 1,
     });
     await compress2.run();
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const configBefore: FileConfig = JSON.parse(
       (await fsReadFile(configPath)).toString(),
     );
@@ -265,7 +268,7 @@ describe('CLI Compress -> Incremental', () => {
     );
     const hashContentBefore = await fsReadFile(hashPath);
 
-    const compress3 = new Compress(COMPRESS_PATH, null, {
+    const compress3 = new Compress(compressTestPath, null, {
       incremental: true,
       gzipLevel: 8,
       workers: 1,

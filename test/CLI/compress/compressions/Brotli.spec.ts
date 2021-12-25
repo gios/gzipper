@@ -2,24 +2,27 @@ import zlib from 'zlib';
 
 import { Compress } from '../../../../src/Compress';
 import {
-  COMPRESS_PATH,
   getFiles,
   clear,
-  COMPRESSION_EXTENSIONS,
+  GZIPPER_CONFIG_FOLDER,
+  generatePaths,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
 describe('CLI Compress -> Brotli compression', () => {
+  let testPath: string;
+  let compressTestPath: string;
+
   beforeEach(async () => {
     jest.restoreAllMocks();
-
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    [testPath, compressTestPath] = await generatePaths();
   });
 
   afterEach(async () => {
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(testPath, true);
+    await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
   test('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
@@ -30,10 +33,10 @@ describe('CLI Compress -> Brotli compression', () => {
       brotliSizeHint: 5,
       workers: 1,
     };
-    const compress = new Compress(COMPRESS_PATH, null, options);
+    const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
+    const files = await getFiles(compressTestPath, ['.br']);
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -88,10 +91,10 @@ describe('CLI Compress -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const compress = new Compress(COMPRESS_PATH, null, options);
+    const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
+    const files = await getFiles(compressTestPath, ['.br']);
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -126,10 +129,10 @@ describe('CLI Compress -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const compress = new Compress(COMPRESS_PATH, null, options);
+    const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
+    const files = await getFiles(compressTestPath, ['.br']);
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -164,10 +167,10 @@ describe('CLI Compress -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const compress = new Compress(COMPRESS_PATH, null, options);
+    const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
+    const files = await getFiles(compressTestPath, ['.br']);
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression BROTLI | paramMode: 2',

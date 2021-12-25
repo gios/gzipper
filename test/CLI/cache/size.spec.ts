@@ -4,10 +4,9 @@ import path from 'path';
 
 import {
   clear,
-  COMPRESS_PATH,
-  COMPRESSION_EXTENSIONS,
   GZIPPER_CONFIG_FOLDER,
   createFolder,
+  generatePaths,
 } from '../../utils';
 import { Compress } from '../../../src/Compress';
 import { Config } from '../../../src/Config';
@@ -17,20 +16,23 @@ import { CompressOptions } from '../../../src/interfaces';
 const fsExists = util.promisify(fs.exists);
 
 describe('CLI Cache -> Size', () => {
+  let testPath: string;
+  let compressTestPath: string;
+
   beforeEach(async () => {
     jest.restoreAllMocks();
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    [testPath, compressTestPath] = await generatePaths();
   });
 
   afterEach(async () => {
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
+    await clear(testPath, true);
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
   test('should returns cache size if exists', async () => {
     const options: CompressOptions = { incremental: true, workers: 1 };
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
-    const compress = new Compress(COMPRESS_PATH, null, options);
+    const compress = new Compress(compressTestPath, null, options);
     await compress.run();
     const config = new Config();
     const incremental = new Incremental(config);
