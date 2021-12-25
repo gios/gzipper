@@ -21,6 +21,7 @@ describe('CLI Cache -> Size', () => {
 
   beforeEach(async () => {
     jest.restoreAllMocks();
+    jest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
   });
 

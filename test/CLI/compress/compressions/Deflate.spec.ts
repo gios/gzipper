@@ -15,6 +15,7 @@ describe('CLI Compress -> Deflate compression', () => {
 
   beforeEach(async () => {
     jest.restoreAllMocks();
+    jest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
   });
 

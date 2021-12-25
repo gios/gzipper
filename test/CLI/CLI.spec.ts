@@ -9,6 +9,7 @@ import { Helpers } from '../../src/helpers';
 describe('Index CLI', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
+    jest.resetModules();
   });
 
   test("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {

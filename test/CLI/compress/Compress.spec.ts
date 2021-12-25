@@ -25,6 +25,7 @@ describe('CLI Compress', () => {
 
   beforeEach(async () => {
     jest.restoreAllMocks();
+    jest.resetModules();
     [testPath, compressTestPath, targetFolderTestPath, emptyFolderTestPath] =
       await generatePaths();
   });

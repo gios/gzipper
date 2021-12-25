@@ -64,6 +64,7 @@ describe('CLI Compress -> Incremental', () => {
 
   beforeEach(async () => {
     jest.restoreAllMocks();
+    jest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
   });
 

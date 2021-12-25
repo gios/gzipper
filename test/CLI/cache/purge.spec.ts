@@ -16,6 +16,7 @@ describe('CLI Cache -> Purge', () => {
 
   beforeEach(async () => {
     jest.restoreAllMocks();
+    jest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
   });
 
