@@ -5,10 +5,8 @@
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
-    "jest": "cross-env NODE_ENV=testing jest",
-    "test": "cross-env NODE_ENV=testing nyc --check-coverage --reporter='text-summary' mocha",
-    "coverage": "cross-env NODE_ENV=testing nyc --reporter='html' mocha",
-    "codecov": "cross-env NODE_ENV=testing nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "test": "cross-env NODE_ENV=testing jest",
+    "coverage": "yarn run test --coverage",
     "eslint": "eslint \"**/*.ts\"",
     "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE CHANGELOG.md dist/"
   },
