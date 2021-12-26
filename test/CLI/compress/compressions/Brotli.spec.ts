@@ -19,6 +19,8 @@ describe('CLI Compress -> Brotli compression', () => {
     jest.restoreAllMocks();
     jest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
+    const processSpy = jest.spyOn(global.process, 'cwd');
+    processSpy.mockImplementation(() => testPath);
   });
 
   afterEach(async () => {

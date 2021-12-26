@@ -28,6 +28,8 @@ describe('CLI Compress', () => {
     jest.resetModules();
     [testPath, compressTestPath, targetFolderTestPath, emptyFolderTestPath] =
       await generatePaths();
+    const processSpy = jest.spyOn(global.process, 'cwd');
+    processSpy.mockImplementation(() => testPath);
   });
 
   afterEach(async () => {

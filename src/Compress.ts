@@ -179,10 +179,11 @@ export class Compress {
           __dirname,
           process.env.NODE_ENV !== 'testing'
             ? './Compress.worker.js'
-            : '../test/workers/Compress.worker.import.js',
+            : '../test/__mocks__/Compress.worker.import.js',
         ),
         {
           workerData: {
+            cwd: process.cwd(),
             chunk,
             target: this.target,
             outputPath: this.outputPath,
