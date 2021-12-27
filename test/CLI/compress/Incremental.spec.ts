@@ -8,11 +8,13 @@ import {
   getFiles,
   GZIPPER_CONFIG_FOLDER,
   generatePaths,
-  COMPRESSION_EXTENSIONS,
 } from '../../utils';
 import { Compress } from '../../../src/Compress';
 import { LogLevel } from '../../../src/logger/LogLevel.enum';
-import { INCREMENTAL_ENABLE_MESSAGE } from '../../../src/constants';
+import {
+  COMPRESSION_EXTENSIONS,
+  INCREMENTAL_ENABLE_MESSAGE,
+} from '../../../src/constants';
 import {
   FileConfig,
   IncrementalFileValueRevision,

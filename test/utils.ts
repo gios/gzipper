@@ -17,7 +17,6 @@ export const COMPRESS_PATH = path.resolve(
   RESOURCES_FOLDER_PATH,
   './folder_to_compress',
 );
-export const COMPRESSION_EXTENSIONS = ['.gz', '.br', '.zz'];
 
 function filterByExtension(extensions: string[], ext: string): boolean {
   return !!extensions.find((fileExtension) => {
@@ -59,7 +58,7 @@ export async function clearDirectory(
       files.push(...(await clearDirectory(filePath, extensions)));
     } else if (isFile) {
       if (Array.isArray(extensions) && extensions.length) {
-        if (extensions.includes(path.extname(filePath))) {
+        if (extensions.includes(path.extname(filePath).slice(1))) {
           await unlink(path.resolve(target, filePath));
           files.push(filePath);
         }
@@ -74,7 +73,7 @@ export async function clearDirectory(
 }
 
 /**
- * Clear directory, extensions = true (delete all files), extensions = [.js, .ts] (only specific files)
+ * Clear directory, extensions = true (delete all files), extensions = [js, ts] (only specific files)
  */
 export async function clear(
   directory: string,
