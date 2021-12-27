@@ -33,6 +33,6 @@ jobs:
       - run: |
           yarn install
           yarn run build
-      - run: cd dist && yarn publish
+      - run: cd dist && yarn npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

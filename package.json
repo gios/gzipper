@@ -8,7 +8,7 @@
     "test": "cross-env NODE_ENV=testing jest",
     "coverage": "yarn run test --coverage",
     "eslint": "eslint \"**/*.ts\"",
-    "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE CHANGELOG.md dist/"
+    "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE CHANGELOG.md yarn.lock dist/"
   },
   "repository": {
     "type": "git",
