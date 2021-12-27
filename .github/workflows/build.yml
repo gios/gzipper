@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: |
-          yarn install
+          yarn install --immutable
           yarn run build
           yarn run eslint
           yarn run test

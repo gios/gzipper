@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: |
-          yarn install
+          yarn install --immutable
           yarn run eslint
           yarn run test
 
@@ -31,8 +31,10 @@ jobs:
           node-version: '16.x'
           registry-url: https://registry.npmjs.org/
       - run: |
-          yarn install
+          yarn install --immutable
           yarn run build
+          yarn config set npmAuthToken $NPM_TOKEN
+          yarn config set npmAlwaysAuth true
       - run: cd dist && yarn npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
