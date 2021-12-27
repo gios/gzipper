@@ -1,33 +1,34 @@
-import assert from 'assert';
-import sinon from 'sinon';
 import zlib from 'zlib';
 
 import { Compress } from '../../../../src/Compress';
 import {
-  COMPRESS_PATH,
   getFiles,
   clear,
-  COMPRESSION_EXTENSIONS,
+  GZIPPER_CONFIG_FOLDER,
+  generatePaths,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
 describe('CLI Compress -> Brotli compression', () => {
-  let sinonSandbox: sinon.SinonSandbox;
+  let testPath: string;
+  let compressTestPath: string;
 
   beforeEach(async () => {
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
-    sinonSandbox = sinon.createSandbox();
+    jest.restoreAllMocks();
+    jest.resetModules();
+    [testPath, compressTestPath] = await generatePaths();
+    const processSpy = jest.spyOn(global.process, 'cwd');
+    processSpy.mockImplementation(() => testPath);
   });
 
   afterEach(async () => {
-    await clear(COMPRESS_PATH, COMPRESSION_EXTENSIONS);
-    sinonSandbox.restore();
-    sinon.restore();
+    await clear(testPath, true);
+    await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  it('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
+  test('--brotli-param-mode, --brotli-quality, --brotli-size-hint should change brotli configuration', async () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'text',
@@ -35,59 +36,56 @@ describe('CLI Compress -> Brotli compression', () => {
       brotliSizeHint: 5,
       workers: 1,
     };
-    const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinonSandbox.spy(Logger, 'log');
+    const compress = new Compress(compressTestPath, null, options);
+    const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
+    const files = await getFiles(compressTestPath, ['.br']);
 
-    assert.ok(
-      logSpy.calledWithExactly(
-        'Compression BROTLI | paramMode: 1, quality: 10, sizeHint: 5',
-        LogLevel.INFO,
-      ),
+    expect(logSpy).toHaveBeenNthCalledWith(
+      1,
+      'Compression BROTLI | paramMode: 1, quality: 10, sizeHint: 5',
+      LogLevel.INFO,
     );
-    assert.ok(
-      logSpy.calledWithExactly(
-        'Default output file format: [filename].[ext].[compressExt]',
-        LogLevel.INFO,
-      ),
+    expect(logSpy).toHaveBeenNthCalledWith(
+      2,
+      'Default output file format: [filename].[ext].[compressExt]',
+      LogLevel.INFO,
     );
-    assert.ok(
-      logSpy.calledWithExactly(
-        sinonSandbox.match(
-          new RegExp(`${files.length} files have been compressed. (.+)`),
-        ),
-        LogLevel.SUCCESS,
-      ),
+    expect(logSpy).toHaveBeenNthCalledWith(
+      3,
+      expect.stringMatching(/\[\d+\] Worker has started./),
+      LogLevel.INFO,
     );
-    assert.strictEqual((compress as any).compressionInstances[0].ext, 'br');
-    assert.strictEqual(
+    expect(logSpy).toHaveBeenLastCalledWith(
+      expect.stringMatching(
+        new RegExp(`${files.length} files have been compressed. (.+)`),
+      ),
+      LogLevel.SUCCESS,
+    );
+    expect((compress as any).compressionInstances[0].ext).toBe('br');
+    expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
-      3,
-    );
-    assert.strictEqual(Object.keys((compress as any).options).length, 5);
-    assert.strictEqual(
+    ).toBe(3);
+    expect(Object.keys((compress as any).options).length).toBe(5);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
-      zlib.constants.BROTLI_MODE_TEXT,
-    );
-    assert.strictEqual(
+    ).toBe(zlib.constants.BROTLI_MODE_TEXT);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_QUALITY
       ],
-      10,
-    );
-    assert.strictEqual(
+    ).toBe(10);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_SIZE_HINT
       ],
-      5,
-    );
+    ).toBe(5);
   });
 
-  it('--brotli-param-mode=default should change brotli configuration', async () => {
+  test('--brotli-param-mode=default should change brotli configuration', async () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'default',
@@ -96,41 +94,36 @@ describe('CLI Compress -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinonSandbox.spy(Logger, 'log');
+    const compress = new Compress(compressTestPath, null, options);
+    const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
+    const files = await getFiles(compressTestPath, ['.br']);
 
-    assert.ok(
-      logSpy.calledWithExactly(
-        'Compression BROTLI | paramMode: 0',
-        LogLevel.INFO,
-      ),
+    expect(logSpy).toHaveBeenNthCalledWith(
+      1,
+      'Compression BROTLI | paramMode: 0',
+      LogLevel.INFO,
     );
-    assert.ok(
-      logSpy.calledWithExactly(
-        sinonSandbox.match(
-          new RegExp(`${files.length} files have been compressed. (.+)`),
-        ),
-        LogLevel.SUCCESS,
+    expect(logSpy).toHaveBeenLastCalledWith(
+      expect.stringMatching(
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
+      LogLevel.SUCCESS,
     );
-    assert.strictEqual((compress as any).compressionInstances[0].ext, 'br');
-    assert.strictEqual(
+    expect((compress as any).compressionInstances[0].ext).toBe('br');
+    expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
-      1,
-    );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
-    assert.strictEqual(
+    ).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(3);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
-      zlib.constants.BROTLI_MODE_GENERIC,
-    );
+    ).toBe(zlib.constants.BROTLI_MODE_GENERIC);
   });
 
-  it('wrong value for --brotli-param-mode should change brotli configuration to brotliParamMode=default', async () => {
+  test('wrong value for --brotli-param-mode should change brotli configuration to brotliParamMode=default', async () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'amigos',
@@ -139,41 +132,36 @@ describe('CLI Compress -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinonSandbox.spy(Logger, 'log');
+    const compress = new Compress(compressTestPath, null, options);
+    const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
+    const files = await getFiles(compressTestPath, ['.br']);
 
-    assert.ok(
-      logSpy.calledWithExactly(
-        'Compression BROTLI | paramMode: 0',
-        LogLevel.INFO,
-      ),
+    expect(logSpy).toHaveBeenNthCalledWith(
+      1,
+      'Compression BROTLI | paramMode: 0',
+      LogLevel.INFO,
     );
-    assert.ok(
-      logSpy.calledWithExactly(
-        sinonSandbox.match(
-          new RegExp(`${files.length} files have been compressed. (.+)`),
-        ),
-        LogLevel.SUCCESS,
+    expect(logSpy).toHaveBeenLastCalledWith(
+      expect.stringMatching(
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
+      LogLevel.SUCCESS,
     );
-    assert.strictEqual((compress as any).compressionInstances[0].ext, 'br');
-    assert.strictEqual(
+    expect((compress as any).compressionInstances[0].ext).toBe('br');
+    expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
-      1,
-    );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
-    assert.strictEqual(
+    ).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(3);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
-      zlib.constants.BROTLI_MODE_GENERIC,
-    );
+    ).toBe(zlib.constants.BROTLI_MODE_GENERIC);
   });
 
-  it('--brotli-param-mode=font should change brotli configuration', async () => {
+  test('--brotli-param-mode=font should change brotli configuration', async () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'font',
@@ -182,37 +170,31 @@ describe('CLI Compress -> Brotli compression', () => {
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
     }
-    const compress = new Compress(COMPRESS_PATH, null, options);
-    const logSpy = sinonSandbox.spy(Logger, 'log');
+    const compress = new Compress(compressTestPath, null, options);
+    const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(COMPRESS_PATH, ['.br']);
-
-    assert.ok(
-      logSpy.calledWithExactly(
-        'Compression BROTLI | paramMode: 2',
-        LogLevel.INFO,
-      ),
+    const files = await getFiles(compressTestPath, ['.br']);
+    expect(logSpy).toHaveBeenNthCalledWith(
+      1,
+      'Compression BROTLI | paramMode: 2',
+      LogLevel.INFO,
     );
-    assert.ok(
-      logSpy.calledWithExactly(
-        sinonSandbox.match(
-          new RegExp(`${files.length} files have been compressed. (.+)`),
-        ),
-        LogLevel.SUCCESS,
+    expect(logSpy).toHaveBeenLastCalledWith(
+      expect.stringMatching(
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
+      LogLevel.SUCCESS,
     );
-    assert.strictEqual((compress as any).compressionInstances[0].ext, 'br');
-    assert.strictEqual(
+    expect((compress as any).compressionInstances[0].ext).toBe('br');
+    expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
-      1,
-    );
-    assert.strictEqual(Object.keys((compress as any).options).length, 3);
-    assert.strictEqual(
+    ).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(3);
+    expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
       ],
-      zlib.constants.BROTLI_MODE_FONT,
-    );
+    ).toBe(zlib.constants.BROTLI_MODE_FONT);
   });
 });

@@ -1,13 +1,12 @@
 {
   "name": "gzipper",
   "packageManager": "yarn@3.1.1",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=testing nyc --check-coverage --reporter='text-summary' mocha",
-    "coverage": "cross-env NODE_ENV=testing nyc --reporter='html' mocha",
-    "codecov": "cross-env NODE_ENV=testing nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "test": "cross-env NODE_ENV=testing jest",
+    "coverage": "yarn run test --coverage",
     "eslint": "eslint \"**/*.ts\"",
     "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE CHANGELOG.md dist/"
   },
@@ -21,6 +20,7 @@
     "compression",
     "brotli",
     "deflate",
+    "zopfli",
     "gzip",
     "zlib",
     "CLI",
@@ -35,9 +35,9 @@
   "homepage": "https://github.com/gios/gzipper#readme",
   "devDependencies": {
     "@types/deep-equal": "^1.0.1",
-    "@types/mocha": "^8.2.2",
+    "@types/jest": "^27.0.3",
     "@types/node": "^14.14.41",
-    "@types/sinon": "^10.0.0",
+    "@types/node-zopfli": "^2.0.2",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
@@ -46,14 +46,12 @@
     "cross-env": "^7.0.3",
     "eslint": "^7.24.0",
     "eslint-config-prettier": "^8.2.0",
-    "mocha": "^8.3.2",
-    "nyc": "^15.1.0",
+    "jest": "^27.4.5",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
-    "sinon": "^10.0.0",
-    "source-map-support": "^0.5.19",
+    "ts-jest": "^27.1.2",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.5.4"
   },
   "engines": {
     "node": ">=12"
@@ -61,6 +59,7 @@
   "dependencies": {
     "commander": "^7.2.0",
     "deep-equal": "^2.0.5",
+    "node-zopfli": "^2.1.4",
     "uuid": "^8.3.2"
   }
 }

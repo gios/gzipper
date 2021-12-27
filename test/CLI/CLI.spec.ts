@@ -1,6 +1,3 @@
-import sinon from 'sinon';
-import assert from 'assert';
-
 import { Index } from '../../src/bin';
 import { Compress } from '../../src/Compress';
 import { CompressOptions } from '../../src/interfaces';
@@ -10,32 +7,12 @@ import { LogLevel } from '../../src/logger/LogLevel.enum';
 import { Helpers } from '../../src/helpers';
 
 describe('Index CLI', () => {
-  let sinonSandbox: sinon.SinonSandbox;
-  let clock: sinon.SinonFakeTimers;
-
-  function compareValues(value1: unknown, value2: unknown): boolean {
-    if (Array.isArray(value1) && Array.isArray(value2)) {
-      return (
-        value1.length === value2.length &&
-        value1.every((value, index) => value === value2[index])
-      );
-    }
-
-    return value1 === value2;
-  }
-
   beforeEach(() => {
-    clock = sinon.useFakeTimers();
-    sinonSandbox = sinon.createSandbox();
+    jest.restoreAllMocks();
+    jest.resetModules();
   });
 
-  afterEach(async () => {
-    clock.restore();
-    sinonSandbox.restore();
-    sinon.restore();
-  });
-
-  it("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
+  test("compress <path> [outputPath] - should exec 'runCompress' with options", async () => {
     const cliArguments = [
       'node.exe',
       'index.js',
@@ -59,12 +36,16 @@ describe('Index CLI', () => {
       '--brotli',
       '--deflate',
       '--gzip',
+      '--zopfli',
       '--brotli-param-mode',
       'text',
       '--brotli-quality',
       '5',
       '--brotli-size-hint',
       '77',
+      '--zopfli-block-splitting',
+      '--zopfli-block-splitting-max',
+      '5',
       '--output-file-format',
       'test-[filename].[ext].[compressExt]',
       '--remove-larger',
@@ -74,18 +55,40 @@ describe('Index CLI', () => {
     ];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const runCompressSpy = sinonSandbox.spy(index as any, 'runCompress');
-    const filterOptionsSpy = sinonSandbox.spy(index as any, 'filterOptions');
-    const compressRunStub = sinonSandbox
-      .stub(Compress.prototype, 'run')
-      .resolves([]);
+    const runCompressSpy = jest.spyOn(index as any, 'runCompress');
+    const filterOptionsSpy = jest.spyOn(index as any, 'filterOptions');
+    const compressRunSpy = jest
+      .spyOn(Compress.prototype, 'run')
+      .mockResolvedValueOnce([]);
     await index.exec();
-    assert.strictEqual(runCompressSpy.callCount, 1);
-    assert.strictEqual(compressRunStub.callCount, 1);
-    assert.strictEqual(filterOptionsSpy.callCount, 1);
-    const [target, outputPath, options] = runCompressSpy.args[0];
-    assert.strictEqual(target, 'folder_to_compress');
-    assert.strictEqual(outputPath, 'folder_to_compress_out');
+    const request: CompressOptions = {
+      verbose: true,
+      incremental: true,
+      exclude: ['png', 'jpg', 'js'],
+      include: ['png', 'wav'],
+      threshold: 500,
+      brotli: true,
+      deflate: true,
+      gzip: true,
+      zopfli: true,
+      gzipLevel: 7,
+      gzipMemoryLevel: 1,
+      gzipStrategy: undefined,
+      deflateLevel: undefined,
+      deflateMemoryLevel: undefined,
+      deflateStrategy: 3,
+      brotliParamMode: 'text',
+      brotliQuality: 5,
+      brotliSizeHint: 77,
+      zopfliNumIterations: undefined,
+      zopfliBlockSplitting: true,
+      zopfliBlockSplittingLast: undefined,
+      zopfliBlockSplittingMax: 5,
+      outputFileFormat: 'test-[filename].[ext].[compressExt]',
+      removeLarger: true,
+      skipCompressed: true,
+      workers: 2,
+    };
     const response: CompressOptions = {
       verbose: true,
       incremental: true,
@@ -98,81 +101,30 @@ describe('Index CLI', () => {
       brotli: true,
       deflate: true,
       gzip: true,
+      zopfli: true,
       brotliParamMode: 'text',
       brotliQuality: 5,
       brotliSizeHint: 77,
       outputFileFormat: 'test-[filename].[ext].[compressExt]',
+      zopfliBlockSplitting: true,
+      zopfliBlockSplittingMax: 5,
       removeLarger: true,
       skipCompressed: true,
       workers: 2,
     };
-    assert.deepStrictEqual(filterOptionsSpy.args[0][0], response);
-    assert.ok(
-      Object.entries(response).every(([key, val]) =>
-        compareValues(options[key], val),
-      ),
-    );
-  });
-
-  it("compress <path> [outputPath] - should exec 'runCompress' with filtered options", async () => {
-    const cliArguments = [
-      'node.exe',
-      'index.js',
-      'compress',
+    expect(runCompressSpy).toHaveBeenCalledTimes(1);
+    expect(runCompressSpy).toHaveBeenCalledWith(
       'folder_to_compress',
       'folder_to_compress_out',
-      '--verbose',
-      '--exclude',
-      'php,cc',
-      '--include',
-      'css',
-      '--threshold',
-      '800',
-      '--gzip-level',
-      '4',
-      '--gzip-memory-level',
-      '2',
-      '--gzip-strategy',
-      '4',
-      '--output-file-format',
-      'test-[filename]-out.[ext].[compressExt]',
-    ];
-    const index = new Index();
-    (index as any).argv = cliArguments;
-    const runCompressSpy = sinonSandbox.spy(index as any, 'runCompress');
-    const filterOptionsSpy = sinonSandbox.spy(index as any, 'filterOptions');
-    const compressRunStub = sinonSandbox
-      .stub(Compress.prototype, 'run')
-      .resolves([]);
-    await index.exec();
-    assert.strictEqual(runCompressSpy.callCount, 1);
-    assert.strictEqual(compressRunStub.callCount, 1);
-    assert.strictEqual(filterOptionsSpy.callCount, 1);
-    const [target, outputPath, options] = runCompressSpy.args[0];
-    assert.strictEqual(target, 'folder_to_compress');
-    assert.strictEqual(outputPath, 'folder_to_compress_out');
-    const response: CompressOptions = {
-      verbose: true,
-      exclude: ['php', 'cc'],
-      include: ['css'],
-      threshold: 800,
-      gzipLevel: 4,
-      gzipMemoryLevel: 2,
-      gzipStrategy: 4,
-      outputFileFormat: 'test-[filename]-out.[ext].[compressExt]',
-    };
-    assert.deepStrictEqual(filterOptionsSpy.args[0][0], response);
-    assert.ok(
-      !Object.values(options).some((val) => val !== val || val === undefined),
+      request,
     );
-    assert.ok(
-      Object.entries(response).every(([key, val]) =>
-        compareValues(options[key], val),
-      ),
-    );
+    expect(compressRunSpy).toHaveBeenCalledTimes(1);
+    expect(filterOptionsSpy).toHaveBeenCalledTimes(1);
+    expect(filterOptionsSpy).toHaveBeenCalledWith(request);
+    expect(filterOptionsSpy).toHaveReturnedWith(response);
   });
 
-  it("compress <path> [outputPath] - should exec 'runCompress' with overwrite options", async () => {
+  test("compress <path> [outputPath] - should exec 'runCompress' with overwrite options", async () => {
     const envArguments = {
       GZIPPER_INCREMENTAL: '0',
       GZIPPER_VERBOSE: '0',
@@ -182,6 +134,7 @@ describe('Index CLI', () => {
       GZIPPER_BROTLI: '0',
       GZIPPER_DEFLATE: '0',
       GZIPPER_GZIP: '0',
+      GZIPPER_ZOPFLI: '0',
       GZIPPER_GZIP_LEVEL: '2',
       GZIPPER_GZIP_MEMORY_LEVEL: '2',
       GZIPPER_GZIP_STRATEGY: '4',
@@ -191,6 +144,10 @@ describe('Index CLI', () => {
       GZIPPER_BROTLI_PARAM_MODE: 'font',
       GZIPPER_BROTLI_QUALITY: '3',
       GZIPPER_BROTLI_SIZE_HINT: '10',
+      GZIPPER_ZOPFLI_NUM_ITERATIONS: '9',
+      GZIPPER_ZOPFLI_BLOCK_SPLITTING: '0',
+      GZIPPER_ZOPFLI_BLOCK_SPLITTING_LAST: '0',
+      GZIPPER_ZOPFLI_BLOCK_SPLITTING_MAX: '14',
       GZIPPER_OUTPUT_FILE_FORMAT: '[filename]-[hash].[ext].[compressExt]',
       GZIPPER_REMOVE_LARGER: '0',
       GZIPPER_SKIP_COMPRESSED: '0',
@@ -225,12 +182,19 @@ describe('Index CLI', () => {
       '--brotli',
       '--deflate',
       '--gzip',
+      '--zopfli',
       '--brotli-param-mode',
       'text',
       '--brotli-quality',
       '5',
       '--brotli-size-hint',
       '77',
+      '--zopfli-num-iterations',
+      '15',
+      '--zopfli-block-splitting',
+      '--zopfli-block-splitting-last',
+      '--zopfli-block-splitting-max',
+      '10',
       '--output-file-format',
       'test-[filename].[ext].[compressExt]',
       '--remove-larger',
@@ -241,18 +205,40 @@ describe('Index CLI', () => {
     const index = new Index();
     (index as any).argv = cliArguments;
     (index as any).env = envArguments;
-    const runCompressSpy = sinonSandbox.spy(index as any, 'runCompress');
-    const filterOptionsSpy = sinonSandbox.spy(index as any, 'filterOptions');
-    const compressRunStub = sinonSandbox
-      .stub(Compress.prototype, 'run')
-      .resolves([]);
+    const runCompressSpy = jest.spyOn(index as any, 'runCompress');
+    const filterOptionsSpy = jest.spyOn(index as any, 'filterOptions');
+    const compressRunSpy = jest
+      .spyOn(Compress.prototype, 'run')
+      .mockResolvedValueOnce([]);
     await index.exec();
-    assert.strictEqual(runCompressSpy.callCount, 1);
-    assert.strictEqual(compressRunStub.callCount, 1);
-    assert.strictEqual(filterOptionsSpy.callCount, 1);
-    const [target, outputPath, options] = runCompressSpy.args[0];
-    assert.strictEqual(target, 'folder_to_compress');
-    assert.strictEqual(outputPath, 'folder_to_compress_out');
+    const request: CompressOptions = {
+      verbose: false,
+      incremental: false,
+      exclude: ['py', 'c'],
+      include: ['r', 'rs'],
+      threshold: 800,
+      brotli: false,
+      deflate: false,
+      gzip: false,
+      zopfli: false,
+      gzipLevel: 2,
+      gzipMemoryLevel: 2,
+      gzipStrategy: 4,
+      deflateLevel: 1,
+      deflateMemoryLevel: 1,
+      deflateStrategy: 3,
+      brotliParamMode: 'font',
+      brotliQuality: 3,
+      brotliSizeHint: 10,
+      zopfliNumIterations: 9,
+      zopfliBlockSplitting: false,
+      zopfliBlockSplittingLast: false,
+      zopfliBlockSplittingMax: 14,
+      outputFileFormat: '[filename]-[hash].[ext].[compressExt]',
+      removeLarger: false,
+      skipCompressed: false,
+      workers: 3,
+    };
     const response: CompressOptions = {
       incremental: false,
       verbose: false,
@@ -268,109 +254,119 @@ describe('Index CLI', () => {
       brotli: false,
       deflate: false,
       gzip: false,
+      zopfli: false,
       brotliParamMode: 'font',
       brotliQuality: 3,
       brotliSizeHint: 10,
+      zopfliNumIterations: 9,
+      zopfliBlockSplitting: false,
+      zopfliBlockSplittingLast: false,
+      zopfliBlockSplittingMax: 14,
       outputFileFormat: '[filename]-[hash].[ext].[compressExt]',
       removeLarger: false,
       skipCompressed: false,
       workers: 3,
     };
-    assert.ok(
-      Object.entries(response).every(([key, val]) =>
-        compareValues(options[key], val),
-      ),
+    expect(runCompressSpy).toHaveBeenCalledTimes(1);
+    expect(runCompressSpy).toHaveBeenCalledWith(
+      'folder_to_compress',
+      'folder_to_compress_out',
+      request,
     );
+    expect(compressRunSpy).toHaveBeenCalledTimes(1);
+    expect(filterOptionsSpy).toHaveBeenCalledTimes(1);
+    expect(filterOptionsSpy).toHaveBeenCalledWith(request);
+    expect(filterOptionsSpy).toHaveReturnedWith(response);
   });
 
-  it("cache purge should exec 'cachePurge' and throw the SUCCESS message", async () => {
+  test("cache purge should exec 'cachePurge' and throw the SUCCESS message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const cachePurgeStub = sinonSandbox.stub(
-      Incremental.prototype,
-      'cachePurge',
-    );
-    const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const cachePurgeSpy = jest
+      .spyOn(Incremental.prototype, 'cachePurge')
+      .mockResolvedValueOnce();
+    const cacheSizeSpy = jest.spyOn(Incremental.prototype, 'cacheSize');
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.SUCCESS);
-    assert.strictEqual(cachePurgeStub.callCount, 1);
-    assert.strictEqual(cacheSizeStub.callCount, 0);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith(
+      'Cache has been purged, you are free to initialize a new one.',
+      LogLevel.SUCCESS,
+    );
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(1);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(0);
   });
 
-  it("cache size should exec 'cacheSize' and throw the info message", async () => {
+  test("cache size should exec 'cacheSize' and throw the info message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const cachePurgeStub = sinonSandbox.stub(
-      Incremental.prototype,
-      'cachePurge',
-    );
-    const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const cachePurgeSpy = jest.spyOn(Incremental.prototype, 'cachePurge');
+    const cacheSizeSpy = jest
+      .spyOn(Incremental.prototype, 'cacheSize')
+      .mockResolvedValueOnce(0);
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.INFO);
-    assert.strictEqual(cachePurgeStub.callCount, 0);
-    assert.strictEqual(cacheSizeStub.callCount, 1);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith(
+      'Cache is empty, initialize a new one with --incremental option.',
+      LogLevel.INFO,
+    );
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("cache size should exec 'cacheSize', 'readableSize' and throw the info message", async () => {
+  test("cache size should exec 'cacheSize', 'readableSize' and throw the info message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const readableSizeStub = sinonSandbox.stub(Helpers, 'readableSize');
-    const cachePurgeStub = sinonSandbox.stub(
-      Incremental.prototype,
-      'cachePurge',
-    );
-    const cacheSizeStub = sinonSandbox
-      .stub(Incremental.prototype, 'cacheSize')
-      .resolves(12);
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const readableSizeSpy = jest.spyOn(Helpers, 'readableSize');
+    const cachePurgeSpy = jest.spyOn(Incremental.prototype, 'cachePurge');
+    const cacheSizeSpy = jest
+      .spyOn(Incremental.prototype, 'cacheSize')
+      .mockResolvedValueOnce(12);
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.INFO);
-    assert.strictEqual(cachePurgeStub.callCount, 0);
-    assert.strictEqual(cacheSizeStub.callCount, 1);
-    assert.strictEqual(readableSizeStub.callCount, 1);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith(
+      'Cache size is 12 B',
+      LogLevel.INFO,
+    );
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(1);
+    expect(readableSizeSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('cache size should throw the error message', async () => {
+  test('cache size should throw the error message', async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const cachePurgeStub = sinonSandbox.stub(
-      Incremental.prototype,
-      'cachePurge',
-    );
-    const cacheSizeStub = sinonSandbox
-      .stub(Incremental.prototype, 'cacheSize')
-      .throws('Error');
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const cachePurgeSpy = jest.spyOn(Incremental.prototype, 'cachePurge');
+    const cacheSizeSpy = jest
+      .spyOn(Incremental.prototype, 'cacheSize')
+      .mockRejectedValueOnce('Error');
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.ERROR);
-    assert.strictEqual(cachePurgeStub.callCount, 0);
-    assert.strictEqual(cacheSizeStub.callCount, 1);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith('Error', LogLevel.ERROR);
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(1);
   });
 
-  it('cache purge should throw the error message', async () => {
+  test('cache purge should throw the error message', async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
     (index as any).argv = cliArguments;
-    const loggerLogStub = sinonSandbox.stub(Logger, 'log');
-    const cachePurgeStub = sinonSandbox
-      .stub(Incremental.prototype, 'cachePurge')
-      .throws('Error');
-    const cacheSizeStub = sinonSandbox.stub(Incremental.prototype, 'cacheSize');
-
+    const loggerLogSpy = jest.spyOn(Logger, 'log');
+    const cachePurgeSpy = jest
+      .spyOn(Incremental.prototype, 'cachePurge')
+      .mockRejectedValueOnce('Error');
+    const cacheSizeSpy = jest.spyOn(Incremental.prototype, 'cacheSize');
     await index.exec();
-    assert.strictEqual(loggerLogStub.callCount, 1);
-    assert.strictEqual(loggerLogStub.args[0][1], LogLevel.ERROR);
-    assert.strictEqual(cachePurgeStub.callCount, 1);
-    assert.strictEqual(cacheSizeStub.callCount, 0);
+    expect(loggerLogSpy).toHaveBeenCalledTimes(1);
+    expect(loggerLogSpy).toHaveBeenCalledWith('Error', LogLevel.ERROR);
+    expect(cachePurgeSpy).toHaveBeenCalledTimes(1);
+    expect(cacheSizeSpy).toHaveBeenCalledTimes(0);
   });
 });

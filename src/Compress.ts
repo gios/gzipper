@@ -179,10 +179,11 @@ export class Compress {
           __dirname,
           process.env.NODE_ENV !== 'testing'
             ? './Compress.worker.js'
-            : '../test/workers/Compress.worker.import.js',
+            : '../test/__mocks__/Compress.worker.import.js',
         ),
         {
           workerData: {
+            cwd: process.cwd(),
             chunk,
             target: this.target,
             outputPath: this.outputPath,
@@ -217,12 +218,12 @@ export class Compress {
    * Show message with compression params.
    */
   private compressionLog(): void {
-    if (!this.options.outputFileFormat) {
-      Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
-    }
-
     for (const instance of this.compressionInstances) {
       Logger.log(`Compression ${instance.readableOptions()}`, LogLevel.INFO);
+    }
+
+    if (!this.options.outputFileFormat) {
+      Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
     }
   }
 }

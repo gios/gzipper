@@ -11,7 +11,7 @@ export class DeflateCompression extends Compression<CompressionOptions> {
   readonly compressionName = CompressionNames.DEFLATE;
   readonly ext = CompressionExtensions.DEFLATE;
   /**
-   * Creates an instance of GzipCompression.
+   * Creates an instance of DeflateCompression.
    */
   constructor(options: CompressOptions) {
     super(options);

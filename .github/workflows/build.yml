@@ -24,6 +24,6 @@ jobs:
           yarn run build
           yarn run eslint
           yarn run test
-      - run: yarn run codecov
+      - run: yarn codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
