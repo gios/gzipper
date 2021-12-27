@@ -47,7 +47,9 @@ jobs:
         run: |
           yarn config set npmAuthToken $NPM_TOKEN
           yarn config set npmAlwaysAuth true
-          yarn run build
+
+      - name: Build
+        run: yarn run build
 
       - name: Publish
         run: cd dist && yarn npm publish
