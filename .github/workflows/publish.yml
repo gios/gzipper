@@ -42,12 +42,12 @@ jobs:
       - name: Install
         run: |
           yarn install --immutable
-          yarn run build
 
       - name: Setup .yarnrc.yml
         run: |
           yarn config set npmAuthToken $NPM_TOKEN
           yarn config set npmAlwaysAuth true
+          yarn run build
 
       - name: Publish
         run: cd dist && yarn npm publish
