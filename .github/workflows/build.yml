@@ -1,4 +1,4 @@
-name: Test Package
+name: Build Package
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
       - master
 
 jobs:
-  buildAndTest:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -26,9 +26,9 @@ jobs:
       - name: Install and Validate
         run: |
           yarn install --immutable
-          yarn run build
           yarn run eslint
           yarn run test
+          yarn run build
 
       - name: Codecov
         run: yarn codecov
