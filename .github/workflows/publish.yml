@@ -45,7 +45,7 @@ jobs:
 
       - name: Setup .yarnrc.yml
         run: |
-          yarn config set npmAuthToken $NPM_TOKEN
+          yarn config set npmAuthToken ${{ secrets.NPM_TOKEN }}
           yarn config set npmAlwaysAuth true
 
       - name: Build
