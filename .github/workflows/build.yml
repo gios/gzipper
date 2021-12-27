@@ -27,7 +27,7 @@ jobs:
         run: |
           yarn install --immutable
           yarn run eslint
-          yarn run test
+          yarn run coverage
           yarn run build
 
       - name: Codecov
