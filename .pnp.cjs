@@ -38,6 +38,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/deep-equal", "npm:1.0.1"],
             ["@types/jest", "npm:27.0.3"],
             ["@types/node", "npm:14.18.2"],
+            ["@types/node-zopfli", "npm:2.0.2"],
             ["@types/uuid", "npm:8.3.3"],
             ["@typescript-eslint/eslint-plugin", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:4.33.0"],
             ["@typescript-eslint/parser", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:4.33.0"],
@@ -1322,6 +1323,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         ["npm:17.0.4", {
           "packageLocation": "./.yarn/cache/@types-node-npm-17.0.4-bc035da5ec-92e6a25fea.zip/node_modules/@types/node/",
           "packageDependencies": [
+            ["@types/node", "npm:17.0.4"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/node-zopfli", [
+        ["npm:2.0.2", {
+          "packageLocation": "./.yarn/cache/@types-node-zopfli-npm-2.0.2-79abe216be-4e0354a5b2.zip/node_modules/@types/node-zopfli/",
+          "packageDependencies": [
+            ["@types/node-zopfli", "npm:2.0.2"],
             ["@types/node", "npm:17.0.4"]
           ],
           "linkType": "HARD",
@@ -3517,6 +3528,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/deep-equal", "npm:1.0.1"],
             ["@types/jest", "npm:27.0.3"],
             ["@types/node", "npm:14.18.2"],
+            ["@types/node-zopfli", "npm:2.0.2"],
             ["@types/uuid", "npm:8.3.3"],
             ["@typescript-eslint/eslint-plugin", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:4.33.0"],
             ["@typescript-eslint/parser", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:4.33.0"],

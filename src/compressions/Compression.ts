@@ -1,8 +1,9 @@
+import zopfli from 'node-zopfli';
 import zlib from 'zlib';
 
-import { CompressOptions, CompressionOptions } from '../interfaces';
+import { CompressOptions } from '../interfaces';
 
-export abstract class Compression<T extends CompressionOptions> {
+export abstract class Compression<T> {
   compressionOptions: T = {} as T;
   abstract ext: string;
   abstract compressionName: string;
@@ -19,7 +20,7 @@ export abstract class Compression<T extends CompressionOptions> {
   /**
    * Returns a compression instance in closure.
    */
-  abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip;
+  abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip | zopfli;
 
   /**
    * Build compression options object [compressionOptions].

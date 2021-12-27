@@ -1,6 +1,7 @@
 import { BrotliCompression } from './compressions/Brotli';
 import { DeflateCompression } from './compressions/Deflate';
 import { GzipCompression } from './compressions/Gzip';
+import { ZopfliCompression } from './compressions/Zopfli';
 import { COMPRESSION_EXTENSIONS } from './constants';
 import { CompressionExtensions } from './enums';
 import { CompressionType, CompressOptions } from './interfaces';
@@ -26,6 +27,10 @@ export class CompressService {
 
     if (this.options.deflate) {
       instances.push(new DeflateCompression(this.options));
+    }
+
+    if (this.options.zopfli) {
+      instances.push(new ZopfliCompression(this.options));
     }
 
     if (this.options.gzip || !instances.length) {

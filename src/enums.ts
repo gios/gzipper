@@ -2,6 +2,7 @@ export enum CompressionNames {
   BROTLI = 'BROTLI',
   DEFLATE = 'DEFLATE',
   GZIP = 'GZIP',
+  ZOPFLI = 'ZOPFLI',
 }
 
 export enum CompressionExtensions {
