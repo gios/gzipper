@@ -39,15 +39,15 @@ jobs:
           node-version: '16.x'
           registry-url: https://registry.npmjs.org/
 
-      - name: Setup .yarnrc.yml
-        run: |
-          yarn config set npmAuthToken $NPM_TOKEN
-          yarn config set npmAlwaysAuth true
-
       - name: Install
         run: |
           yarn install --immutable
           yarn run build
+
+      - name: Setup .yarnrc.yml
+        run: |
+          yarn config set npmAuthToken $NPM_TOKEN
+          yarn config set npmAlwaysAuth true
 
       - name: Publish
         run: cd dist && yarn npm publish
