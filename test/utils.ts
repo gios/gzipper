@@ -12,6 +12,7 @@ const readdir = util.promisify(fs.readdir);
 const rmdir = util.promisify(fs.rmdir);
 
 export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, './resources');
+export const TEST_FOLDER_PATH = path.resolve(__dirname, './tmp-test-folder');
 export const GZIPPER_CONFIG_FOLDER = path.resolve(process.cwd(), './.gzipper');
 export const COMPRESS_PATH = path.resolve(
   RESOURCES_FOLDER_PATH,
@@ -28,7 +29,7 @@ function filterByExtension(extensions: string[], ext: string): boolean {
 }
 
 export async function generatePaths(): Promise<string[]> {
-  const tmpDir = path.resolve(RESOURCES_FOLDER_PATH, `./tmp-${v4()}`);
+  const tmpDir = path.resolve(TEST_FOLDER_PATH, `./tmp-${v4()}`);
   const compressPath = path.resolve(tmpDir, `./tmp-compress-${v4()}`);
   const emptyFolderPath = path.resolve(tmpDir, `./tmp-empty-folder-${v4()}`);
   const compressTargetPath = path.resolve(

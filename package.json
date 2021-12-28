@@ -5,7 +5,7 @@
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
-    "test": "jest --silent",
+    "test": "jest",
     "coverage": "yarn run test --coverage --silent",
     "eslint": "eslint \"**/*.ts\"",
     "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE CHANGELOG.md yarn.lock dist/"
@@ -53,12 +53,13 @@
     "typescript": "^4.5.4"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=14"
   },
   "dependencies": {
     "commander": "^7.2.0",
     "deep-equal": "^2.0.5",
     "node-zopfli": "^2.1.4",
+    "simple-zstd": "^1.4.0",
     "uuid": "^8.3.2"
   }
 }

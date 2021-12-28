@@ -1,4 +1,5 @@
 import zopfli from 'node-zopfli';
+import zstd from 'simple-zstd';
 import zlib from 'zlib';
 
 import { CompressOptions } from '../interfaces';
@@ -20,7 +21,11 @@ export abstract class Compression<T> {
   /**
    * Returns a compression instance in closure.
    */
-  abstract getCompression(): () => zlib.BrotliCompress | zlib.Gzip | zopfli;
+  abstract getCompression(): () =>
+    | zlib.BrotliCompress
+    | zlib.Gzip
+    | zopfli
+    | zstd.ZSTDCompress;
 
   /**
    * Build compression options object [compressionOptions].

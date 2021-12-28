@@ -1,3 +1,5 @@
+import zstd from 'simple-zstd';
+
 import { Compression } from './Compression';
 import { CompressOptions, ZstdOptions } from '../interfaces';
 import { CompressionExtensions, CompressionNames } from '../enums';
@@ -18,8 +20,9 @@ export class ZstdCompression extends Compression<ZstdOptions> {
   /**
    * Returns zstd compression instance in closure.
    */
-  getCompression(): () => any {
-    return (): any => null;
+  getCompression(): () => zstd.ZSTDCompress {
+    return (): zstd.ZSTDCompress =>
+      zstd.ZSTDCompress(this.compressionOptions.level);
   }
 
   /**
