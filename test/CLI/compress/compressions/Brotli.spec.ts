@@ -34,7 +34,6 @@ describe('CLI Compress -> Brotli compression', () => {
       brotliParamMode: 'text',
       brotliQuality: 10,
       brotliSizeHint: 5,
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
@@ -89,7 +88,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'default',
-      workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
@@ -127,7 +125,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'amigos',
-      workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
@@ -165,7 +162,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'font',
-      workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;

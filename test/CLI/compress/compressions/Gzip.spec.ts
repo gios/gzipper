@@ -31,7 +31,6 @@ describe('CLI Compress -> Gzip compression', () => {
       gzipLevel: 6,
       gzipMemoryLevel: 4,
       gzipStrategy: 2,
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');

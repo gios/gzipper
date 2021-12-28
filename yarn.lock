@@ -1347,15 +1347,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bindings@npm:^1.2.1":
-  version: 1.5.0
-  resolution: "bindings@npm:1.5.0"
-  dependencies:
-    file-uri-to-path: 1.0.0
-  checksum: 65b6b48095717c2e6105a021a7da4ea435aa8d3d3cd085cb9e85bcb6e5773cf318c4745c3f7c504412855940b585bdf9b918236612a1c7a7942491de176f1ae7
-  languageName: node
-  linkType: hard
-
 "bl@npm:^4.0.3":
   version: 4.1.0
   resolution: "bl@npm:4.1.0"
@@ -1743,19 +1734,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-env@npm:^7.0.3":
-  version: 7.0.3
-  resolution: "cross-env@npm:7.0.3"
-  dependencies:
-    cross-spawn: ^7.0.1
-  bin:
-    cross-env: src/bin/cross-env.js
-    cross-env-shell: src/bin/cross-env-shell.js
-  checksum: 26f2f3ea2ab32617f57effb70d329c2070d2f5630adc800985d8b30b56e8bf7f5f439dd3a0358b79cee6f930afc23cf8e23515f17ccfb30092c6b62c6b630a79
-  languageName: node
-  linkType: hard
-
-"cross-spawn@npm:^7.0.1, cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
+"cross-spawn@npm:^7.0.2, cross-spawn@npm:^7.0.3":
   version: 7.0.3
   resolution: "cross-spawn@npm:7.0.3"
   dependencies:
@@ -2419,13 +2398,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"file-uri-to-path@npm:1.0.0":
-  version: 1.0.0
-  resolution: "file-uri-to-path@npm:1.0.0"
-  checksum: b648580bdd893a008c92c7ecc96c3ee57a5e7b6c4c18a9a09b44fb5d36d79146f8e442578bc0e173dc027adf3987e254ba1dfd6e3ec998b7c282873010502144
-  languageName: node
-  linkType: hard
-
 "fill-range@npm:^7.0.1":
   version: 7.0.1
   resolution: "fill-range@npm:7.0.1"
@@ -2699,13 +2671,11 @@ __metadata:
     codecov: ^3.8.1
     commander: ^7.2.0
     copyfiles: ^2.4.1
-    cross-env: ^7.0.3
     deep-equal: ^2.0.5
     eslint: ^7.24.0
     eslint-config-prettier: ^8.2.0
     jest: ^27.4.5
     node-zopfli: ^2.1.4
-    node-zstd: ^2.0.1
     prettier: ^2.2.1
     rimraf: ^3.0.2
     ts-jest: ^27.1.2
@@ -4181,15 +4151,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nan@npm:^2.4.0":
-  version: 2.15.0
-  resolution: "nan@npm:2.15.0"
-  dependencies:
-    node-gyp: latest
-  checksum: 33e1bb4dfca447fe37d4bb5889be55de154828632c8d38646db67293a21afd61ed9909cdf1b886214a64707d935926c4e60e2b09de9edfc2ad58de31d6ce8f39
-  languageName: node
-  linkType: hard
-
 "napi-build-utils@npm:^1.0.1":
   version: 1.0.2
   resolution: "napi-build-utils@npm:1.0.2"
@@ -4285,17 +4246,6 @@ __metadata:
     zopfli: bin/zopfli
     zopflipng: bin/zopflipng
   checksum: 97eefd71bf076f7b3fab50f574bfb1eb6871db41b3fe3617ef3a08cb59014e1bfa0051aefc314d093f2bb2e13f70466ef6cb4553ec10931cad370afa8c3c45b4
-  languageName: node
-  linkType: hard
-
-"node-zstd@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "node-zstd@npm:2.0.1"
-  dependencies:
-    bindings: ^1.2.1
-    nan: ^2.4.0
-    node-gyp: latest
-  checksum: ca5b378be7159d6367c20757bac4299597249c70d40b53ce16c6d9e0c296ff4a5f3b60780e1c00cd5bb9ef7dd7bb24e0bbc497000b304fa1c195065cd4b63eb9
   languageName: node
   linkType: hard
 

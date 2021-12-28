@@ -32,7 +32,6 @@ describe('CLI Compress -> Deflate compression', () => {
       deflateLevel: 6,
       deflateMemoryLevel: 4,
       deflateStrategy: 2,
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
