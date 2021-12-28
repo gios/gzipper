@@ -32,6 +32,7 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--deflate](#--deflate)
       - [--brotli](#--brotli)
       - [--zopfli](#--zopfli)
+      - [--zstd](#--zstd)
       - [--gzip-level <number>](#--gzip-level-number)
       - [--gzip-memory-level <number>](#--gzip-memory-level-number)
       - [--gzip-strategy <number>](#--gzip-strategy-number)
@@ -45,6 +46,7 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--zopfli-block-splitting](#--zopfli-block-splitting)
       - [--zopfli-block-splitting-last](#--zopfli-block-splitting-last)
       - [--zopfli-block-splitting-max <number>](#--zopfli-block-splitting-max-number)
+      - [--zstd-level <number>](#--zstd-level-number)
       - [--output-file-format](#--output-file-format)
       - [--remove-larger](#--remove-larger)
       - [--skip-compressed](#--skip-compressed)
@@ -100,6 +102,7 @@ Options:
   --brotli                               enable brotli compression
   --gzip                                 enable gzip compression
   --zopfli                               enable zopfli compression
+  --zstd                                 enable zstd compression
   --gzip-level <number>                  gzip compression level 6 (default), 0 (no compression) - 9 (best compression)
   --gzip-memory-level <number>           amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)
   --gzip-strategy <number>               gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)
@@ -113,6 +116,7 @@ Options:
   --zopfli-block-splitting               splits the data in multiple deflate blocks with optimal choice for the block boundaries
   --zopfli-block-splitting-last          chooses the optimal block split points only after doing the iterative LZ77 compression
   --zopfli-block-splitting-max <number>  maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)
+  --zstd-level <number>                  zstd compression level 1 (default), 5 (best compression)
   --output-file-format <value>           output file format with default artifacts [filename].[ext].[compressExt]
   --remove-larger                        remove compressed files if they larger than uncompressed originals
   --skip-compressed                      skip compressed files if they already exist
@@ -228,6 +232,7 @@ try {
 | [`--deflate`](#--deflate)                                                       | `GZIPPER_DEFLATE` (0 or 1)                     |
 | [`--brotli`](#--brotli)                                                         | `GZIPPER_BROTLI` (0 or 1)                      |
 | [`--zopfli`](#--zopfli)                                                         | `GZIPPER_ZOPFLI` (0 or 1)                      |
+| [`--zstd`](#--zstd)                                                             | `GZIPPER_ZSTD` (0 or 1)                        |
 | [`--gzip-level <number>`](#--gzip-level-number)                                 | `GZIPPER_GZIP_LEVEL`                           |
 | [`--gzip-memory-level <number>`](#--gzip-memory-level-number)                   | `GZIPPER_GZIP_MEMORY_LEVEL`                    |
 | [`--gzip-strategy <number>`](#--gzip-strategy-number)                           | `GZIPPER_GZIP_STRATEGY`                        |
@@ -241,6 +246,7 @@ try {
 | [`--zopfli-block-splitting`](#--zopfli-block-splitting)                         | `GZIPPER_ZOPFLI_BLOCK_SPLITTING` (0 or 1)      |
 | [`--zopfli-block-splitting-last`](#--zopfli-block-splitting-last)               | `GZIPPER_ZOPFLI_BLOCK_SPLITTING_LAST` (0 or 1) |
 | [`--zopfli-block-splitting-max <number>`](#--zopfli-block-splitting-max-number) | `GZIPPER_ZOPFLI_BLOCK_SPLITTING_MAX`           |
+| [`--zstd-level <number>`](#--zstd-level-number)                                 | `GZIPPER_ZSTD_LEVEL`                           |
 | [`--output-file-format <value>`](#--output-file-format)                         | `GZIPPER_OUTPUT_FILE_FORMAT`                   |
 | [`--remove-larger`](#--remove-larger)                                           | `GZIPPER_REMOVE_LARGER` (0 or 1)               |
 | [`--skip-compressed`](#--skip-compressed)                                       | `GZIPPER_SKIP_COMPRESSED` (0 or 1)             |
@@ -301,6 +307,12 @@ Enable brotli compression.
 `gzipper c ./src --zopfli`
 
 Enable zopfli compression.
+
+#### --zstd
+
+`gzipper c ./src --zstd`
+
+Enable zstd compression.
 
 #### --gzip-level <number>
 
@@ -379,6 +391,12 @@ If true, chooses the optimal block split points only after doing the iterative L
 `gzipper c ./src --zopfli-block-splitting-max 5`
 
 Maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files), only for `--zopfli`
+
+#### --zstd-level <number>
+
+`gzipper c ./src --zstd-level 8`
+
+zstd compression level 1 (default), 5 (best compression)
 
 #### --output-file-format
 
