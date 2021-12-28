@@ -11,7 +11,7 @@ import { CompressOptions } from '../../../../src/interfaces';
 
 jest.setTimeout(300000);
 
-describe.skip('CLI Compress -> Zopfli compression', () => {
+describe('CLI Compress -> Zopfli compression', () => {
   let testPath: string;
   let compressTestPath: string;
 
