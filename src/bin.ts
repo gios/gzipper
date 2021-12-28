@@ -318,6 +318,6 @@ export class Index {
   }
 }
 
-if (process.env.NODE_ENV !== 'testing') {
+if (process.env.NODE_ENV !== 'test') {
   new Index().exec();
 }

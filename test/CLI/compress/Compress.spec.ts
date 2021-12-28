@@ -73,7 +73,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
     expect((compress as any).options.outputFileFormat).toBe(
       options.outputFileFormat,
     );
@@ -156,7 +156,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('should print message about empty folder', async () => {
@@ -175,7 +175,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
   test('should compress a single file to a certain folder', async () => {
@@ -210,7 +210,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
   test('should compress files to a certain folder with existing folder structure', async () => {
@@ -260,7 +260,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
   test('should use default file format artifacts via --output-file-format', async () => {
@@ -291,7 +291,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
     expect((compress as any).options.outputFileFormat).toBeUndefined();
 
     for (const [index, compressedFile] of compressedFiles.entries()) {
@@ -370,7 +370,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('should --exclude file extensions from compression jpeg,jpg', async () => {
@@ -403,7 +403,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('should --exclude compression extensions', async () => {
@@ -432,7 +432,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
   test('should exclude file sizes smaller than 860 bytes from compression', async () => {
@@ -471,7 +471,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--remove-larger should remove compressed files', async () => {
@@ -500,7 +500,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--skip-compressed should skip compressed files', async () => {
@@ -536,7 +536,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--skip-compressed should skip compressed files (same folder)', async () => {
@@ -568,7 +568,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--skip-compressed should skip compressed files with appropriate message', async () => {
@@ -600,7 +600,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--gzip --brotli --deflate should run simultaneously', async () => {
@@ -664,6 +664,6 @@ describe('CLI Compress', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect(Object.keys((compress as any).options).length).toBe(7);
+    expect(Object.keys((compress as any).options).length).toBe(6);
   });
 });

@@ -112,7 +112,7 @@ describe('CLI Compress -> Incremental', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('should generate .gzipperconfig', async () => {

@@ -177,7 +177,7 @@ export class Compress {
       const worker = new Worker(
         path.resolve(
           __dirname,
-          process.env.NODE_ENV !== 'testing'
+          process.env.NODE_ENV !== 'test'
             ? './Compress.worker.js'
             : '../test/__mocks__/Compress.worker.import.js',
         ),
