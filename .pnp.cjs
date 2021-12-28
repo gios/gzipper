@@ -51,6 +51,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-config-prettier", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:8.3.0"],
             ["jest", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:27.4.5"],
             ["node-zopfli", "npm:2.1.4"],
+            ["node-zstd", "npm:2.0.1"],
             ["prettier", "npm:2.5.1"],
             ["rimraf", "npm:3.0.2"],
             ["ts-jest", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:27.1.2"],
@@ -2020,6 +2021,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["bindings", [
+        ["npm:1.5.0", {
+          "packageLocation": "./.yarn/cache/bindings-npm-1.5.0-77ce1d213c-65b6b48095.zip/node_modules/bindings/",
+          "packageDependencies": [
+            ["bindings", "npm:1.5.0"],
+            ["file-uri-to-path", "npm:1.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["bl", [
         ["npm:4.1.0", {
           "packageLocation": "./.yarn/cache/bl-npm-4.1.0-7f94cdcf3f-9e8521fa7e.zip/node_modules/bl/",
@@ -3235,6 +3246,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["file-uri-to-path", [
+        ["npm:1.0.0", {
+          "packageLocation": "./.yarn/cache/file-uri-to-path-npm-1.0.0-1043ac6206-b648580bdd.zip/node_modules/file-uri-to-path/",
+          "packageDependencies": [
+            ["file-uri-to-path", "npm:1.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["fill-range", [
         ["npm:7.0.1", {
           "packageLocation": "./.yarn/cache/fill-range-npm-7.0.1-b8b1817caa-cc283f4e65.zip/node_modules/fill-range/",
@@ -3541,6 +3561,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-config-prettier", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:8.3.0"],
             ["jest", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:27.4.5"],
             ["node-zopfli", "npm:2.1.4"],
+            ["node-zstd", "npm:2.0.1"],
             ["prettier", "npm:2.5.1"],
             ["rimraf", "npm:3.0.2"],
             ["ts-jest", "virtual:a9f1e13f49868a06a351c45d12320b7ed306361f053c534faa4d4674a8170c2e71b8853d1c924e0d8e80905a09594c500ac9d0c7e070cb6134b608c7b006b235#npm:27.1.2"],
@@ -5215,6 +5236,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["nan", [
+        ["npm:2.15.0", {
+          "packageLocation": "./.yarn/unplugged/nan-npm-2.15.0-505c98ef4d/node_modules/nan/",
+          "packageDependencies": [
+            ["nan", "npm:2.15.0"],
+            ["node-gyp", "npm:8.4.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["napi-build-utils", [
         ["npm:1.0.2", {
           "packageLocation": "./.yarn/cache/napi-build-utils-npm-1.0.2-892e4bba56-06c14271ee.zip/node_modules/napi-build-utils/",
@@ -5319,6 +5350,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["node-addon-api", "npm:1.7.2"],
             ["node-gyp", "npm:8.4.1"],
             ["prebuild-install", "npm:5.3.6"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["node-zstd", [
+        ["npm:2.0.1", {
+          "packageLocation": "./.yarn/unplugged/node-zstd-npm-2.0.1-c435ef8236/node_modules/node-zstd/",
+          "packageDependencies": [
+            ["node-zstd", "npm:2.0.1"],
+            ["bindings", "npm:1.5.0"],
+            ["nan", "npm:2.15.0"],
+            ["node-gyp", "npm:8.4.1"]
           ],
           "linkType": "HARD",
         }]

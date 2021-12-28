@@ -60,6 +60,7 @@
     "commander": "^7.2.0",
     "deep-equal": "^2.0.5",
     "node-zopfli": "^2.1.4",
+    "node-zstd": "^2.0.1",
     "uuid": "^8.3.2"
   }
 }
