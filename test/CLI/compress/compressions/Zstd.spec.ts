@@ -9,7 +9,7 @@ import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
-describe.skip('CLI Compress -> Zstd compression', () => {
+describe('CLI Compress -> Zstd compression', () => {
   let testPath: string;
   let compressTestPath: string;
 

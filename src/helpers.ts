@@ -70,7 +70,7 @@ export class Helpers {
    * Splits array into equal chunks.
    */
   static chunkArray<T>(array: T[], size: number): T[][] {
-    const result = [];
+    const result: T[][] = [];
     for (let i = 0; i < array.length; i += size) {
       result.push(array.slice(i, i + size));
     }
