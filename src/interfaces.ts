@@ -4,6 +4,7 @@ import { BrotliCompression } from './compressions/Brotli';
 import { DeflateCompression } from './compressions/Deflate';
 import { GzipCompression } from './compressions/Gzip';
 import { ZopfliCompression } from './compressions/Zopfli';
+import { ZstdCompression } from './compressions/Zstd';
 
 export interface CompressOptions {
   verbose?: boolean;
@@ -15,6 +16,7 @@ export interface CompressOptions {
   deflate?: boolean;
   brotli?: boolean;
   zopfli?: boolean;
+  zstd?: boolean;
   gzipLevel?: number;
   gzipMemoryLevel?: number;
   gzipStrategy?: number;
@@ -28,6 +30,7 @@ export interface CompressOptions {
   zopfliBlockSplitting?: boolean;
   zopfliBlockSplittingLast?: boolean;
   zopfliBlockSplittingMax?: number;
+  zstdLevel?: number;
   outputFileFormat?: string;
   removeLarger?: boolean;
   skipCompressed?: boolean;
@@ -44,9 +47,14 @@ export type CompressionType =
   | BrotliCompression
   | DeflateCompression
   | GzipCompression
-  | ZopfliCompression;
+  | ZopfliCompression
+  | ZstdCompression;
 
 export type BrotliOptions = { [key: number]: number };
+
+export type ZstdOptions = {
+  level?: number;
+};
 
 export type ZopfliOptions = {
   numiterations?: number;

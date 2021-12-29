@@ -34,7 +34,6 @@ describe('CLI Compress -> Brotli compression', () => {
       brotliParamMode: 'text',
       brotliQuality: 10,
       brotliSizeHint: 5,
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
@@ -67,7 +66,7 @@ describe('CLI Compress -> Brotli compression', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(3);
-    expect(Object.keys((compress as any).options).length).toBe(5);
+    expect(Object.keys((compress as any).options).length).toBe(4);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
@@ -89,7 +88,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'default',
-      workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
@@ -115,7 +113,7 @@ describe('CLI Compress -> Brotli compression', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(1);
-    expect(Object.keys((compress as any).options).length).toBe(3);
+    expect(Object.keys((compress as any).options).length).toBe(2);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
@@ -127,7 +125,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'amigos',
-      workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
@@ -153,7 +150,7 @@ describe('CLI Compress -> Brotli compression', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(1);
-    expect(Object.keys((compress as any).options).length).toBe(3);
+    expect(Object.keys((compress as any).options).length).toBe(2);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
@@ -165,7 +162,6 @@ describe('CLI Compress -> Brotli compression', () => {
     const options: CompressOptions = {
       brotli: true,
       brotliParamMode: 'font',
-      workers: 1,
     };
     if (typeof zlib.createBrotliCompress !== 'function') {
       return;
@@ -190,7 +186,7 @@ describe('CLI Compress -> Brotli compression', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(1);
-    expect(Object.keys((compress as any).options).length).toBe(3);
+    expect(Object.keys((compress as any).options).length).toBe(2);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE

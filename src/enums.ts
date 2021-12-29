@@ -3,10 +3,12 @@ export enum CompressionNames {
   DEFLATE = 'DEFLATE',
   GZIP = 'GZIP',
   ZOPFLI = 'ZOPFLI',
+  ZSTD = 'ZSTD',
 }
 
 export enum CompressionExtensions {
   BROTLI = 'br',
   DEFLATE = 'zz',
   GZIP = 'gz',
+  ZSTD = 'zst',
 }

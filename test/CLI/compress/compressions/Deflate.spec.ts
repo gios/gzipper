@@ -32,7 +32,6 @@ describe('CLI Compress -> Deflate compression', () => {
       deflateLevel: 6,
       deflateMemoryLevel: 4,
       deflateStrategy: 2,
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
@@ -60,7 +59,7 @@ describe('CLI Compress -> Deflate compression', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(3);
-    expect(Object.keys((compress as any).options).length).toBe(5);
+    expect(Object.keys((compress as any).options).length).toBe(4);
     expect(
       (compress as any).compressionInstances[0].compressionOptions.level,
     ).toBe(6);

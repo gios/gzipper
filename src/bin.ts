@@ -41,6 +41,7 @@ export class Index {
       .option('--brotli', 'enable brotli compression')
       .option('--gzip', 'enable gzip compression')
       .option('--zopfli', 'enable zopfli compression')
+      .option('--zstd', 'enable zstd compression')
       .option(
         '--gzip-level <number>',
         'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
@@ -101,6 +102,11 @@ export class Index {
       .option(
         '--zopfli-block-splitting-max <number>',
         'maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)',
+        (value) => parseInt(value),
+      )
+      .option(
+        '--zstd-level <number>',
+        'zstd compression level 1 (default), 5 (best compression)',
         (value) => parseInt(value),
       )
       .option(
@@ -173,6 +179,9 @@ export class Index {
       zopfli: this.env.GZIPPER_ZOPFLI
         ? !!parseInt(this.env.GZIPPER_ZOPFLI as string)
         : options.zopfli,
+      zstd: this.env.GZIPPER_ZSTD
+        ? !!parseInt(this.env.GZIPPER_ZSTD as string)
+        : options.zstd,
       gzipLevel:
         parseInt(this.env.GZIPPER_GZIP_LEVEL as string) || options.gzipLevel,
       gzipMemoryLevel:
@@ -210,6 +219,8 @@ export class Index {
       zopfliBlockSplittingMax:
         parseInt(this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING_MAX as string) ||
         options.zopfliBlockSplittingMax,
+      zstdLevel:
+        parseInt(this.env.GZIPPER_ZSTD_LEVEL as string) || options.zstdLevel,
       outputFileFormat:
         this.env.GZIPPER_OUTPUT_FILE_FORMAT || options.outputFileFormat,
       removeLarger: this.env.GZIPPER_REMOVE_LARGER
@@ -307,6 +318,6 @@ export class Index {
   }
 }
 
-if (process.env.NODE_ENV !== 'testing') {
+if (process.env.NODE_ENV !== 'test') {
   new Index().exec();
 }

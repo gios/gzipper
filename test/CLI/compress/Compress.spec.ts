@@ -73,7 +73,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
     expect((compress as any).options.outputFileFormat).toBe(
       options.outputFileFormat,
     );
@@ -91,9 +91,7 @@ describe('CLI Compress', () => {
   });
 
   test('should throw on compress error', async () => {
-    const compress = new Compress(compressTestPath, null, {
-      workers: 1,
-    });
+    const compress = new Compress(compressTestPath, null);
     const createWorkersSpy = jest.spyOn(compress, 'createWorkers' as any);
     const logSpy = jest.spyOn(Logger, 'log');
     const runCompressWorkerSpy = jest
@@ -142,30 +140,8 @@ describe('CLI Compress', () => {
         'gif',
         'sunny',
       ],
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
-    await compress.run();
-
-    expect(logSpy).toHaveBeenNthCalledWith(
-      1,
-      'Compression GZIP | ',
-      LogLevel.INFO,
-    );
-    expect(logSpy).toHaveBeenLastCalledWith(NO_FILES_MESSAGE, LogLevel.WARNING);
-    expect((compress as any).compressionInstances[0].ext).toBe('gz');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
-  });
-
-  test('should print message about empty folder', async () => {
-    const compress = new Compress(emptyFolderTestPath, null, {
-      workers: 1,
-    });
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
 
@@ -183,11 +159,28 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
+  test('should print message about empty folder', async () => {
+    const compress = new Compress(emptyFolderTestPath, null);
+    const logSpy = jest.spyOn(Logger, 'log');
+    await compress.run();
+
+    expect(logSpy).toHaveBeenNthCalledWith(
+      1,
+      'Compression GZIP | ',
+      LogLevel.INFO,
+    );
+    expect(logSpy).toHaveBeenLastCalledWith(NO_FILES_MESSAGE, LogLevel.WARNING);
+    expect((compress as any).compressionInstances[0].ext).toBe('gz');
+    expect(
+      Object.keys((compress as any).compressionInstances[0].compressionOptions)
+        .length,
+    ).toBe(0);
+    expect(Object.keys((compress as any).options).length).toBe(0);
+  });
+
   test('should compress a single file to a certain folder', async () => {
     const file = `${compressTestPath}${path.sep}index.txt`;
-    const compress = new Compress(file, targetFolderTestPath, {
-      workers: 1,
-    });
+    const compress = new Compress(file, targetFolderTestPath);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
     const compressedFiles = await getFiles(targetFolderTestPath, ['.gz']);
@@ -217,13 +210,11 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
   test('should compress files to a certain folder with existing folder structure', async () => {
-    const compress = new Compress(compressTestPath, targetFolderTestPath, {
-      workers: 1,
-    });
+    const compress = new Compress(compressTestPath, targetFolderTestPath);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath);
@@ -269,12 +260,11 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
   test('should use default file format artifacts via --output-file-format', async () => {
-    const options: CompressOptions = { workers: 1 };
-    const compress = new Compress(compressTestPath, null, options);
+    const compress = new Compress(compressTestPath, null);
     const logSpy = jest.spyOn(Logger, 'log');
     const files = await getFiles(compressTestPath);
     await compress.run();
@@ -301,7 +291,7 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
     expect((compress as any).options.outputFileFormat).toBeUndefined();
 
     for (const [index, compressedFile] of compressedFiles.entries()) {
@@ -314,7 +304,6 @@ describe('CLI Compress', () => {
   test('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
     const options: CompressOptions = {
       outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
-      workers: 1,
     };
 
     const [compress, files, compressedFiles] = await validateOutputFileFormat(
@@ -337,7 +326,6 @@ describe('CLI Compress', () => {
   test('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
     const options: CompressOptions = {
       outputFileFormat: '[filename]-[hash]-55.[ext]',
-      workers: 1,
     };
 
     const [, files, compressedFiles] = await validateOutputFileFormat(options);
@@ -359,7 +347,6 @@ describe('CLI Compress', () => {
   test('should --include specific file extensions for compression (also exclude others)', async () => {
     const options: CompressOptions = {
       include: ['sunny'],
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
@@ -383,13 +370,12 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('should --exclude file extensions from compression jpeg,jpg', async () => {
     const options: CompressOptions = {
       exclude: ['jpeg', 'jpg'],
-      workers: 1,
     };
     const beforeFiles = (await getFiles(compressTestPath)).filter((file) => {
       const ext = path.extname(file);
@@ -417,14 +403,11 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('should --exclude compression extensions', async () => {
-    const options: CompressOptions = {
-      workers: 1,
-    };
-    const compress = new Compress(compressTestPath, null, options);
+    const compress = new Compress(compressTestPath, null);
     await compress.run();
     const filesBefore = await getFiles(compressTestPath, ['.gz']);
     const logSpy = jest.spyOn(Logger, 'log');
@@ -449,14 +432,13 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
   test('should exclude file sizes smaller than 860 bytes from compression', async () => {
     const THRESHOLD = 860;
     const options: CompressOptions = {
       threshold: THRESHOLD,
-      workers: 1,
     };
     let includedFiles = 0;
     const files = await getFiles(compressTestPath);
@@ -489,13 +471,12 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--remove-larger should remove compressed files', async () => {
     const options: CompressOptions = {
       removeLarger: true,
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
@@ -519,13 +500,12 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--skip-compressed should skip compressed files', async () => {
     const options: CompressOptions = {
       skipCompressed: true,
-      workers: 1,
     };
     const compress = new Compress(
       compressTestPath,
@@ -556,13 +536,12 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--skip-compressed should skip compressed files (same folder)', async () => {
     const options: CompressOptions = {
       skipCompressed: true,
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     await compress.run();
@@ -589,13 +568,12 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--skip-compressed should skip compressed files with appropriate message', async () => {
     const options: CompressOptions = {
       skipCompressed: true,
-      workers: 1,
     };
     const compress = new Compress(compressTestPath, null, options);
     await compress.run();
@@ -622,12 +600,11 @@ describe('CLI Compress', () => {
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
     ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(2);
+    expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
   test('--gzip --brotli --deflate should run simultaneously', async () => {
     const options: CompressOptions = {
-      workers: 1,
       gzip: true,
       brotli: true,
       deflate: true,
@@ -687,6 +664,6 @@ describe('CLI Compress', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect(Object.keys((compress as any).options).length).toBe(7);
+    expect(Object.keys((compress as any).options).length).toBe(6);
   });
 });

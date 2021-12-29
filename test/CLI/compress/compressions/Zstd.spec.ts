@@ -9,9 +9,7 @@ import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
-jest.setTimeout(300000);
-
-describe('CLI Compress -> Zopfli compression', () => {
+describe('CLI Compress -> Zstd compression', () => {
   let testPath: string;
   let compressTestPath: string;
 
@@ -28,22 +26,19 @@ describe('CLI Compress -> Zopfli compression', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('--zopfli-num-iterations, --zopfli-block-splitting, --zopfli-block-splitting-last, --zopfli-block-splitting-max <number> should change zopfli configuration', async () => {
+  test('--zstd-level <number> should change zstd configuration', async () => {
     const options: CompressOptions = {
-      zopfli: true,
-      zopfliNumIterations: 15,
-      zopfliBlockSplitting: true,
-      zopfliBlockSplittingMax: 10,
-      zopfliBlockSplittingLast: false,
+      zstd: true,
+      zstdLevel: 3,
     };
     const compress = new Compress(compressTestPath, null, options);
     const logSpy = jest.spyOn(Logger, 'log');
     await compress.run();
-    const files = await getFiles(compressTestPath, ['.gz']);
+    const files = await getFiles(compressTestPath, ['.zst']);
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
-      'Compression ZOPFLI | numiterations: 15, blocksplitting: true, blocksplittinglast: false, blocksplittingmax: 10',
+      'Compression ZSTD | level: 3',
       LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
@@ -57,27 +52,14 @@ describe('CLI Compress -> Zopfli compression', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('gz');
+    expect((compress as any).compressionInstances[0].ext).toBe('zst');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
         .length,
-    ).toBe(4);
-    expect(Object.keys((compress as any).options).length).toBe(5);
+    ).toBe(1);
+    expect(Object.keys((compress as any).options).length).toBe(2);
     expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .numiterations,
-    ).toBe(15);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .blocksplitting,
-    ).toBeTruthy();
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .blocksplittinglast,
-    ).toBeFalsy();
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .blocksplittingmax,
-    ).toBe(10);
+      (compress as any).compressionInstances[0].compressionOptions.level,
+    ).toBe(3);
   });
 });
