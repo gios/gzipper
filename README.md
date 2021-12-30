@@ -505,7 +505,7 @@ I appreciate every contribution, just fork the repository and send the pull requ
 
 ## Prerequisites
 
-If you want to use `--zstd` compression you have to make sure that the appropriate library is installed and available at your environment variable.
+If you want to use `--zstd` compression you have to make sure that the appropriate library is installed and available at your environment.
 `where zstd.exe` (Windows)
 `which zstd` (MacOS/Linux)
 
