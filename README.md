@@ -57,6 +57,8 @@ By default `gzipper` compress **all the files** but you could use `include` or `
   - [Changelog](#changelog)
   - [Contribution](#contribution)
   - [Support](#support)
+  - [Prerequisites](#prerequisites)
+    - [MacOS/Linux/WSL (Windows Subsystem for Linux)](#macoslinuxwsl-windows-subsystem-for-linux)
 
 ## Install
 
@@ -499,4 +501,18 @@ I appreciate every contribution, just fork the repository and send the pull requ
 
 ## Support
 
-- Node.js >= 12
+- Node.js >= 14
+
+## Prerequisites
+
+If you want to use `--zstd` compression you have to make sure that the appropriate library is installed and available at your environment variable.
+`where zstd.exe` (Windows)
+`which zstd` (MacOS/Linux)
+
+If you didn't find executable `zstd` you have to install this manually.
+
+### MacOS/Linux/WSL (Windows Subsystem for Linux)
+Brew: `brew install zstd` (zstd only)
+      `brew install zlib` (whole library)
+
+APT: `sudo apt install zstd`

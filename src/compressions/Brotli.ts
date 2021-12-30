@@ -20,11 +20,10 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   /**
    * Returns brotli compression instance in closure.
    */
-  getCompression(): () => zlib.BrotliCompress {
-    return (): zlib.BrotliCompress =>
-      zlib.createBrotliCompress({
-        params: this.compressionOptions,
-      });
+  getCompression(): zlib.BrotliCompress {
+    return zlib.createBrotliCompress({
+      params: this.compressionOptions,
+    });
   }
 
   /**

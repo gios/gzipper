@@ -94,7 +94,7 @@ class CompressWorker {
     target: string,
     compressionInstance: CompressionType,
   ): Promise<Partial<CompressedFile>> {
-    const createCompression = compressionInstance.getCompression();
+    const createCompression = await compressionInstance.getCompression();
     let isCached = false;
     let isSkipped = false;
     const inputPath = path.join(target, filename);
@@ -135,7 +135,7 @@ class CompressWorker {
       if (isChanged) {
         await this.nativeStream.pipeline(
           fs.createReadStream(inputPath),
-          createCompression(),
+          createCompression,
           fs.createWriteStream(outputPath),
         );
 
@@ -153,7 +153,7 @@ class CompressWorker {
     } else {
       await this.nativeStream.pipeline(
         fs.createReadStream(inputPath),
-        createCompression(),
+        createCompression,
         fs.createWriteStream(outputPath),
       );
     }
