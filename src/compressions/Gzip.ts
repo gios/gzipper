@@ -20,8 +20,8 @@ export class GzipCompression extends Compression<CompressionOptions> {
   /**
    * Returns gzip compression instance in closure.
    */
-  getCompression(): () => zlib.Gzip {
-    return (): zlib.Gzip => zlib.createGzip(this.compressionOptions);
+  getCompression(): zlib.Gzip {
+    return zlib.createGzip(this.compressionOptions);
   }
 
   /**

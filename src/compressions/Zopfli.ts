@@ -20,8 +20,8 @@ export class ZopfliCompression extends Compression<ZopfliOptions> {
   /**
    * Returns zopfli compression instance in closure.
    */
-  getCompression(): () => zopfli {
-    return (): zopfli => new zopfli('gzip', this.compressionOptions);
+  getCompression(): zopfli {
+    return new zopfli('gzip', this.compressionOptions);
   }
 
   /**

@@ -20,8 +20,8 @@ export class DeflateCompression extends Compression<CompressionOptions> {
   /**
    * Returns deflate compression instance in closure.
    */
-  getCompression(): () => zlib.Deflate {
-    return (): zlib.Deflate => zlib.createDeflate(this.compressionOptions);
+  getCompression(): zlib.Deflate {
+    return zlib.createDeflate(this.compressionOptions);
   }
 
   /**

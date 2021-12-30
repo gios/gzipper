@@ -1,8 +1,14 @@
 import zopfli from 'node-zopfli';
-import zstd from 'simple-zstd';
+import stream from 'stream';
 import zlib from 'zlib';
 
 import { CompressOptions } from '../interfaces';
+
+type CompressionType =
+  | zlib.BrotliCompress
+  | zlib.Gzip
+  | zopfli
+  | stream.Transform;
 
 export abstract class Compression<T> {
   compressionOptions: T = {} as T;
@@ -21,11 +27,7 @@ export abstract class Compression<T> {
   /**
    * Returns a compression instance in closure.
    */
-  abstract getCompression(): () =>
-    | zlib.BrotliCompress
-    | zlib.Gzip
-    | zopfli
-    | zstd.ZSTDCompress;
+  abstract getCompression(): CompressionType | Promise<CompressionType>;
 
   /**
    * Build compression options object [compressionOptions].
