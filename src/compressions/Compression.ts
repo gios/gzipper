@@ -1,13 +1,13 @@
-import zopfli from 'node-zopfli';
 import stream from 'stream';
 import zlib from 'zlib';
 
 import { CompressOptions } from '../interfaces';
+import { ZopfliCompression } from './Zopfli';
 
 type CompressionType =
   | zlib.BrotliCompress
   | zlib.Gzip
-  | zopfli
+  | ZopfliCompression
   | stream.Transform;
 
 export abstract class Compression<T> {
