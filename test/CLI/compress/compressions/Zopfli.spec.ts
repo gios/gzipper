@@ -9,9 +9,7 @@ import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
-jest.setTimeout(400000);
-
-describe('CLI Compress -> Zopfli compression', () => {
+describe.skip('CLI Compress -> Zopfli compression', () => {
   let testPath: string;
   let compressTestPath: string;
 
