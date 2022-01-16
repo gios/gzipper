@@ -44,7 +44,6 @@ By default `gzipper` compress **all the files** but you could use `include` or `
       - [--brotli-size-hint <number>](#--brotli-size-hint-number)
       - [--zopfli-num-iterations <number>](#--zopfli-num-iterations-number)
       - [--zopfli-block-splitting](#--zopfli-block-splitting)
-      - [--zopfli-block-splitting-last](#--zopfli-block-splitting-last)
       - [--zopfli-block-splitting-max <number>](#--zopfli-block-splitting-max-number)
       - [--zstd-level <number>](#--zstd-level-number)
       - [--output-file-format](#--output-file-format)
@@ -116,7 +115,6 @@ Options:
   --brotli-size-hint <number>            expected input size 0 (default)
   --zopfli-num-iterations <number>       maximum amount of times to rerun forward and backward pass to optimize LZ77 compression cost
   --zopfli-block-splitting               splits the data in multiple deflate blocks with optimal choice for the block boundaries
-  --zopfli-block-splitting-last          chooses the optimal block split points only after doing the iterative LZ77 compression
   --zopfli-block-splitting-max <number>  maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)
   --zstd-level <number>                  zstd compression level 1 (default), 5 (best compression)
   --output-file-format <value>           output file format with default artifacts [filename].[ext].[compressExt]
@@ -223,36 +221,35 @@ try {
 
 ### Compress|c
 
-| Option                                                                          | ENV                                            |
-| ------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [`--incremental`](#--incremental)                                               | `GZIPPER_INCREMENTAL` (0 or 1)                 |
-| [`-v, --verbose`](#-v---verbose)                                                | `GZIPPER_VERBOSE` (0 or 1)                     |
-| [`-e, --exclude <extensions>`](#-e---exclude-extensions)                        | `GZIPPER_EXCLUDE`                              |
-| [`-i, --include <extensions>`](#-i---include-extensions)                        | `GZIPPER_INCLUDE`                              |
-| [`-t, --threshold <number>`](#-t---threshold-number)                            | `GZIPPER_THRESHOLD`                            |
-| [`--gzip`](#--gzip)                                                             | `GZIPPER_GZIP` (0 or 1)                        |
-| [`--deflate`](#--deflate)                                                       | `GZIPPER_DEFLATE` (0 or 1)                     |
-| [`--brotli`](#--brotli)                                                         | `GZIPPER_BROTLI` (0 or 1)                      |
-| [`--zopfli`](#--zopfli)                                                         | `GZIPPER_ZOPFLI` (0 or 1)                      |
-| [`--zstd`](#--zstd)                                                             | `GZIPPER_ZSTD` (0 or 1)                        |
-| [`--gzip-level <number>`](#--gzip-level-number)                                 | `GZIPPER_GZIP_LEVEL`                           |
-| [`--gzip-memory-level <number>`](#--gzip-memory-level-number)                   | `GZIPPER_GZIP_MEMORY_LEVEL`                    |
-| [`--gzip-strategy <number>`](#--gzip-strategy-number)                           | `GZIPPER_GZIP_STRATEGY`                        |
-| [`--deflate-level <number>`](#--deflate-level-number)                           | `GZIPPER_DEFLATE_LEVEL`                        |
-| [`--deflate-memory-level <number>`](#--deflate-memory-level-number)             | `GZIPPER_DEFLATE_MEMORY_LEVEL`                 |
-| [`--deflate-strategy <number>`](#--deflate-strategy-number)                     | `GZIPPER_DEFLATE_STRATEGY`                     |
-| [`--brotli-param-mode <value>`](#--brotli-param-mode-value)                     | `GZIPPER_BROTLI_PARAM_MODE`                    |
-| [`--brotli-quality <number>`](#--brotli-quality-number)                         | `GZIPPER_BROTLI_QUALITY`                       |
-| [`--brotli-size-hint <number>`](#--brotli-size-hint-number)                     | `GZIPPER_BROTLI_SIZE_HINT`                     |
-| [`--zopfli-num-iterations <number>`](#--zopfli-num-iterations-number)           | `GZIPPER_ZOPFLI_NUM_ITERATIONS`                |
-| [`--zopfli-block-splitting`](#--zopfli-block-splitting)                         | `GZIPPER_ZOPFLI_BLOCK_SPLITTING` (0 or 1)      |
-| [`--zopfli-block-splitting-last`](#--zopfli-block-splitting-last)               | `GZIPPER_ZOPFLI_BLOCK_SPLITTING_LAST` (0 or 1) |
-| [`--zopfli-block-splitting-max <number>`](#--zopfli-block-splitting-max-number) | `GZIPPER_ZOPFLI_BLOCK_SPLITTING_MAX`           |
-| [`--zstd-level <number>`](#--zstd-level-number)                                 | `GZIPPER_ZSTD_LEVEL`                           |
-| [`--output-file-format <value>`](#--output-file-format)                         | `GZIPPER_OUTPUT_FILE_FORMAT`                   |
-| [`--remove-larger`](#--remove-larger)                                           | `GZIPPER_REMOVE_LARGER` (0 or 1)               |
-| [`--skip-compressed`](#--skip-compressed)                                       | `GZIPPER_SKIP_COMPRESSED` (0 or 1)             |
-| [`--workers`](#--workers)                                                       | `GZIPPER_WORKERS`                              |
+| Option                                                                          | ENV                                       |
+| ------------------------------------------------------------------------------- | ----------------------------------------- |
+| [`--incremental`](#--incremental)                                               | `GZIPPER_INCREMENTAL` (0 or 1)            |
+| [`-v, --verbose`](#-v---verbose)                                                | `GZIPPER_VERBOSE` (0 or 1)                |
+| [`-e, --exclude <extensions>`](#-e---exclude-extensions)                        | `GZIPPER_EXCLUDE`                         |
+| [`-i, --include <extensions>`](#-i---include-extensions)                        | `GZIPPER_INCLUDE`                         |
+| [`-t, --threshold <number>`](#-t---threshold-number)                            | `GZIPPER_THRESHOLD`                       |
+| [`--gzip`](#--gzip)                                                             | `GZIPPER_GZIP` (0 or 1)                   |
+| [`--deflate`](#--deflate)                                                       | `GZIPPER_DEFLATE` (0 or 1)                |
+| [`--brotli`](#--brotli)                                                         | `GZIPPER_BROTLI` (0 or 1)                 |
+| [`--zopfli`](#--zopfli)                                                         | `GZIPPER_ZOPFLI` (0 or 1)                 |
+| [`--zstd`](#--zstd)                                                             | `GZIPPER_ZSTD` (0 or 1)                   |
+| [`--gzip-level <number>`](#--gzip-level-number)                                 | `GZIPPER_GZIP_LEVEL`                      |
+| [`--gzip-memory-level <number>`](#--gzip-memory-level-number)                   | `GZIPPER_GZIP_MEMORY_LEVEL`               |
+| [`--gzip-strategy <number>`](#--gzip-strategy-number)                           | `GZIPPER_GZIP_STRATEGY`                   |
+| [`--deflate-level <number>`](#--deflate-level-number)                           | `GZIPPER_DEFLATE_LEVEL`                   |
+| [`--deflate-memory-level <number>`](#--deflate-memory-level-number)             | `GZIPPER_DEFLATE_MEMORY_LEVEL`            |
+| [`--deflate-strategy <number>`](#--deflate-strategy-number)                     | `GZIPPER_DEFLATE_STRATEGY`                |
+| [`--brotli-param-mode <value>`](#--brotli-param-mode-value)                     | `GZIPPER_BROTLI_PARAM_MODE`               |
+| [`--brotli-quality <number>`](#--brotli-quality-number)                         | `GZIPPER_BROTLI_QUALITY`                  |
+| [`--brotli-size-hint <number>`](#--brotli-size-hint-number)                     | `GZIPPER_BROTLI_SIZE_HINT`                |
+| [`--zopfli-num-iterations <number>`](#--zopfli-num-iterations-number)           | `GZIPPER_ZOPFLI_NUM_ITERATIONS`           |
+| [`--zopfli-block-splitting`](#--zopfli-block-splitting)                         | `GZIPPER_ZOPFLI_BLOCK_SPLITTING` (0 or 1) |
+| [`--zopfli-block-splitting-max <number>`](#--zopfli-block-splitting-max-number) | `GZIPPER_ZOPFLI_BLOCK_SPLITTING_MAX`      |
+| [`--zstd-level <number>`](#--zstd-level-number)                                 | `GZIPPER_ZSTD_LEVEL`                      |
+| [`--output-file-format <value>`](#--output-file-format)                         | `GZIPPER_OUTPUT_FILE_FORMAT`              |
+| [`--remove-larger`](#--remove-larger)                                           | `GZIPPER_REMOVE_LARGER` (0 or 1)          |
+| [`--skip-compressed`](#--skip-compressed)                                       | `GZIPPER_SKIP_COMPRESSED` (0 or 1)        |
+| [`--workers`](#--workers)                                                       | `GZIPPER_WORKERS`                         |
 
 > ENV Variables have higher priority over CLI arguments.
 
@@ -381,12 +378,6 @@ Maximum amount of times to rerun forward and backward pass to optimize LZ77 comp
 `gzipper c ./src --zopfli-block-splitting`
 
 If true, splits the data in multiple deflate blocks with optimal choice for the block boundaries. Block splitting gives better compression, only for `--zopfli`
-
-#### --zopfli-block-splitting-last
-
-`gzipper c ./src --zopfli-block-splitting-last`
-
-If true, chooses the optimal block split points only after doing the iterative LZ77 compression. If false, chooses the block split points first, then does iterative LZ77 on each individual block. Depending on the file, either first or last gives the best compression, only for `--zopfli`
 
 #### --zopfli-block-splitting-max <number>
 

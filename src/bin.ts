@@ -96,10 +96,6 @@ export class Index {
         'splits the data in multiple deflate blocks with optimal choice for the block boundaries',
       )
       .option(
-        '--zopfli-block-splitting-last',
-        'chooses the optimal block split points only after doing the iterative LZ77 compression',
-      )
-      .option(
         '--zopfli-block-splitting-max <number>',
         'maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)',
         (value) => parseInt(value),
@@ -213,9 +209,6 @@ export class Index {
       zopfliBlockSplitting: this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING
         ? !!parseInt(this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING as string)
         : options.zopfliBlockSplitting,
-      zopfliBlockSplittingLast: this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING_LAST
-        ? !!parseInt(this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING_LAST as string)
-        : options.zopfliBlockSplittingLast,
       zopfliBlockSplittingMax:
         parseInt(this.env.GZIPPER_ZOPFLI_BLOCK_SPLITTING_MAX as string) ||
         options.zopfliBlockSplittingMax,

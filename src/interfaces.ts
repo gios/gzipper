@@ -28,7 +28,6 @@ export interface CompressOptions {
   brotliSizeHint?: number;
   zopfliNumIterations?: number;
   zopfliBlockSplitting?: boolean;
-  zopfliBlockSplittingLast?: boolean;
   zopfliBlockSplittingMax?: number;
   zstdLevel?: number;
   outputFileFormat?: string;
@@ -59,7 +58,6 @@ export type ZstdOptions = {
 export type ZopfliOptions = {
   numiterations?: number;
   blocksplitting?: boolean;
-  blocksplittinglast?: boolean;
   blocksplittingmax?: number;
 };
 

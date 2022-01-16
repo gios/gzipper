@@ -1,8 +1,7 @@
-import zopfli from 'node-zopfli';
-
 import { Compression } from './Compression';
 import { CompressOptions, ZopfliOptions } from '../interfaces';
 import { CompressionExtensions, CompressionNames } from '../enums';
+import { ZopfliStream } from './ZopfliStream';
 
 /**
  * Zopfli compression
@@ -20,8 +19,8 @@ export class ZopfliCompression extends Compression<ZopfliOptions> {
   /**
    * Returns zopfli compression instance in closure.
    */
-  getCompression(): zopfli {
-    return new zopfli('gzip', this.compressionOptions);
+  getCompression(): ZopfliStream {
+    return new ZopfliStream(this.compressionOptions);
   }
 
   /**
@@ -36,10 +35,6 @@ export class ZopfliCompression extends Compression<ZopfliOptions> {
 
     if (this.options.zopfliBlockSplitting !== undefined) {
       options.blocksplitting = this.options.zopfliBlockSplitting;
-    }
-
-    if (this.options.zopfliBlockSplittingLast !== undefined) {
-      options.blocksplittinglast = this.options.zopfliBlockSplittingLast;
     }
 
     if (this.options.zopfliBlockSplittingMax !== undefined) {
