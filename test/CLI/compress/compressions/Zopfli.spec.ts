@@ -9,14 +9,18 @@ import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
-describe.skip('CLI Compress -> Zopfli compression', () => {
+jest.setTimeout(60000);
+
+describe('CLI Compress -> Zopfli compression', () => {
   let testPath: string;
   let compressTestPath: string;
 
   beforeEach(async () => {
     jest.restoreAllMocks();
     jest.resetModules();
-    [testPath, compressTestPath] = await generatePaths();
+    [testPath, compressTestPath] = await generatePaths({
+      excludeBig: true,
+    });
     const processSpy = jest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
