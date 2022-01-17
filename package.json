@@ -1,7 +1,7 @@
 {
   "name": "gzipper",
   "packageManager": "yarn@3.1.1",
-  "version": "6.2.1",
+  "version": "7.0.0",
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,6 @@
     "@types/deep-equal": "^1.0.1",
     "@types/jest": "^27.0.3",
     "@types/node": "^14.14.41",
-    "@types/node-zopfli": "^2.0.2",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
@@ -56,9 +55,9 @@
     "node": ">=14"
   },
   "dependencies": {
+    "@gfx/zopfli": "^1.0.15",
     "commander": "^7.2.0",
     "deep-equal": "^2.0.5",
-    "node-zopfli": "^2.1.4",
     "simple-zstd": "^1.4.0",
     "uuid": "^8.3.2"
   }

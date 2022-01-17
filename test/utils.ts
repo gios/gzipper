@@ -11,6 +11,10 @@ const exists = util.promisify(fs.exists);
 const readdir = util.promisify(fs.readdir);
 const rmdir = util.promisify(fs.rmdir);
 
+interface GeneratePathsOptions {
+  excludeBig: boolean;
+}
+
 export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, './resources');
 export const TEST_FOLDER_PATH = path.resolve(__dirname, './tmp-test-folder');
 export const GZIPPER_CONFIG_FOLDER = path.resolve(process.cwd(), './.gzipper');
@@ -18,6 +22,7 @@ export const COMPRESS_PATH = path.resolve(
   RESOURCES_FOLDER_PATH,
   './folder_to_compress',
 );
+const BIG_FILE_NAME = './big.js';
 
 function filterByExtension(extensions: string[], ext: string): boolean {
   return !!extensions.find((fileExtension) => {
@@ -28,7 +33,11 @@ function filterByExtension(extensions: string[], ext: string): boolean {
   });
 }
 
-export async function generatePaths(): Promise<string[]> {
+export async function generatePaths(
+  options: GeneratePathsOptions = {
+    excludeBig: false,
+  },
+): Promise<string[]> {
   const tmpDir = path.resolve(TEST_FOLDER_PATH, `./tmp-${v4()}`);
   const compressPath = path.resolve(tmpDir, `./tmp-compress-${v4()}`);
   const emptyFolderPath = path.resolve(tmpDir, `./tmp-empty-folder-${v4()}`);
@@ -37,6 +46,7 @@ export async function generatePaths(): Promise<string[]> {
     `./tmp-compress-target-${v4()}`,
   );
   await copyFolder(COMPRESS_PATH, compressPath);
+  options.excludeBig && unlink(path.resolve(compressPath, BIG_FILE_NAME));
   await createFolder(compressTargetPath);
   await createFolder(emptyFolderPath);
   return [tmpDir, compressPath, compressTargetPath, emptyFolderPath];
