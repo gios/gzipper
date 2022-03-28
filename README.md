@@ -1,5 +1,6 @@
 # Gzipper
 
+[![Support Ukraine Badge](https://bit.ly/support-ukraine-now)](https://github.com/support-ukraine/support-ukraine)
 [![Build Status](https://travis-ci.org/gios/gzipper.svg?branch=master)](https://travis-ci.org/gios/gzipper)
 [![npm version](https://badge.fury.io/js/gzipper.svg)](https://badge.fury.io/js/gzipper)
 [![codecov](https://codecov.io/gh/gios/gzipper/branch/master/graph/badge.svg)](https://codecov.io/gh/gios/gzipper)
@@ -73,7 +74,6 @@ By default `gzipper` compress **all the files** but you could use
   - [Contribution](#contribution)
   - [Support](#support)
   - [Prerequisites](#prerequisites)
-    - [MacOS/Linux/WSL (Windows Subsystem for Linux)](#macoslinuxwsl-windows-subsystem-for-linux)
 
 ## Install
 
