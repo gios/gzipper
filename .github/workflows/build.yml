@@ -25,12 +25,12 @@ jobs:
 
       - name: Install and Validate
         run: |
-          yarn install --immutable
-          yarn run eslint
-          yarn run coverage
-          yarn run build
+          npm install
+          npm run eslint
+          npm run coverage
+          npm run build
 
       - name: Codecov
-        run: yarn codecov
+        run: npm run codecov
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

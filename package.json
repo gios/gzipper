@@ -1,7 +1,6 @@
 {
   "name": "gzipper",
-  "packageManager": "yarn@3.1.1",
-  "version": "7.0.2",
+  "version": "7.1.0",
   "description": "CLI for compressing files.",
   "main": "index.js",
   "scripts": {
