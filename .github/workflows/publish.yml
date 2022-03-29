@@ -22,9 +22,9 @@ jobs:
 
       - name: Install and Validate
         run: |
-          yarn install --immutable
-          yarn run eslint
-          yarn run test
+          npm install
+          npm run eslint
+          npm run test
 
   publish:
     needs: test
@@ -40,16 +40,12 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install
-        run: |
-          yarn install --immutable
-
-      - name: Setup .yarnrc.yml
-        run: |
-          yarn config set npmAuthToken ${{ secrets.NPM_TOKEN }}
-          yarn config set npmAlwaysAuth true
+        run: npm install
 
       - name: Build
-        run: yarn run build
+        run: npm run build
 
       - name: Publish
-        run: cd dist && yarn npm publish
+        run: cd dist && npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
