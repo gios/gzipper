@@ -42,12 +42,10 @@ jobs:
       - name: Install
         run: npm install
 
-      - name: Setup Auth Token
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Build
         run: npm run build
 
       - name: Publish
         run: cd dist && npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
