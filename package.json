@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "coverage": "yarn run test --coverage --silent",
+    "coverage": "npm run test --coverage --silent",
     "eslint": "eslint \"**/*.ts\"",
-    "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE CHANGELOG.md yarn.lock dist/"
+    "build": "rimraf dist && tsc && copyfiles -f package.json package-lock.json README.md LICENSE CHANGELOG.md dist/"
   },
   "repository": {
     "type": "git",
