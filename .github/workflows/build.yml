@@ -1,25 +1,27 @@
 name: Build Package
 
 on:
-  pull_request:
-    branches: [master]
   push:
+    branches: [master]
+  pull_request:
     branches: [master]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        node: [14, 16, 17]
+        node-version: [14, 16, 17]
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Use Node
+      - name: Use Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
+          node-version: ${{ matrix.node-version }}
 
       - name: Install and Validate
         run: |
