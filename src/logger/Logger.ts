@@ -1,11 +1,14 @@
-import {filter} from './filter.decorator';
-import {LogLevel} from './LogLevel.enum';
+import { filter } from './filter.decorator';
+import { LogLevel } from './LogLevel.enum';
+import { workerData } from 'worker_threads';
+import { CompressOptions } from '../interfaces';
 
 /**
  * Custom logger.
  */
 export class Logger {
     static verbose: boolean;
+    private static options: CompressOptions = workerData?.options;
 
     /**
      * Set verbose mode.
@@ -28,9 +31,9 @@ export class Logger {
     private static logger<T>(message: T, level: LogLevel): void {
         let colorfulMessage = '';
         const prefix = 'gzipper';
-        const colorlessMessage = `${prefix}: %s`
+        const colorlessMessage = `${prefix}: %s`;
 
-        if (!process.env.NO_COLOR) {
+        if (!(process.env.NO_COLOR && +process.env.NO_COLOR)  && !(this.options?.noColor && +this.options.noColor)) {
             switch (level) {
                 case LogLevel.INFO:
                     colorfulMessage = `\x1b[30;46m${prefix}:\x1b[0m\x1b[36m %s\x1b[0m`;
@@ -54,7 +57,6 @@ export class Logger {
                     break;
             }
         }
-
 
         console.log(colorfulMessage || colorlessMessage, message);
     }

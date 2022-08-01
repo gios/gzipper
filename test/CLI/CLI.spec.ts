@@ -160,6 +160,7 @@ describe('Index CLI', () => {
       GZIPPER_REMOVE_LARGER: '0',
       GZIPPER_SKIP_COMPRESSED: '0',
       GZIPPER_WORKERS: '3',
+      NO_COLOR: '0'
     };
     const cliArguments = [
       'node.exe',
@@ -211,6 +212,7 @@ describe('Index CLI', () => {
       '--skip-compressed',
       '--workers',
       '2',
+      '--no-color'
     ];
     const index = new Index();
     (index as any).argv = cliArguments;

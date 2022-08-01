@@ -122,6 +122,10 @@ export class Index {
         'numbers of workers which will be spawned, system CPU cores count (default)',
         (value) => parseInt(value),
       )
+      .option(
+          '--no-color',
+          'Disable logger colorful messages',
+      )
       .action(this.compress.bind(this));
 
     const cache = this.commander
@@ -223,6 +227,9 @@ export class Index {
         ? !!parseInt(this.env.GZIPPER_SKIP_COMPRESSED as string)
         : options.skipCompressed,
       workers: parseInt(this.env.GZIPPER_WORKERS as string) || options.workers,
+      noColor: this.env.NO_COLOR
+          ? !!parseInt(this.env.NO_COLOR as string)
+          : options.noColor,
     };
 
     await this.runCompress(target, outputPath, adjustedOptions);

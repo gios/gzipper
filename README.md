@@ -265,7 +265,8 @@ try {
 | [`--output-file-format <value>`](#--output-file-format-value)                   | `GZIPPER_OUTPUT_FILE_FORMAT`                  |
 | [`--remove-larger`](#--remove-larger)                                           | `GZIPPER_REMOVE_LARGER` (`0` or `1`)          |
 | [`--skip-compressed`](#--skip-compressed)                                       | `GZIPPER_SKIP_COMPRESSED` (`0` or `1`)        |
-| [`--workers <number>`](#--workers-number)                                       | `GZIPPER_WORKERS`                             |
+| [`--workers <number>`](#--workers-number)                                       | `GZIPPER_WORKERS`   
+| [`--no-color`](#--no-color)                                                     | `NO_COLOR` (`0` or `1`)
 
 > ENV variables have higher priority over CLI arguments.
 

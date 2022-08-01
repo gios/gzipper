@@ -34,6 +34,7 @@ export interface CompressOptions {
   removeLarger?: boolean;
   skipCompressed?: boolean;
   workers?: number;
+  noColor?: boolean;
 }
 
 export type CompressionOptions = {
