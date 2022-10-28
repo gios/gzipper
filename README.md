@@ -67,6 +67,7 @@ By default `gzipper` compress **all the files** but you could use
       - [`--remove-larger`](#--remove-larger)
       - [`--skip-compressed`](#--skip-compressed)
       - [`--workers <number>`](#--workers-number)
+      - [`--no-color`](#--no-color)
     - [`cache`](#cache-1)
       - [`purge`](#purge)
       - [`size`](#size)
@@ -137,6 +138,7 @@ Options:
   --remove-larger                        remove compressed files if they larger than uncompressed originals
   --skip-compressed                      skip compressed files if they already exist
   --workers <number>                     numbers of workers which will be spawned, system CPU cores count (default)
+  --no-color                             disable logger colorful messages
   -h, --help                             display help for command
 ```
 
@@ -266,6 +268,7 @@ try {
 | [`--remove-larger`](#--remove-larger)                                           | `GZIPPER_REMOVE_LARGER` (`0` or `1`)          |
 | [`--skip-compressed`](#--skip-compressed)                                       | `GZIPPER_SKIP_COMPRESSED` (`0` or `1`)        |
 | [`--workers <number>`](#--workers-number)                                       | `GZIPPER_WORKERS`                             |
+| [`--no-color`](#--no-color)                                                     | `GZIPPER_NO_COLOR` or `NO_COLOR` (`0` or `1`) |
 
 > ENV variables have higher priority over CLI arguments.
 
@@ -530,6 +533,10 @@ Only with default [`--output-file-format`](#--output-file-format-value).
 Spawn workers for parallel compression.
 Be aware of workers number because every worker creates an additional thread.
 More info at [nodesource.com](https://nodesource.com/blog/worker-threads-nodejs/).
+
+#### `--no-color`
+
+Disable logger colorful messages.
 
 ### `cache`
 

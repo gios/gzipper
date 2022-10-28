@@ -122,6 +122,7 @@ export class Index {
         'numbers of workers which will be spawned, system CPU cores count (default)',
         (value) => parseInt(value),
       )
+      .option('--no-color', 'disable logger colorful messages')
       .action(this.compress.bind(this));
 
     const cache = this.commander
@@ -223,13 +224,16 @@ export class Index {
         ? !!parseInt(this.env.GZIPPER_SKIP_COMPRESSED as string)
         : options.skipCompressed,
       workers: parseInt(this.env.GZIPPER_WORKERS as string) || options.workers,
+      color: Helpers.getLogColor(options.color, this.env),
     };
 
     await this.runCompress(target, outputPath, adjustedOptions);
   }
 
   private async cachePurge(): Promise<void> {
-    Logger.setVerboseMode(true);
+    Logger.setOptions({
+      verbose: true,
+    });
     const config = new Config();
     const incremental = new Incremental(config);
 
@@ -245,7 +249,9 @@ export class Index {
   }
 
   private async cacheSize(): Promise<void> {
-    Logger.setVerboseMode(true);
+    Logger.setOptions({
+      verbose: true,
+    });
     const incremental = new Incremental();
 
     try {
@@ -266,7 +272,9 @@ export class Index {
     outputPath: string,
     options: CompressOptions,
   ): Promise<void> {
-    Logger.setVerboseMode(true);
+    Logger.setOptions({
+      verbose: true,
+    });
     const compress = new Compress(
       target,
       outputPath,

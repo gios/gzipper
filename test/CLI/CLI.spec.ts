@@ -55,6 +55,7 @@ describe('Index CLI', () => {
       '--skip-compressed',
       '--workers',
       '2',
+      '--no-color',
     ];
     const index = new Index();
     (index as any).argv = cliArguments;
@@ -92,6 +93,7 @@ describe('Index CLI', () => {
       removeLarger: true,
       skipCompressed: true,
       workers: 2,
+      color: false,
     };
     const response: CompressOptions = {
       verbose: true,
@@ -117,6 +119,7 @@ describe('Index CLI', () => {
       removeLarger: true,
       skipCompressed: true,
       workers: 2,
+      color: false,
     };
     expect(runCompressSpy).toHaveBeenCalledTimes(1);
     expect(runCompressSpy).toHaveBeenCalledWith(
@@ -160,6 +163,7 @@ describe('Index CLI', () => {
       GZIPPER_REMOVE_LARGER: '0',
       GZIPPER_SKIP_COMPRESSED: '0',
       GZIPPER_WORKERS: '3',
+      GZIPPER_NO_COLOR: '0',
     };
     const cliArguments = [
       'node.exe',
@@ -211,6 +215,7 @@ describe('Index CLI', () => {
       '--skip-compressed',
       '--workers',
       '2',
+      '--no-color',
     ];
     const index = new Index();
     (index as any).argv = cliArguments;
@@ -249,6 +254,7 @@ describe('Index CLI', () => {
       removeLarger: false,
       skipCompressed: false,
       workers: 3,
+      color: true,
     };
     const response: CompressOptions = {
       incremental: false,
@@ -278,6 +284,7 @@ describe('Index CLI', () => {
       removeLarger: false,
       skipCompressed: false,
       workers: 3,
+      color: true,
     };
     expect(runCompressSpy).toHaveBeenCalledTimes(1);
     expect(runCompressSpy).toHaveBeenCalledWith(
