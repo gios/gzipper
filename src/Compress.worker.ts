@@ -42,7 +42,10 @@ class CompressWorker {
       this.incremental = new Incremental();
       this.incremental.filePaths = this.incrementalFilePaths;
     }
-    Logger.setVerboseMode(this.options.verbose as boolean);
+    Logger.setOptions({
+      verbose: this.options.verbose,
+      color: this.options.color,
+    });
     this.service = new CompressService(this.options);
     this.compressionInstances = this.service.getCompressionInstances();
   }

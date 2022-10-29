@@ -104,4 +104,18 @@ export class Helpers {
 
     return result;
   }
+
+  /**
+   * Returns color option based on GZIPPER_NO_COLOR and NO_COLOR vars.
+   */
+  static getLogColor(
+    defaultValue = true,
+    env: NodeJS.ProcessEnv = process.env,
+  ): boolean {
+    return !(env.GZIPPER_NO_COLOR
+      ? !!parseInt(env.GZIPPER_NO_COLOR as string)
+      : env.NO_COLOR
+      ? !!parseInt(env.NO_COLOR as string)
+      : !defaultValue);
+  }
 }

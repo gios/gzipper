@@ -43,7 +43,10 @@ export class Compress {
     outputPath?: string | null,
     options: CompressOptions = {},
   ) {
-    Logger.setVerboseMode(options.verbose as boolean);
+    Logger.setOptions({
+      verbose: options.verbose,
+      color: options.color,
+    });
     this.config = new Config();
     if (!target) {
       const message = NO_PATH_MESSAGE;

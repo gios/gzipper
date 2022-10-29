@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14, 16, 17]
+        node-version: [14, 16, 17, 18]
 
     steps:
       - name: Checkout Repository
@@ -39,7 +39,7 @@ jobs:
       - name: Use Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: '18.x'
           registry-url: https://registry.npmjs.org/
 
       - name: Install
