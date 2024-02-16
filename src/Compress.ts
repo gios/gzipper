@@ -99,8 +99,7 @@ export class Compress {
     const filesCount = files.length;
     if (filesCount) {
       Logger.log(
-        `${filesCount} ${
-          filesCount > 1 ? 'files have' : 'file has'
+        `${filesCount} ${filesCount > 1 ? 'files have' : 'file has'
         } been compressed. (${Helpers.readableHrtime(hrtime)})`,
         LogLevel.SUCCESS,
       );

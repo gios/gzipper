@@ -1,3 +1,5 @@
+import { describe, beforeEach, afterEach, it, expect, vitest } from "vitest";
+
 import { Compress } from '../../../../src/Compress';
 import {
   getFiles,
@@ -14,10 +16,10 @@ describe('CLI Compress -> Deflate compression', () => {
   let compressTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -26,7 +28,7 @@ describe('CLI Compress -> Deflate compression', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('--level, --memory-level, --strategy should change deflate configuration', async () => {
+  it('--level, --memory-level, --strategy should change deflate configuration', async () => {
     const options: CompressOptions = {
       deflate: true,
       deflateLevel: 6,
@@ -34,7 +36,7 @@ describe('CLI Compress -> Deflate compression', () => {
       deflateStrategy: 2,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.zz']);
 

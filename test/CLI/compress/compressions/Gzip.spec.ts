@@ -1,3 +1,5 @@
+import { describe, beforeEach, afterEach, it, expect, vitest } from "vitest";
+
 import { Compress } from '../../../../src/Compress';
 import {
   getFiles,
@@ -14,10 +16,10 @@ describe('CLI Compress -> Gzip compression', () => {
   let compressTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -26,14 +28,14 @@ describe('CLI Compress -> Gzip compression', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('--level, --memory-level, --strategy should change gzip configuration', async () => {
+  it('--level, --memory-level, --strategy should change gzip configuration', async () => {
     const options: CompressOptions = {
       gzipLevel: 6,
       gzipMemoryLevel: 4,
       gzipStrategy: 2,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
 

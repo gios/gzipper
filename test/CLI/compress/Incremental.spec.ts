@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import util from 'util';
 import deepEqual from 'deep-equal';
+import { describe, beforeEach, afterEach, it, expect, vitest } from "vitest";
 
 import {
   clear,
@@ -65,10 +66,10 @@ describe('CLI Compress -> Incremental', () => {
   let compressTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -77,10 +78,10 @@ describe('CLI Compress -> Incremental', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('should compress files and create .gzipper folder', async () => {
+  it('should compress files and create .gzipper folder', async () => {
     const options: CompressOptions = { incremental: true };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
 
@@ -115,7 +116,7 @@ describe('CLI Compress -> Incremental', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('should generate .gzipperconfig', async () => {
+  it('should generate .gzipperconfig', async () => {
     const options: CompressOptions = { incremental: true };
     const compress = new Compress(compressTestPath, null, options);
     const files = await getFiles(compressTestPath);
@@ -129,7 +130,7 @@ describe('CLI Compress -> Incremental', () => {
     expect(validateConfig(config, files)).toBeTruthy();
   });
 
-  test('should retrieve all files from cache', async () => {
+  it('should retrieve all files from cache', async () => {
     const options: CompressOptions = { incremental: true };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const compress = new Compress(compressTestPath, null, options);
@@ -143,7 +144,7 @@ describe('CLI Compress -> Incremental', () => {
     expect(configBefore).toEqual(configAfter);
   });
 
-  test('should update "lastChecksum" and "date" revision if file was changed', async () => {
+  it('should update "lastChecksum" and "date" revision if file was changed', async () => {
     const options: CompressOptions = { incremental: true };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const compress = new Compress(compressTestPath, null, options);
@@ -180,7 +181,7 @@ describe('CLI Compress -> Incremental', () => {
     expect(configBefore).toEqual(configAfter);
   });
 
-  test('should update hash inside cache folder if file was changed', async () => {
+  it('should update hash inside cache folder if file was changed', async () => {
     const options: CompressOptions = { incremental: true };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
@@ -205,7 +206,7 @@ describe('CLI Compress -> Incremental', () => {
     expect(!hashContentBefore.equals(hashContentAfter)).toBeTruthy();
   });
 
-  test('should add new revision if compress options were changed', async () => {
+  it('should add new revision if compress options were changed', async () => {
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const files = await getFiles(compressTestPath);
@@ -237,7 +238,7 @@ describe('CLI Compress -> Incremental', () => {
     expect(files.length * 2).toBe(cachedFiles.length);
   });
 
-  test('should update certain revision if file was changed', async () => {
+  it('should update certain revision if file was changed', async () => {
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const fileToEdit = path.resolve(compressTestPath, './index.txt');

@@ -1,6 +1,7 @@
 import path from 'path';
 import util from 'util';
 import fs from 'fs';
+import { describe, beforeEach, afterEach, it, expect, vitest } from "vitest";
 
 import { Compress } from '../../../src/Compress';
 import {
@@ -24,11 +25,11 @@ describe('CLI Compress', () => {
   let emptyFolderTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath, targetFolderTestPath, emptyFolderTestPath] =
       await generatePaths();
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -45,7 +46,7 @@ describe('CLI Compress', () => {
       targetFolderTestPath,
       options,
     );
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     const files = await getFiles(compressTestPath);
     await compress.run();
     const compressedFiles = await getFiles(targetFolderTestPath);
@@ -81,7 +82,7 @@ describe('CLI Compress', () => {
     return [compress, files, compressedFiles];
   }
 
-  test('should throw an error if no path found', () => {
+  it('should throw an error if no path found', () => {
     try {
       new Compress(null as any, null);
     } catch (err: any) {
@@ -90,11 +91,11 @@ describe('CLI Compress', () => {
     }
   });
 
-  test('should throw on compress error', async () => {
+  it('should throw on compress error', async () => {
     const compress = new Compress(compressTestPath, null);
-    const createWorkersSpy = jest.spyOn(compress, 'createWorkers' as any);
-    const logSpy = jest.spyOn(Logger, 'log');
-    const runCompressWorkerSpy = jest
+    const createWorkersSpy = vitest.spyOn(compress, 'createWorkers' as any);
+    const logSpy = vitest.spyOn(Logger, 'log');
+    const runCompressWorkerSpy = vitest
       .spyOn(compress as any, 'runCompressWorker')
       .mockRejectedValueOnce(new Error('Compressing error.'));
 
@@ -120,7 +121,7 @@ describe('CLI Compress', () => {
     }
   });
 
-  test('should print message about appropriate files', async () => {
+  it('should print message about appropriate files', async () => {
     const options: CompressOptions = {
       exclude: [
         'js',
@@ -142,7 +143,7 @@ describe('CLI Compress', () => {
       ],
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
 
     expect(logSpy).toHaveBeenNthCalledWith(
@@ -159,9 +160,9 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('should print message about empty folder', async () => {
+  it('should print message about empty folder', async () => {
     const compress = new Compress(emptyFolderTestPath, null);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
 
     expect(logSpy).toHaveBeenNthCalledWith(
@@ -178,10 +179,10 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
-  test('should compress a single file to a certain folder', async () => {
+  it('should compress a single file to a certain folder', async () => {
     const file = `${compressTestPath}${path.sep}index.txt`;
     const compress = new Compress(file, targetFolderTestPath);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const compressedFiles = await getFiles(targetFolderTestPath, ['.gz']);
 
@@ -213,9 +214,9 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
-  test('should compress files to a certain folder with existing folder structure', async () => {
+  it('should compress files to a certain folder with existing folder structure', async () => {
     const compress = new Compress(compressTestPath, targetFolderTestPath);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath);
     const compressedFiles = await getFiles(targetFolderTestPath, ['.gz']);
@@ -263,9 +264,9 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
-  test('should use default file format artifacts via --output-file-format', async () => {
+  it('should use default file format artifacts via --output-file-format', async () => {
     const compress = new Compress(compressTestPath, null);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     const files = await getFiles(compressTestPath);
     await compress.run();
     const compressedFiles = await getFiles(compressTestPath, ['.gz']);
@@ -301,7 +302,7 @@ describe('CLI Compress', () => {
     }
   });
 
-  test('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
+  it('should set custom file format artifacts (test-[filename]-55-[filename].[compressExt]x.[ext]) via --output-file-format', async () => {
     const options: CompressOptions = {
       outputFileFormat: 'test-[filename]-55-[filename].[compressExt]x.[ext]',
     };
@@ -316,14 +317,13 @@ describe('CLI Compress', () => {
     for (const file of files) {
       const fileExt = path.extname(file);
       const fileName = path.basename(file, fileExt);
-      const output = `test-${fileName}-55-${fileName}.${
-        (compress as any).compressionInstances[0].ext
-      }x${fileExt}`;
+      const output = `test-${fileName}-55-${fileName}.${(compress as any).compressionInstances[0].ext
+        }x${fileExt}`;
       expect(compressedFilesNames.includes(output)).toBeTruthy();
     }
   });
 
-  test('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
+  it('should set custom file format artifacts ([filename]-[hash]-55.[ext]) via --output-file-format', async () => {
     const options: CompressOptions = {
       outputFileFormat: '[filename]-[hash]-55.[ext]',
     };
@@ -344,12 +344,12 @@ describe('CLI Compress', () => {
     }
   });
 
-  test('should --include specific file extensions for compression (also exclude others)', async () => {
+  it('should --include specific file extensions for compression (also exclude others)', async () => {
     const options: CompressOptions = {
       include: ['sunny'],
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
 
@@ -373,7 +373,7 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('should --exclude file extensions from compression jpeg,jpg', async () => {
+  it('should --exclude file extensions from compression jpeg,jpg', async () => {
     const options: CompressOptions = {
       exclude: ['jpeg', 'jpg'],
     };
@@ -382,7 +382,7 @@ describe('CLI Compress', () => {
       return !(ext === '.jpeg' || ext === '.jpg');
     });
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
 
@@ -406,11 +406,11 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('should --exclude compression extensions', async () => {
+  it('should --exclude compression extensions', async () => {
     const compress = new Compress(compressTestPath, null);
     await compress.run();
     const filesBefore = await getFiles(compressTestPath, ['.gz']);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
 
     const filesAfter = await getFiles(compressTestPath, ['.gz']);
@@ -435,7 +435,7 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(0);
   });
 
-  test('should exclude file sizes smaller than 860 bytes from compression', async () => {
+  it('should exclude file sizes smaller than 860 bytes from compression', async () => {
     const THRESHOLD = 860;
     const options: CompressOptions = {
       threshold: THRESHOLD,
@@ -450,7 +450,7 @@ describe('CLI Compress', () => {
       ++includedFiles;
     }
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const filesGzipped = await getFiles(compressTestPath, ['.gz']);
 
@@ -474,12 +474,12 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('--remove-larger should remove compressed files', async () => {
+  it('--remove-larger should remove compressed files', async () => {
     const options: CompressOptions = {
       removeLarger: true,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
 
@@ -503,7 +503,7 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('--skip-compressed should skip compressed files', async () => {
+  it('--skip-compressed should skip compressed files', async () => {
     const options: CompressOptions = {
       skipCompressed: true,
     };
@@ -516,7 +516,7 @@ describe('CLI Compress', () => {
 
     const filesBefore = await getFiles(targetFolderTestPath, ['.gz']);
 
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
 
     const filesAfter = await getFiles(targetFolderTestPath, ['.gz']);
@@ -539,7 +539,7 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('--skip-compressed should skip compressed files (same folder)', async () => {
+  it('--skip-compressed should skip compressed files (same folder)', async () => {
     const options: CompressOptions = {
       skipCompressed: true,
     };
@@ -548,7 +548,7 @@ describe('CLI Compress', () => {
 
     const filesBefore = await getFiles(compressTestPath, ['.gz']);
 
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
 
     const filesAfter = await getFiles(compressTestPath, ['.gz']);
@@ -571,7 +571,7 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('--skip-compressed should skip compressed files with appropriate message', async () => {
+  it('--skip-compressed should skip compressed files with appropriate message', async () => {
     const options: CompressOptions = {
       skipCompressed: true,
     };
@@ -580,7 +580,7 @@ describe('CLI Compress', () => {
 
     const filesBefore = await getFiles(compressTestPath, ['.gz']);
 
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
 
     const filesAfter = await getFiles(compressTestPath, ['.gz']);
@@ -603,7 +603,7 @@ describe('CLI Compress', () => {
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
 
-  test('--gzip --brotli --deflate should run simultaneously', async () => {
+  it('--gzip --brotli --deflate should run simultaneously', async () => {
     const options: CompressOptions = {
       gzip: true,
       brotli: true,
@@ -613,7 +613,7 @@ describe('CLI Compress', () => {
       brotliQuality: 2,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
 
     const gzipFiles = await getFiles(compressTestPath, ['.gz']);
@@ -657,8 +657,7 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
         new RegExp(
-          `${
-            gzipFiles.length + brotliFiles.length + deflateFiles.length
+          `${gzipFiles.length + brotliFiles.length + deflateFiles.length
           } files have been compressed. (.+)`,
         ),
       ),
