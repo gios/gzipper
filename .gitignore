@@ -72,3 +72,5 @@ typings/
 .gzipper
 tsconfig.tsbuildinfo
 dist
+test/tmp-test-folder
+

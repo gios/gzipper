@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, it, expect, vitest } from "vitest";
 import { Compress } from '../../../../src/Compress';
 import {
   getFiles,
@@ -9,19 +10,17 @@ import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 
-jest.setTimeout(60000);
-
 describe('CLI Compress -> Zopfli compression', () => {
   let testPath: string;
   let compressTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath] = await generatePaths({
       excludeBig: true,
     });
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -30,7 +29,7 @@ describe('CLI Compress -> Zopfli compression', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('--zopfli-num-iterations, --zopfli-block-splitting, --zopfli-block-splitting-max <number> should change zopfli configuration', async () => {
+  it('--zopfli-num-iterations, --zopfli-block-splitting, --zopfli-block-splitting-max <number> should change zopfli configuration', async () => {
     const options: CompressOptions = {
       zopfli: true,
       zopfliNumIterations: 15,
@@ -38,7 +37,7 @@ describe('CLI Compress -> Zopfli compression', () => {
       zopfliBlockSplittingMax: 10,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
 
@@ -77,4 +76,4 @@ describe('CLI Compress -> Zopfli compression', () => {
         .blocksplittingmax,
     ).toBe(10);
   });
-});
+}, 10000);
