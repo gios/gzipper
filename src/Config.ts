@@ -1,37 +1,37 @@
-import path from "node:path";
-import { access, writeFile } from "node:fs/promises";
+import path from 'node:path'
+import { access, writeFile } from 'node:fs/promises'
 
-import { FileConfig } from "./interfaces";
-import { CONFIG_FILE, CONFIG_FOLDER } from "./constants";
-import { Helpers } from "./helpers";
+import { FileConfig } from './interfaces'
+import { CONFIG_FILE, CONFIG_FOLDER } from './constants'
+import { Helpers } from './helpers'
 
 export class Config {
-  private readonly _configFile: string;
-  private _configContent: FileConfig = {} as FileConfig;
+  private readonly _configFile: string
+  private _configContent: FileConfig = {} as FileConfig
 
   get configContent(): Readonly<FileConfig> {
-    return this._configContent;
+    return this._configContent
   }
 
   set configContent(value: Readonly<FileConfig>) {
-    this._configContent = value;
+    this._configContent = value
   }
 
   /**
    * Creates an instance of Config.
    */
   constructor() {
-    this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
-    this.setProperty("version", Helpers.getVersion());
+    this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE)
+    this.setProperty('version', Helpers.getVersion())
   }
 
   /**
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    await access(this._configFile);
-    const response = await Helpers.readFile(this._configFile);
-    this._configContent = JSON.parse(response.toString());
+    await access(this._configFile)
+    const response = await Helpers.readFile(this._configFile)
+    this._configContent = JSON.parse(response.toString())
   }
 
   /**
@@ -39,16 +39,16 @@ export class Config {
    */
   setProperty<T extends keyof FileConfig, K extends FileConfig[T]>(
     field: T,
-    content: K,
+    content: K
   ): void {
-    this._configContent[field] = content;
+    this._configContent[field] = content
   }
 
   /**
    * delete property from config file (.gzipperconfig).
    */
   deleteProperty<T extends keyof FileConfig>(field: T): void {
-    delete this._configContent[field];
+    delete this._configContent[field]
   }
 
   /**
@@ -57,7 +57,7 @@ export class Config {
   async writeConfig(): Promise<void> {
     await writeFile(
       path.resolve(this._configFile),
-      JSON.stringify(this._configContent, null, 2),
-    );
+      JSON.stringify(this._configContent, null, 2)
+    )
   }
 }
