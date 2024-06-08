@@ -1,5 +1,5 @@
 import { gzip } from '@gfx/zopfli';
-import { Transform, TransformCallback } from 'stream';
+import { Transform, TransformCallback } from 'node:stream';
 
 import { ZopfliOptions } from '../interfaces';
 

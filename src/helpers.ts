@@ -1,29 +1,28 @@
-import fs from 'fs';
-import util from 'util';
-import os from 'os';
+import { createReadStream } from "node:fs";
+import { mkdir } from "node:fs/promises";
+import os from "node:os";
 
-import * as pack from '../package.json';
+import * as pack from "../package.json";
 
 export class Helpers {
-  private static readonly nativeFs = {
-    mkdir: util.promisify(fs.mkdir),
-  };
-
   /**
    * Create folders by path.
    */
   static async createFolders(target: string): Promise<void> {
-    await this.nativeFs.mkdir(target, { recursive: true });
+    await mkdir(target, { recursive: true });
   }
 
   /**
    * Convert Map to JSON.
    */
   static mapToJSON<K extends string, V>(map: Map<K, V>): Record<K, V> {
-    return Array.from(map).reduce((obj, [key, value]) => {
-      obj[key] = value;
-      return obj;
-    }, {} as Record<K, V>);
+    return Array.from(map).reduce(
+      (obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+      },
+      {} as Record<K, V>,
+    );
   }
 
   /**
@@ -38,9 +37,9 @@ export class Helpers {
    */
   static readableSize(bytes: number): string {
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const sizes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     return `${Number((bytes / Math.pow(1024, i)).toFixed(2)).toString()} ${
-      sizes[i] || 'b'
+      sizes[i] || "b"
     }`;
   }
 
@@ -49,20 +48,20 @@ export class Helpers {
    */
   static readableHrtime(hrTime: [number, number]): string {
     const [seconds, nanoseconds] = hrTime;
-    return `${seconds ? seconds + 's ' : ''}${nanoseconds / 1e6}ms`;
+    return `${seconds ? seconds + "s " : ""}${nanoseconds / 1e6}ms`;
   }
 
   /**
    * Read file via readable stream.
    */
   static async readFile(file: string): Promise<string> {
-    let data = '';
-    const stream = fs.createReadStream(file, { encoding: 'utf8' });
+    let data = "";
+    const stream = createReadStream(file, { encoding: "utf8" });
 
     return new Promise((resolve, reject) => {
-      stream.on('data', (chunk) => (data += chunk));
-      stream.on('end', () => resolve(data));
-      stream.on('error', (err) => reject(err));
+      stream.on("data", (chunk) => (data += chunk));
+      stream.on("end", () => resolve(data));
+      stream.on("error", (err) => reject(err));
     });
   }
 
@@ -115,7 +114,7 @@ export class Helpers {
     return !(env.GZIPPER_NO_COLOR
       ? !!parseInt(env.GZIPPER_NO_COLOR as string)
       : env.NO_COLOR
-      ? !!parseInt(env.NO_COLOR as string)
-      : !defaultValue);
+        ? !!parseInt(env.NO_COLOR as string)
+        : !defaultValue);
   }
 }

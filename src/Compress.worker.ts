@@ -1,9 +1,9 @@
-import { parentPort, workerData } from 'worker_threads';
-import fs from 'fs';
-import { v4 } from 'uuid';
-import util from 'util';
-import stream from 'stream';
-import path from 'path';
+import { parentPort, workerData } from "node:worker_threads";
+import { createReadStream, createWriteStream } from "node:fs";
+import { lstat, access, unlink } from "node:fs/promises";
+import { pipeline } from "node:stream/promises";
+import path from "node:path";
+import crypto from "node:crypto";
 
 import {
   CompressedFile,
@@ -11,22 +11,14 @@ import {
   CompressOptions,
   IncrementalFileValue,
   WorkerMessage,
-} from './interfaces';
-import { OUTPUT_FILE_FORMAT_REGEXP } from './constants';
-import { Helpers } from './helpers';
-import { Logger } from './logger/Logger';
-import { CompressService } from './Compress.service';
-import { Incremental } from './Incremental';
+} from "./interfaces";
+import { OUTPUT_FILE_FORMAT_REGEXP } from "./constants";
+import { Helpers } from "./helpers";
+import { Logger } from "./logger/Logger";
+import { CompressService } from "./Compress.service";
+import { Incremental } from "./Incremental";
 
 class CompressWorker {
-  private readonly nativeFs = {
-    lstat: util.promisify(fs.lstat),
-    exists: util.promisify(fs.exists),
-    unlink: util.promisify(fs.unlink),
-  };
-  private readonly nativeStream = {
-    pipeline: util.promisify(stream.pipeline),
-  };
   private readonly options: CompressOptions = workerData.options;
   private readonly chunk: string[] = workerData.chunk;
   private readonly target: string = workerData.target;
@@ -102,7 +94,7 @@ class CompressWorker {
     let isSkipped = false;
     const inputPath = path.join(target, filename);
     if (this.outputPath) {
-      const isFileTarget = (await this.nativeFs.lstat(this.target)).isFile();
+      const isFileTarget = (await lstat(this.target)).isFile();
       target = isFileTarget
         ? this.outputPath
         : path.join(this.outputPath, path.relative(this.target, target));
@@ -115,15 +107,14 @@ class CompressWorker {
     );
 
     if (this.options.skipCompressed) {
-      if (await this.nativeFs.exists(outputPath)) {
-        isSkipped = true;
-        return { isCached, isSkipped };
-      }
+      await access(outputPath);
+      isSkipped = true;
+      return { isCached, isSkipped };
     }
 
     if (this.options.incremental) {
       const checksum = await this.incremental.getFileChecksum(inputPath);
-      const { isChanged, fileId } = await this.incremental.setFile(
+      const { isChanged, fileId } = this.incremental.setFile(
         inputPath,
         checksum,
         compressionInstance.compressionName,
@@ -136,39 +127,39 @@ class CompressWorker {
       );
 
       if (isChanged) {
-        await this.nativeStream.pipeline(
-          fs.createReadStream(inputPath),
+        await pipeline(
+          createReadStream(inputPath),
           createCompression,
-          fs.createWriteStream(outputPath),
+          createWriteStream(outputPath),
         );
 
-        await this.nativeStream.pipeline(
-          fs.createReadStream(outputPath),
-          fs.createWriteStream(cachedFile),
+        await pipeline(
+          createReadStream(outputPath),
+          createWriteStream(cachedFile),
         );
       } else {
-        await this.nativeStream.pipeline(
-          fs.createReadStream(cachedFile),
-          fs.createWriteStream(outputPath),
+        await pipeline(
+          createReadStream(cachedFile),
+          createWriteStream(outputPath),
         );
         isCached = true;
       }
     } else {
-      await this.nativeStream.pipeline(
-        fs.createReadStream(inputPath),
+      await pipeline(
+        createReadStream(inputPath),
         createCompression,
-        fs.createWriteStream(outputPath),
+        createWriteStream(outputPath),
       );
     }
 
     if (this.options.verbose || this.options.removeLarger) {
-      const beforeSize = (await this.nativeFs.lstat(inputPath)).size;
-      const afterSize = (await this.nativeFs.lstat(outputPath)).size;
+      const beforeSize = (await lstat(inputPath)).size;
+      const afterSize = (await lstat(outputPath)).size;
 
       const removeCompressed =
         this.options.removeLarger && beforeSize < afterSize;
       if (removeCompressed) {
-        await this.nativeFs.unlink(outputPath);
+        await unlink(outputPath);
       }
       return {
         beforeSize,
@@ -187,24 +178,24 @@ class CompressWorker {
    */
   private getOutputPath(target: string, file: string, ext: string): string {
     const artifactsMap = new Map<string, string | null>([
-      ['[filename]', path.parse(file).name],
-      ['[ext]', path.extname(file).slice(1)],
-      ['[compressExt]', ext],
+      ["[filename]", path.parse(file).name],
+      ["[ext]", path.extname(file).slice(1)],
+      ["[compressExt]", ext],
     ]);
-    let filename = `${artifactsMap.get('[filename]')}.${artifactsMap.get(
-      '[ext]',
-    )}.${artifactsMap.get('[compressExt]')}`;
+    let filename = `${artifactsMap.get("[filename]")}.${artifactsMap.get(
+      "[ext]",
+    )}.${artifactsMap.get("[compressExt]")}`;
 
     if (this.options.outputFileFormat) {
-      artifactsMap.set('[hash]', null);
+      artifactsMap.set("[hash]", null);
 
       filename = this.options.outputFileFormat.replace(
         OUTPUT_FILE_FORMAT_REGEXP,
         (artifact) => {
           if (artifactsMap.has(artifact)) {
             // Need to generate hash only if we have appropriate param
-            if (artifact === '[hash]') {
-              artifactsMap.set('[hash]', v4());
+            if (artifact === "[hash]") {
+              artifactsMap.set("[hash]", crypto.randomUUID());
             }
             return artifactsMap.get(artifact) as string;
           } else {

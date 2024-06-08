@@ -1,4 +1,4 @@
-import zlib from 'zlib';
+import zlib from 'node:zlib';
 
 import { Compression } from './Compression';
 import { CompressOptions, CompressionOptions } from '../interfaces';

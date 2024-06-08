@@ -1,32 +1,27 @@
-import fs from 'fs';
-import path from 'path';
-import util from 'util';
-import { Worker } from 'worker_threads';
+import { lstat, readdir } from "node:fs/promises";
+import path from "node:path";
+import { Worker } from "node:worker_threads";
 
-import { Helpers } from './helpers';
-import { Logger } from './logger/Logger';
+import { Helpers } from "./helpers";
+import { Logger } from "./logger/Logger";
 import {
   NO_FILES_MESSAGE,
   NO_PATH_MESSAGE,
   DEFAULT_OUTPUT_FORMAT_MESSAGE,
   INCREMENTAL_ENABLE_MESSAGE,
   WORKER_STARTED,
-} from './constants';
-import { CompressionType, CompressOptions, WorkerMessage } from './interfaces';
-import { Incremental } from './Incremental';
-import { Config } from './Config';
-import { LogLevel } from './logger/LogLevel.enum';
-import { CompressService } from './Compress.service';
-import { CompressionExtensions } from './enums';
+} from "./constants";
+import { CompressionType, CompressOptions, WorkerMessage } from "./interfaces";
+import { Incremental } from "./Incremental";
+import { Config } from "./Config";
+import { LogLevel } from "./logger/LogLevel.enum";
+import { CompressService } from "./Compress.service";
+import { CompressionExtensions } from "./enums";
 
 /**
  * Compressing files.
  */
 export class Compress {
-  private readonly nativeFs = {
-    lstat: util.promisify(fs.lstat),
-    readdir: util.promisify(fs.readdir),
-  };
   private readonly incremental!: Incremental;
   private readonly config: Config;
   private readonly options: CompressOptions;
@@ -99,7 +94,8 @@ export class Compress {
     const filesCount = files.length;
     if (filesCount) {
       Logger.log(
-        `${filesCount} ${filesCount > 1 ? 'files have' : 'file has'
+        `${filesCount} ${
+          filesCount > 1 ? "files have" : "file has"
         } been compressed. (${Helpers.readableHrtime(hrtime)})`,
         LogLevel.SUCCESS,
       );
@@ -115,7 +111,7 @@ export class Compress {
    */
   private async getFilesToCompress(target = this.target): Promise<string[]> {
     const compressedFiles: string[] = [];
-    const isFileTarget = (await this.nativeFs.lstat(target)).isFile();
+    const isFileTarget = (await lstat(target)).isFile();
     let filesList: string[];
 
     if (isFileTarget) {
@@ -123,12 +119,12 @@ export class Compress {
       target = targetParsed.dir;
       filesList = [targetParsed.base];
     } else {
-      filesList = await this.nativeFs.readdir(target);
+      filesList = await readdir(target);
     }
 
     for (const file of filesList) {
       const filePath = path.resolve(target, file);
-      const fileStat = await this.nativeFs.lstat(filePath);
+      const fileStat = await lstat(filePath);
 
       if (fileStat.isDirectory()) {
         compressedFiles.push(...(await this.getFilesToCompress(filePath)));
@@ -153,7 +149,7 @@ export class Compress {
   private async createWorkers(): Promise<WorkerMessage> {
     const files = await this.getFilesToCompress();
     const cpus =
-      process.env.NODE_ENV !== 'test'
+      process.env.NODE_ENV !== "test"
         ? this.options.workers || Helpers.getCPUs()
         : 1;
     const size = Math.ceil(files.length / cpus);
@@ -182,9 +178,9 @@ export class Compress {
       const worker = new Worker(
         path.resolve(
           __dirname,
-          process.env.NODE_ENV !== 'test'
-            ? './Compress.worker.js'
-            : '../test/__mocks__/Compress.worker.import.js',
+          process.env.NODE_ENV !== "test"
+            ? "./Compress.worker.js"
+            : "../test/__mocks__/Compress.worker.import.js",
         ),
         {
           workerData: {
@@ -199,20 +195,20 @@ export class Compress {
                 chunk.includes(key),
               ),
           },
-          execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
+          execArgv: [...process.execArgv, "--unhandled-rejections=strict"],
         },
       );
 
-      worker.on('online', () => {
+      worker.on("online", () => {
         Logger.log(`[${worker.threadId}] ${WORKER_STARTED}`, LogLevel.INFO);
       });
 
-      worker.once('message', (result) => {
+      worker.once("message", (result) => {
         worker.terminate();
         resolve(result);
       });
 
-      worker.on('error', (error) => {
+      worker.on("error", (error) => {
         worker.terminate();
         reject(error);
       });

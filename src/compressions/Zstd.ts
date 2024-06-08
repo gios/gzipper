@@ -1,4 +1,4 @@
-import stream from 'stream';
+import stream from 'node:stream';
 
 import { Compression } from './Compression';
 import { CompressOptions, ZstdOptions } from '../interfaces';

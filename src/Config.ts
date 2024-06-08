@@ -1,16 +1,11 @@
-import path from 'path';
-import util from 'util';
-import fs from 'fs';
+import path from "node:path";
+import { access, writeFile } from "node:fs/promises";
 
-import { FileConfig } from './interfaces';
-import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
-import { Helpers } from './helpers';
+import { FileConfig } from "./interfaces";
+import { CONFIG_FILE, CONFIG_FOLDER } from "./constants";
+import { Helpers } from "./helpers";
 
 export class Config {
-  private readonly nativeFs = {
-    writeFile: util.promisify(fs.writeFile),
-    exists: util.promisify(fs.exists),
-  };
   private readonly _configFile: string;
   private _configContent: FileConfig = {} as FileConfig;
 
@@ -27,17 +22,16 @@ export class Config {
    */
   constructor() {
     this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
-    this.setProperty('version', Helpers.getVersion());
+    this.setProperty("version", Helpers.getVersion());
   }
 
   /**
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    if (await this.nativeFs.exists(this._configFile)) {
-      const response = await Helpers.readFile(this._configFile);
-      this._configContent = JSON.parse(response.toString());
-    }
+    await access(this._configFile);
+    const response = await Helpers.readFile(this._configFile);
+    this._configContent = JSON.parse(response.toString());
   }
 
   /**
@@ -61,7 +55,7 @@ export class Config {
    * Init or update config (.gzipperconfig).
    */
   async writeConfig(): Promise<void> {
-    await this.nativeFs.writeFile(
+    await writeFile(
       path.resolve(this._configFile),
       JSON.stringify(this._configContent, null, 2),
     );

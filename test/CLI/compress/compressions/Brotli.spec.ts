@@ -1,4 +1,4 @@
-import zlib from 'zlib';
+import zlib from 'node:zlib';
 import { describe, beforeEach, afterEach, it, expect, vitest } from "vitest";
 
 import { Compress } from '../../../../src/Compress';

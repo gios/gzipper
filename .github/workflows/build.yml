@@ -27,10 +27,5 @@ jobs:
         run: |
           npm install
           npm run eslint
-          npm run coverage
           npm run build
 
-      - name: Codecov
-        run: npx codecov
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

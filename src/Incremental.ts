@@ -1,23 +1,15 @@
-import fs from 'fs';
-import crypto from 'crypto';
-import path from 'path';
-import util from 'util';
-import { v4 } from 'uuid';
-import deepEqual from 'deep-equal';
+import { createReadStream } from "node:fs";
+import { lstat, readdir, unlink, rmdir, access } from "node:fs/promises";
+import crypto from "node:crypto";
+import path from "node:path";
+import deepEqual from "deep-equal";
 
-import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
-import { Helpers } from './helpers';
-import { Cache, IncrementalFileValue } from './interfaces';
-import { Config } from './Config';
+import { CACHE_FOLDER, CONFIG_FOLDER } from "./constants";
+import { Helpers } from "./helpers";
+import { Cache, IncrementalFileValue } from "./interfaces";
+import { Config } from "./Config";
 
 export class Incremental implements Cache {
-  private readonly nativeFs = {
-    exists: util.promisify(fs.exists),
-    unlink: util.promisify(fs.unlink),
-    readdir: util.promisify(fs.readdir),
-    lstat: util.promisify(fs.lstat),
-    rmdir: util.promisify(fs.rmdir),
-  };
   private readonly config!: Config;
   private readonly _cacheFolder: string;
   private _filePaths = new Map<string, IncrementalFileValue>();
@@ -62,7 +54,7 @@ export class Incremental implements Cache {
    * update config (.gzipperconfig).
    */
   async updateConfig(): Promise<void> {
-    this.config.setProperty('incremental', {
+    this.config.setProperty("incremental", {
       files: Helpers.mapToJSON(this._filePaths),
     });
   }
@@ -71,7 +63,9 @@ export class Incremental implements Cache {
    * Create cache folder (.gzipper).
    */
   async initCacheFolder(): Promise<void> {
-    if (!(await this.nativeFs.exists(this._cacheFolder))) {
+    try {
+      await access(this._cacheFolder);
+    } catch {
       await Helpers.createFolders(this._cacheFolder);
     }
   }
@@ -83,7 +77,7 @@ export class Incremental implements Cache {
     target: string,
     checksum: string,
     compressionType: string,
-    compressOptions: IncrementalFileValue['revisions'][number]['options'],
+    compressOptions: IncrementalFileValue["revisions"][number]["options"],
   ): {
     isChanged: boolean;
     fileId: string;
@@ -96,7 +90,7 @@ export class Incremental implements Cache {
     );
 
     if (!filePath) {
-      const fileId = v4();
+      const fileId = crypto.randomUUID();
       this._filePaths.set(target, {
         revisions: [
           {
@@ -116,7 +110,7 @@ export class Incremental implements Cache {
     }
 
     if (!selectedRevision) {
-      const fileId = v4();
+      const fileId = crypto.randomUUID();
       this._filePaths.set(target, {
         revisions: filePath.revisions.concat({
           lastChecksum: checksum,
@@ -158,13 +152,13 @@ export class Incremental implements Cache {
    * Returns file checksum.
    */
   async getFileChecksum(target: string): Promise<string> {
-    const hash = crypto.createHash('md5');
-    const stream = fs.createReadStream(target);
+    const hash = crypto.createHash("md5");
+    const stream = createReadStream(target);
 
     return new Promise((resolve, reject) => {
-      stream.on('data', (data: string) => hash.update(data, 'utf8'));
-      stream.on('end', () => resolve(hash.digest('hex')));
-      stream.on('error', (error) => reject(error));
+      stream.on("data", (data: string) => hash.update(data, "utf8"));
+      stream.on("end", () => resolve(hash.digest("hex")));
+      stream.on("error", (error: unknown) => reject(error));
     });
   }
 
@@ -172,31 +166,33 @@ export class Incremental implements Cache {
    * Purge cache folder.
    */
   async cachePurge(): Promise<void> {
-    if (!(await this.nativeFs.exists(this._cacheFolder))) {
-      throw new Error('No cache found.');
+    try {
+      await access(this._cacheFolder);
+    } catch {
+      throw new Error("No cache found.");
     }
 
     const recursiveRemove = async (
       folderPath = this._cacheFolder,
     ): Promise<void> => {
-      const files = await this.nativeFs.readdir(folderPath);
+      const files = await readdir(folderPath);
 
       for (const file of files) {
         const filePath = path.resolve(folderPath, file);
-        const isDirectory = (await this.nativeFs.lstat(filePath)).isDirectory();
+        const isDirectory = (await lstat(filePath)).isDirectory();
 
         if (isDirectory) {
           await recursiveRemove(filePath);
         } else {
-          await this.nativeFs.unlink(filePath);
+          await unlink(filePath);
         }
       }
 
-      await this.nativeFs.rmdir(folderPath);
+      await rmdir(folderPath);
     };
 
     await recursiveRemove();
-    this.config.deleteProperty('incremental');
+    this.config.deleteProperty("incremental");
     await this.config.writeConfig();
   }
 
@@ -204,11 +200,13 @@ export class Incremental implements Cache {
    * Returns cache size.
    */
   async cacheSize(folderPath = this._cacheFolder, size = 0): Promise<number> {
-    if (!(await this.nativeFs.exists(this._cacheFolder))) {
-      throw new Error('No cache found.');
+    try {
+      await access(this._cacheFolder);
+    } catch {
+      throw new Error("No cache found.");
     }
 
-    const files = await this.nativeFs.readdir(folderPath);
+    const files = await readdir(folderPath);
 
     if (!files.length) {
       return 0;
@@ -216,7 +214,7 @@ export class Incremental implements Cache {
 
     for (const file of files) {
       const filePath = path.resolve(folderPath, file);
-      const fileStat = await this.nativeFs.lstat(filePath);
+      const fileStat = await lstat(filePath);
 
       if (fileStat.isDirectory()) {
         size += await this.cacheSize(filePath, size);
