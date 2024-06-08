@@ -1,11 +1,11 @@
-import { BrotliCompression } from './compressions/Brotli';
-import { DeflateCompression } from './compressions/Deflate';
-import { GzipCompression } from './compressions/Gzip';
-import { ZopfliCompression } from './compressions/Zopfli';
-import { ZstdCompression } from './compressions/Zstd';
-import { COMPRESSION_EXTENSIONS } from './constants';
-import { CompressionExtensions } from './enums';
-import { CompressionType, CompressOptions } from './interfaces';
+import { BrotliCompression } from "./compressions/Brotli";
+import { DeflateCompression } from "./compressions/Deflate";
+import { GzipCompression } from "./compressions/Gzip";
+import { ZopfliCompression } from "./compressions/Zopfli";
+import { ZstdCompression } from "./compressions/Zstd";
+import { COMPRESSION_EXTENSIONS } from "./constants";
+import { CompressionExtensions } from "./enums";
+import { CompressionType, CompressOptions } from "./interfaces";
 
 export class CompressService {
   private readonly options: CompressOptions;

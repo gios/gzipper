@@ -1,8 +1,8 @@
-import stream from 'node:stream';
+import stream from "node:stream";
 
-import { Compression } from './Compression';
-import { CompressOptions, ZstdOptions } from '../interfaces';
-import { CompressionExtensions, CompressionNames } from '../enums';
+import { Compression } from "./Compression";
+import { CompressOptions, ZstdOptions } from "../interfaces";
+import { CompressionExtensions, CompressionNames } from "../enums";
 
 /**
  * Zstd compression
@@ -21,7 +21,7 @@ export class ZstdCompression extends Compression<ZstdOptions> {
    * Returns zstd compression instance in closure.
    */
   async getCompression(): Promise<stream.Transform> {
-    const zstd = await import('simple-zstd');
+    const zstd = await import("simple-zstd");
     return zstd.ZSTDCompress(this.compressionOptions.level);
   }
 

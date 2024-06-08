@@ -1,10 +1,10 @@
-import zlib from 'node:zlib';
+import zlib from "node:zlib";
 
-import { BrotliCompression } from './compressions/Brotli';
-import { DeflateCompression } from './compressions/Deflate';
-import { GzipCompression } from './compressions/Gzip';
-import { ZopfliCompression } from './compressions/Zopfli';
-import { ZstdCompression } from './compressions/Zstd';
+import { BrotliCompression } from "./compressions/Brotli";
+import { DeflateCompression } from "./compressions/Deflate";
+import { GzipCompression } from "./compressions/Gzip";
+import { ZopfliCompression } from "./compressions/Zopfli";
+import { ZstdCompression } from "./compressions/Zstd";
 
 export interface CompressOptions {
   verbose?: boolean;

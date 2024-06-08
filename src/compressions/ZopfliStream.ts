@@ -1,7 +1,7 @@
-import { gzip } from '@gfx/zopfli';
-import { Transform, TransformCallback } from 'node:stream';
+import { gzip } from "@gfx/zopfli";
+import { Transform, TransformCallback } from "node:stream";
 
-import { ZopfliOptions } from '../interfaces';
+import { ZopfliOptions } from "../interfaces";
 
 export class ZopfliStream extends Transform {
   private buffer: Buffer;

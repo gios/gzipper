@@ -1,8 +1,8 @@
-import zlib from 'node:zlib';
+import zlib from "node:zlib";
 
-import { Compression } from './Compression';
-import { CompressOptions, BrotliOptions } from '../interfaces';
-import { CompressionExtensions, CompressionNames } from '../enums';
+import { Compression } from "./Compression";
+import { CompressOptions, BrotliOptions } from "../interfaces";
+import { CompressionExtensions, CompressionNames } from "../enums";
 
 /**
  * Brotli compression
@@ -41,17 +41,17 @@ export class BrotliCompression extends Compression<BrotliOptions> {
 
     if (this.options.brotliParamMode !== undefined) {
       switch (this.options.brotliParamMode) {
-        case 'text':
+        case "text":
           options[zlib.constants.BROTLI_PARAM_MODE] =
             zlib.constants.BROTLI_MODE_TEXT;
           break;
 
-        case 'font':
+        case "font":
           options[zlib.constants.BROTLI_PARAM_MODE] =
             zlib.constants.BROTLI_MODE_FONT;
           break;
 
-        case 'default':
+        case "default":
         default:
           options[zlib.constants.BROTLI_PARAM_MODE] =
             zlib.constants.BROTLI_MODE_GENERIC;
@@ -76,13 +76,13 @@ export class BrotliCompression extends Compression<BrotliOptions> {
   protected getBrotliOptionName(index: string): string | undefined {
     switch (parseInt(index)) {
       case zlib.constants.BROTLI_PARAM_MODE:
-        return 'paramMode';
+        return "paramMode";
 
       case zlib.constants.BROTLI_PARAM_QUALITY:
-        return 'quality';
+        return "quality";
 
       case zlib.constants.BROTLI_PARAM_SIZE_HINT:
-        return 'sizeHint';
+        return "sizeHint";
     }
   }
 }

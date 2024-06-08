@@ -1,7 +1,7 @@
-import { filter } from './filter.decorator';
-import { LogLevel } from './LogLevel.enum';
-import { Helpers } from '../helpers';
-import { CompressOptions } from '../interfaces';
+import { filter } from "./filter.decorator";
+import { LogLevel } from "./LogLevel.enum";
+import { Helpers } from "../helpers";
+import { CompressOptions } from "../interfaces";
 
 /**
  * Custom logger.
@@ -13,7 +13,7 @@ export class Logger {
   /**
    * Set verbose mode.
    */
-  static setOptions(options: Pick<CompressOptions, 'verbose' | 'color'>): void {
+  static setOptions(options: Pick<CompressOptions, "verbose" | "color">): void {
     Logger.verbose = !!options.verbose;
     Logger.color = Helpers.getLogColor(options.color);
   }
@@ -31,7 +31,7 @@ export class Logger {
    */
   private static logger<T>(message: T, level: LogLevel): void {
     let colorfulMessage: string;
-    const prefix = 'gzipper';
+    const prefix = "gzipper";
     level = !Logger.color ? LogLevel.DEBUG : level;
 
     switch (level) {

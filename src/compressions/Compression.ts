@@ -1,6 +1,6 @@
-import stream from 'stream';
+import stream from "stream";
 
-import { CompressOptions } from '../interfaces';
+import { CompressOptions } from "../interfaces";
 
 export abstract class Compression<T> {
   compressionOptions: T = {} as T;
@@ -34,7 +34,7 @@ export abstract class Compression<T> {
       key: string,
     ): string | undefined => key,
   ): string {
-    let options = '';
+    let options = "";
 
     for (const [key, value] of Object.entries(this.compressionOptions)) {
       options += `${keyWrapper(key)}: ${value}, `;

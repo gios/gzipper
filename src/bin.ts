@@ -1,12 +1,12 @@
-import { Command } from 'commander';
+import { Command } from "commander";
 
-import { Compress } from './Compress';
-import { Helpers } from './helpers';
-import { CompressOptions } from './interfaces';
-import { Incremental } from './Incremental';
-import { Config } from './Config';
-import { Logger } from './logger/Logger';
-import { LogLevel } from './logger/LogLevel.enum';
+import { Compress } from "./Compress";
+import { Helpers } from "./helpers";
+import { CompressOptions } from "./interfaces";
+import { Incremental } from "./Incremental";
+import { Config } from "./Config";
+import { Logger } from "./logger/Logger";
+import { LogLevel } from "./logger/LogLevel.enum";
 
 export class Index {
   private readonly argv: string[] = process.argv;
@@ -14,129 +14,129 @@ export class Index {
   private commander = new Command();
 
   async exec(): Promise<void> {
-    this.commander.version(Helpers.getVersion()).name('gzipper');
+    this.commander.version(Helpers.getVersion()).name("gzipper");
 
     this.commander
-      .command('compress <path> [outputPath]')
-      .alias('c')
-      .description('compress selected path and optionally set output directory')
-      .option('-v, --verbose', 'detailed level of logs')
-      .option('--incremental', 'incremental compression')
+      .command("compress <path> [outputPath]")
+      .alias("c")
+      .description("compress selected path and optionally set output directory")
+      .option("-v, --verbose", "detailed level of logs")
+      .option("--incremental", "incremental compression")
       .option(
-        '-e, --exclude <extensions>',
-        'exclude file extensions from compression, example: jpeg,jpg...',
+        "-e, --exclude <extensions>",
+        "exclude file extensions from compression, example: jpeg,jpg...",
         this.optionToArray.bind(this),
       )
       .option(
-        '-i, --include <extensions>',
-        'include file extensions for compression, example: js,css,html...',
+        "-i, --include <extensions>",
+        "include file extensions for compression, example: js,css,html...",
         this.optionToArray.bind(this),
       )
       .option(
-        '-t, --threshold <number>',
-        'exclude assets smaller than this byte size. 0 (default)',
+        "-t, --threshold <number>",
+        "exclude assets smaller than this byte size. 0 (default)",
         (value) => parseInt(value),
       )
-      .option('--deflate', 'enable deflate compression')
-      .option('--brotli', 'enable brotli compression')
-      .option('--gzip', 'enable gzip compression')
-      .option('--zopfli', 'enable zopfli compression')
-      .option('--zstd', 'enable zstd compression')
+      .option("--deflate", "enable deflate compression")
+      .option("--brotli", "enable brotli compression")
+      .option("--gzip", "enable gzip compression")
+      .option("--zopfli", "enable zopfli compression")
+      .option("--zstd", "enable zstd compression")
       .option(
-        '--gzip-level <number>',
-        'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
-        (value) => parseInt(value),
-      )
-      .option(
-        '--gzip-memory-level <number>',
-        'amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
+        "--gzip-level <number>",
+        "gzip compression level 6 (default), 0 (no compression) - 9 (best compression)",
         (value) => parseInt(value),
       )
       .option(
-        '--gzip-strategy <number>',
-        'gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
+        "--gzip-memory-level <number>",
+        "amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)",
         (value) => parseInt(value),
       )
       .option(
-        '--deflate-level <number>',
-        'deflate compression level 6 (default), 0 (no compression) - 9 (best compression)',
+        "--gzip-strategy <number>",
+        "gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)",
         (value) => parseInt(value),
       )
       .option(
-        '--deflate-memory-level <number>',
-        'amount of memory which will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
+        "--deflate-level <number>",
+        "deflate compression level 6 (default), 0 (no compression) - 9 (best compression)",
         (value) => parseInt(value),
       )
       .option(
-        '--deflate-strategy <number>',
-        'deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
+        "--deflate-memory-level <number>",
+        "amount of memory which will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)",
         (value) => parseInt(value),
       )
       .option(
-        '--brotli-param-mode <value>',
-        'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)',
-      )
-      .option(
-        '--brotli-quality <number>',
-        'brotli compression quality 11 (default), 0 - 11',
+        "--deflate-strategy <number>",
+        "deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)",
         (value) => parseInt(value),
       )
       .option(
-        '--brotli-size-hint <number>',
-        'expected input size 0 (default)',
+        "--brotli-param-mode <value>",
+        "default, text (for UTF-8 text), font (for WOFF 2.0 fonts)",
+      )
+      .option(
+        "--brotli-quality <number>",
+        "brotli compression quality 11 (default), 0 - 11",
         (value) => parseInt(value),
       )
       .option(
-        '--zopfli-num-iterations <number>',
-        'maximum amount of times to rerun forward and backward pass to optimize LZ77 compression cost',
+        "--brotli-size-hint <number>",
+        "expected input size 0 (default)",
         (value) => parseInt(value),
       )
       .option(
-        '--zopfli-block-splitting',
-        'splits the data in multiple deflate blocks with optimal choice for the block boundaries',
-      )
-      .option(
-        '--zopfli-block-splitting-max <number>',
-        'maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)',
+        "--zopfli-num-iterations <number>",
+        "maximum amount of times to rerun forward and backward pass to optimize LZ77 compression cost",
         (value) => parseInt(value),
       )
       .option(
-        '--zstd-level <number>',
-        'zstd compression level 1 (default), 5 (best compression)',
+        "--zopfli-block-splitting",
+        "splits the data in multiple deflate blocks with optimal choice for the block boundaries",
+      )
+      .option(
+        "--zopfli-block-splitting-max <number>",
+        "maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)",
         (value) => parseInt(value),
       )
       .option(
-        '--output-file-format <value>',
-        'output file format with default artifacts [filename].[ext].[compressExt]',
-      )
-      .option(
-        '--remove-larger',
-        'remove compressed files if they larger than uncompressed originals',
-      )
-      .option(
-        '--skip-compressed',
-        'skip compressed files if they already exist',
-      )
-      .option(
-        '--workers <number>',
-        'numbers of workers which will be spawned, system CPU cores count (default)',
+        "--zstd-level <number>",
+        "zstd compression level 1 (default), 5 (best compression)",
         (value) => parseInt(value),
       )
-      .option('--no-color', 'disable logger colorful messages')
+      .option(
+        "--output-file-format <value>",
+        "output file format with default artifacts [filename].[ext].[compressExt]",
+      )
+      .option(
+        "--remove-larger",
+        "remove compressed files if they larger than uncompressed originals",
+      )
+      .option(
+        "--skip-compressed",
+        "skip compressed files if they already exist",
+      )
+      .option(
+        "--workers <number>",
+        "numbers of workers which will be spawned, system CPU cores count (default)",
+        (value) => parseInt(value),
+      )
+      .option("--no-color", "disable logger colorful messages")
       .action(this.compress.bind(this));
 
     const cache = this.commander
-      .command('cache')
-      .description('manipulations with cache');
+      .command("cache")
+      .description("manipulations with cache");
 
     cache
-      .command('purge')
-      .description('purge cache storage')
+      .command("purge")
+      .description("purge cache storage")
       .action(this.cachePurge.bind(this));
 
     cache
-      .command('size')
-      .description('size of cached resources')
+      .command("size")
+      .description("size of cached resources")
       .action(this.cacheSize.bind(this));
 
     await this.commander.parseAsync(this.argv);
@@ -240,7 +240,7 @@ export class Index {
     try {
       await incremental.cachePurge();
       Logger.log(
-        'Cache has been purged, you are free to initialize a new one.',
+        "Cache has been purged, you are free to initialize a new one.",
         LogLevel.SUCCESS,
       );
     } catch (err) {
@@ -311,14 +311,14 @@ export class Index {
   }
 
   private optionToArray<T>(value: T): string[] | T {
-    if (typeof value === 'string' && value) {
-      return value.split(',').map((item) => item.trim());
+    if (typeof value === "string" && value) {
+      return value.split(",").map((item) => item.trim());
     }
 
     return value;
   }
 }
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   new Index().exec();
 }

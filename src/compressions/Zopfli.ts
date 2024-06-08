@@ -1,7 +1,7 @@
-import { Compression } from './Compression';
-import { CompressOptions, ZopfliOptions } from '../interfaces';
-import { CompressionExtensions, CompressionNames } from '../enums';
-import { ZopfliStream } from './ZopfliStream';
+import { Compression } from "./Compression";
+import { CompressOptions, ZopfliOptions } from "../interfaces";
+import { CompressionExtensions, CompressionNames } from "../enums";
+import { ZopfliStream } from "./ZopfliStream";
 
 /**
  * Zopfli compression

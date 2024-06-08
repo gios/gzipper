@@ -1,5 +1,5 @@
-import { Logger } from './Logger';
-import { LogLevel } from './LogLevel.enum';
+import { Logger } from "./Logger";
+import { LogLevel } from "./LogLevel.enum";
 
 /**
  * Exec only 'ERROR', 'WARNING', 'SUCCESS' or when 'verbose' flag is available.
