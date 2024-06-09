@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs'
-import { mkdir } from 'node:fs/promises'
+import { mkdir, access } from 'node:fs/promises'
 import os from 'node:os'
 
 import * as pack from '../package.json'
@@ -116,5 +116,17 @@ export class Helpers {
       : env.NO_COLOR
         ? !!parseInt(env.NO_COLOR as string)
         : !defaultValue)
+  }
+
+  /**
+   * Returns true if file exists, otherwise false.
+   */
+  static async checkFileExists(path: string): Promise<boolean> {
+    try {
+      await access(path)
+      return true
+    } catch {
+      return false
+    }
   }
 }

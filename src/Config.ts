@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { access, writeFile } from 'node:fs/promises'
+import { writeFile } from 'node:fs/promises'
 
 import { FileConfig } from './interfaces'
 import { CONFIG_FILE, CONFIG_FOLDER } from './constants'
@@ -29,9 +29,10 @@ export class Config {
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    await access(this._configFile)
-    const response = await Helpers.readFile(this._configFile)
-    this._configContent = JSON.parse(response.toString())
+    if (await Helpers.checkFileExists(this._configFile)) {
+      const response = await Helpers.readFile(this._configFile)
+      this._configContent = JSON.parse(response.toString())
+    }
   }
 
   /**

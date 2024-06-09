@@ -4,11 +4,12 @@ import {
   readdir,
   lstat,
   rmdir,
-  access,
   mkdir,
   copyFile,
 } from 'node:fs/promises'
 import crypto from 'node:crypto'
+
+import { Helpers } from '../src/helpers'
 
 interface GeneratePathsOptions {
   excludeBig: boolean
@@ -95,19 +96,14 @@ export async function clear(
   directory: string,
   extensions: string[] | boolean
 ): Promise<void> {
-  try {
-    await access(directory)
+  if (await Helpers.checkFileExists(directory)) {
     await clearDirectory(directory, extensions)
-  } catch {
-    console.warn('no directory to clear')
   }
 }
 
 export async function createFolder(target: string): Promise<string> {
   const folderPath = path.resolve(__dirname, target)
-  try {
-    await access(folderPath)
-  } catch {
+  if (!(await Helpers.checkFileExists(folderPath))) {
     await mkdir(folderPath, { recursive: true })
   }
   return folderPath

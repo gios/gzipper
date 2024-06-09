@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { access, readFile, writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import deepEqual from 'deep-equal'
 import { describe, beforeEach, afterEach, it, expect, vitest } from 'vitest'
 
@@ -22,6 +22,7 @@ import {
   CompressOptions,
 } from '../../../src/interfaces'
 import { Logger } from '../../../src/logger/Logger'
+import { Helpers } from '../../../src/helpers'
 
 function getFileRevisions(
   config: FileConfig,
@@ -80,8 +81,11 @@ describe('CLI Compress -> Incremental', () => {
     await compress.run()
     const files = await getFiles(compressTestPath, ['.gz'])
 
-    await access(path.resolve(process.cwd(), './.gzipper'))
+    const exists = await Helpers.checkFileExists(
+      path.resolve(process.cwd(), './.gzipper')
+    )
 
+    expect(exists).toBeTruthy()
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       INCREMENTAL_ENABLE_MESSAGE,
@@ -118,7 +122,8 @@ describe('CLI Compress -> Incremental', () => {
     await compress.run()
 
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig')
-    await access(configPath)
+    const exists = await Helpers.checkFileExists(configPath)
+    expect(exists).toBeTruthy()
 
     const fileConfig = await readFile(configPath)
     const config = JSON.parse(fileConfig.toString())

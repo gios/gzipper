@@ -1,4 +1,3 @@
-import { access } from 'node:fs/promises'
 import path from 'node:path'
 import { describe, beforeEach, afterEach, it, expect, vitest } from 'vitest'
 
@@ -12,6 +11,7 @@ import { Compress } from '../../../src/Compress'
 import { Config } from '../../../src/Config'
 import { Incremental } from '../../../src/Incremental'
 import { CompressOptions } from '../../../src/interfaces'
+import { Helpers } from '../../../src/helpers'
 
 describe('CLI Cache -> Size', () => {
   let testPath: string
@@ -40,7 +40,8 @@ describe('CLI Cache -> Size', () => {
     const size = await incremental.cacheSize()
 
     expect(size).toBeGreaterThan(0)
-    await expect(access(cachePath)).resolves.toBeNull()
+    const cacheExist = await Helpers.checkFileExists(cachePath)
+    expect(cacheExist).toBeTruthy()
   })
 
   it("should throw error if cache doesn't exists", async () => {

@@ -1,6 +1,6 @@
 import { parentPort, workerData } from 'node:worker_threads'
 import { createReadStream, createWriteStream } from 'node:fs'
-import { lstat, access, unlink } from 'node:fs/promises'
+import { lstat, unlink } from 'node:fs/promises'
 import { pipeline } from 'node:stream/promises'
 import path from 'node:path'
 import crypto from 'node:crypto'
@@ -107,9 +107,10 @@ class CompressWorker {
     )
 
     if (this.options.skipCompressed) {
-      await access(outputPath)
-      isSkipped = true
-      return { isCached, isSkipped }
+      if (await Helpers.checkFileExists(outputPath)) {
+        isSkipped = true
+        return { isCached, isSkipped }
+      }
     }
 
     if (this.options.incremental) {

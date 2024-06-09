@@ -1,5 +1,5 @@
 import { createReadStream } from 'node:fs'
-import { lstat, readdir, unlink, rmdir, access } from 'node:fs/promises'
+import { lstat, readdir, unlink, rmdir } from 'node:fs/promises'
 import crypto from 'node:crypto'
 import path from 'node:path'
 import deepEqual from 'deep-equal'
@@ -59,9 +59,7 @@ export class Incremental implements Cache {
    * Create cache folder (.gzipper).
    */
   async initCacheFolder(): Promise<void> {
-    try {
-      await access(this._cacheFolder)
-    } catch {
+    if (!(await Helpers.checkFileExists(this._cacheFolder))) {
       await Helpers.createFolders(this._cacheFolder)
     }
   }
@@ -162,9 +160,7 @@ export class Incremental implements Cache {
    * Purge cache folder.
    */
   async cachePurge(): Promise<void> {
-    try {
-      await access(this._cacheFolder)
-    } catch {
+    if (!(await Helpers.checkFileExists(this._cacheFolder))) {
       throw new Error('No cache found.')
     }
 
@@ -196,9 +192,7 @@ export class Incremental implements Cache {
    * Returns cache size.
    */
   async cacheSize(folderPath = this._cacheFolder, size = 0): Promise<number> {
-    try {
-      await access(this._cacheFolder)
-    } catch {
+    if (!(await Helpers.checkFileExists(this._cacheFolder))) {
       throw new Error('No cache found.')
     }
 
