@@ -95,8 +95,12 @@ export async function clear(
   directory: string,
   extensions: string[] | boolean
 ): Promise<void> {
-  await access(directory)
-  await clearDirectory(directory, extensions)
+  try {
+    await access(directory)
+    await clearDirectory(directory, extensions)
+  } catch {
+    console.warn('no directory to clear')
+  }
 }
 
 export async function createFolder(target: string): Promise<string> {

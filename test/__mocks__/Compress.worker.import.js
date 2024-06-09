@@ -1,8 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path');
-const { workerData } = require('worker_threads');
+import { tsImport } from 'tsx/esm/api'
 
-require('ts-node').register();
-// Need to overwrite default cwd behavior for worker threads
-process.cwd = () => workerData.cwd;
-require(path.resolve(__dirname, '../../src/Compress.worker.ts'));
+await tsImport('../../src/Compress.worker.ts', import.meta.url)

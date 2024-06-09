@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "ES2020",
-    "lib": ["ES2020"],
+    "target": "es2022",
+    "module": "node16",
+    "lib": ["es2023"],
+    "moduleResolution": "bundler",
     "outDir": "dist",
     "declaration": true,
     "strict": true,
