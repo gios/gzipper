@@ -1,34 +1,34 @@
-import { lstat, readdir } from 'node:fs/promises'
-import path from 'node:path'
-import { Worker } from 'node:worker_threads'
+import { lstat, readdir } from 'node:fs/promises';
+import path from 'node:path';
+import { Worker } from 'node:worker_threads';
 
-import { Helpers } from './helpers'
-import { Logger } from './logger/Logger'
+import { Helpers } from './helpers';
+import { Logger } from './logger/Logger';
 import {
   NO_FILES_MESSAGE,
   NO_PATH_MESSAGE,
   DEFAULT_OUTPUT_FORMAT_MESSAGE,
   INCREMENTAL_ENABLE_MESSAGE,
   WORKER_STARTED,
-} from './constants'
-import { CompressionType, CompressOptions, WorkerMessage } from './interfaces'
-import { Incremental } from './Incremental'
-import { Config } from './Config'
-import { LogLevel } from './logger/LogLevel.enum'
-import { CompressService } from './Compress.service'
-import { CompressionExtensions } from './enums'
+} from './constants';
+import { CompressionType, CompressOptions, WorkerMessage } from './interfaces';
+import { Incremental } from './Incremental';
+import { Config } from './Config';
+import { LogLevel } from './logger/LogLevel.enum';
+import { CompressService } from './Compress.service';
+import { CompressionExtensions } from './enums';
 
 /**
  * Compressing files.
  */
 export class Compress {
-  private readonly incremental!: Incremental
-  private readonly config: Config
-  private readonly options: CompressOptions
-  private readonly outputPath: string | undefined
-  private readonly compressionInstances: CompressionType[]
-  private readonly target: string
-  private readonly service: CompressService
+  private readonly incremental!: Incremental;
+  private readonly config: Config;
+  private readonly options: CompressOptions;
+  private readonly outputPath: string | undefined;
+  private readonly compressionInstances: CompressionType[];
+  private readonly target: string;
+  private readonly service: CompressService;
 
   /**
    * Creates an instance of Compress.
@@ -41,93 +41,93 @@ export class Compress {
     Logger.setOptions({
       verbose: options.verbose,
       color: options.color,
-    })
-    this.config = new Config()
+    });
+    this.config = new Config();
     if (!target) {
-      const message = NO_PATH_MESSAGE
-      Logger.log(message, LogLevel.ERROR)
-      throw new Error(message)
+      const message = NO_PATH_MESSAGE;
+      Logger.log(message, LogLevel.ERROR);
+      throw new Error(message);
     }
     if (outputPath) {
-      this.outputPath = path.resolve(process.cwd(), outputPath)
+      this.outputPath = path.resolve(process.cwd(), outputPath);
     }
     if (options.incremental) {
-      this.incremental = new Incremental(this.config)
+      this.incremental = new Incremental(this.config);
     }
-    this.target = path.resolve(process.cwd(), target)
-    this.options = options
-    this.service = new CompressService(this.options)
-    this.compressionInstances = this.service.getCompressionInstances()
+    this.target = path.resolve(process.cwd(), target);
+    this.options = options;
+    this.service = new CompressService(this.options);
+    this.compressionInstances = this.service.getCompressionInstances();
   }
 
   /**
    * Start compressing files.
    */
   async run(): Promise<string[]> {
-    let files: string[]
-    let hrtime: [number, number]
+    let files: string[];
+    let hrtime: [number, number];
     try {
       if (this.outputPath) {
-        await Helpers.createFolders(this.outputPath)
+        await Helpers.createFolders(this.outputPath);
       }
       if (this.options.incremental) {
-        await this.config.readConfig()
-        Logger.log(INCREMENTAL_ENABLE_MESSAGE, LogLevel.INFO)
-        await this.incremental.initCacheFolder()
-        await this.incremental.readConfig()
+        await this.config.readConfig();
+        Logger.log(INCREMENTAL_ENABLE_MESSAGE, LogLevel.INFO);
+        await this.incremental.initCacheFolder();
+        await this.incremental.readConfig();
       }
-      this.compressionLog()
-      const hrtimeStart = process.hrtime()
-      const workersResponse = await this.createWorkers()
-      files = workersResponse.files
-      hrtime = process.hrtime(hrtimeStart)
+      this.compressionLog();
+      const hrtimeStart = process.hrtime();
+      const workersResponse = await this.createWorkers();
+      files = workersResponse.files;
+      hrtime = process.hrtime(hrtimeStart);
       if (this.options.incremental) {
-        this.incremental.filePaths = workersResponse.filePaths
-        await this.incremental.updateConfig()
-        await this.config.writeConfig()
+        this.incremental.filePaths = workersResponse.filePaths;
+        await this.incremental.updateConfig();
+        await this.config.writeConfig();
       }
     } catch (error) {
-      Logger.log(error as Error, LogLevel.ERROR)
-      throw new Error((error as Error).message)
+      Logger.log(error as Error, LogLevel.ERROR);
+      throw new Error((error as Error).message);
     }
 
-    const filesCount = files.length
+    const filesCount = files.length;
     if (filesCount) {
       Logger.log(
         `${filesCount} ${
           filesCount > 1 ? 'files have' : 'file has'
         } been compressed. (${Helpers.readableHrtime(hrtime)})`,
         LogLevel.SUCCESS
-      )
+      );
     } else {
-      Logger.log(NO_FILES_MESSAGE, LogLevel.WARNING)
+      Logger.log(NO_FILES_MESSAGE, LogLevel.WARNING);
     }
 
-    return files
+    return files;
   }
 
   /**
    * Returns available files to compress.
    */
   private async getFilesToCompress(target = this.target): Promise<string[]> {
-    const compressedFiles: string[] = []
-    const isFileTarget = (await lstat(target)).isFile()
-    let filesList: string[]
+    const compressedFiles: string[] = [];
+    const isFileTarget = (await lstat(target)).isFile();
+    let filesList: string[];
 
     if (isFileTarget) {
-      const targetParsed = path.parse(target)
-      target = targetParsed.dir
-      filesList = [targetParsed.base]
+      const targetParsed = path.parse(target);
+      target = targetParsed.dir;
+      filesList = [targetParsed.base];
     } else {
-      filesList = await readdir(target)
+      filesList = await readdir(target);
     }
 
     for (const file of filesList) {
-      const filePath = path.resolve(target, file)
-      const fileStat = await lstat(filePath)
+      const filePath = path.resolve(target, file);
+      const fileStat = await lstat(filePath);
 
       if (fileStat.isDirectory()) {
-        compressedFiles.push(...(await this.getFilesToCompress(filePath)))
+        compressedFiles.push(...(await this.getFilesToCompress(filePath)));
       } else if (
         fileStat.isFile() &&
         this.service.isValidFileExtensions(
@@ -135,39 +135,39 @@ export class Compress {
         )
       ) {
         if (fileStat.size < (this.options.threshold ?? 0)) {
-          continue
+          continue;
         }
-        compressedFiles.push(filePath)
+        compressedFiles.push(filePath);
       }
     }
-    return compressedFiles
+    return compressedFiles;
   }
 
   /**
    * Create workers for parallel compression.
    */
   private async createWorkers(): Promise<WorkerMessage> {
-    const files = await this.getFilesToCompress()
+    const files = await this.getFilesToCompress();
     const cpus =
       process.env.NODE_ENV !== 'test'
         ? this.options.workers || Helpers.getCPUs()
-        : 1
-    const size = Math.ceil(files.length / cpus)
-    const chunks = Helpers.chunkArray(files, size)
-    const workers = chunks.map((chunk) => this.runCompressWorker(chunk))
-    const results = await Promise.all(workers)
+        : 1;
+    const size = Math.ceil(files.length / cpus);
+    const chunks = Helpers.chunkArray(files, size);
+    const workers = chunks.map((chunk) => this.runCompressWorker(chunk));
+    const results = await Promise.all(workers);
     return results.reduce(
       (accumulator, value) => {
         return {
           files: [...accumulator.files, ...value.files],
           filePaths: { ...accumulator.filePaths, ...value.filePaths },
-        }
+        };
       },
       {
         files: [],
         filePaths: {},
       } as WorkerMessage
-    )
+    );
   }
 
   /**
@@ -197,22 +197,22 @@ export class Compress {
           },
           execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
         }
-      )
+      );
 
       worker.on('online', () => {
-        Logger.log(`[${worker.threadId}] ${WORKER_STARTED}`, LogLevel.INFO)
-      })
+        Logger.log(`[${worker.threadId}] ${WORKER_STARTED}`, LogLevel.INFO);
+      });
 
       worker.once('message', (result) => {
-        worker.terminate()
-        resolve(result)
-      })
+        worker.terminate();
+        resolve(result);
+      });
 
       worker.on('error', (error) => {
-        worker.terminate()
-        reject(error)
-      })
-    })
+        worker.terminate();
+        reject(error);
+      });
+    });
   }
 
   /**
@@ -220,11 +220,11 @@ export class Compress {
    */
   private compressionLog(): void {
     for (const instance of this.compressionInstances) {
-      Logger.log(`Compression ${instance.readableOptions()}`, LogLevel.INFO)
+      Logger.log(`Compression ${instance.readableOptions()}`, LogLevel.INFO);
     }
 
     if (!this.options.outputFileFormat) {
-      Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO)
+      Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
     }
   }
 }

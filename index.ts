@@ -1,1 +1,1 @@
-export * from './src/Compress'
+export * from './src/Compress';

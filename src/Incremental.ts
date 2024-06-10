@@ -1,29 +1,29 @@
-import { createReadStream } from 'node:fs'
-import { lstat, readdir, unlink, rmdir } from 'node:fs/promises'
-import crypto from 'node:crypto'
-import path from 'node:path'
-import deepEqual from 'deep-equal'
+import { createReadStream } from 'node:fs';
+import { lstat, readdir, unlink, rmdir } from 'node:fs/promises';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import deepEqual from 'deep-equal';
 
-import { CACHE_FOLDER, CONFIG_FOLDER } from './constants'
-import { Helpers } from './helpers'
-import { Cache, IncrementalFileValue } from './interfaces'
-import { Config } from './Config'
+import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
+import { Helpers } from './helpers';
+import { Cache, IncrementalFileValue } from './interfaces';
+import { Config } from './Config';
 
 export class Incremental implements Cache {
-  private readonly config!: Config
-  private readonly _cacheFolder: string
-  private _filePaths = new Map<string, IncrementalFileValue>()
+  private readonly config!: Config;
+  private readonly _cacheFolder: string;
+  private _filePaths = new Map<string, IncrementalFileValue>();
 
   get cacheFolder(): string {
-    return this._cacheFolder
+    return this._cacheFolder;
   }
 
   get filePaths(): Record<string, IncrementalFileValue> {
-    return Object.fromEntries(this._filePaths)
+    return Object.fromEntries(this._filePaths);
   }
 
   set filePaths(value: Record<string, IncrementalFileValue>) {
-    this._filePaths = new Map(Object.entries(value))
+    this._filePaths = new Map(Object.entries(value));
   }
 
   /**
@@ -31,18 +31,22 @@ export class Incremental implements Cache {
    */
   constructor(config?: Config) {
     if (config) {
-      this.config = config
+      this.config = config;
     }
-    this._cacheFolder = path.resolve(process.cwd(), CONFIG_FOLDER, CACHE_FOLDER)
+    this._cacheFolder = path.resolve(
+      process.cwd(),
+      CONFIG_FOLDER,
+      CACHE_FOLDER
+    );
   }
 
   /**
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    const incrementalConfig = this.config.configContent.incremental
+    const incrementalConfig = this.config.configContent.incremental;
     if (incrementalConfig) {
-      this._filePaths = new Map(Object.entries(incrementalConfig.files))
+      this._filePaths = new Map(Object.entries(incrementalConfig.files));
     }
   }
 
@@ -52,7 +56,7 @@ export class Incremental implements Cache {
   async updateConfig(): Promise<void> {
     this.config.setProperty('incremental', {
       files: Helpers.mapToJSON(this._filePaths),
-    })
+    });
   }
 
   /**
@@ -60,7 +64,7 @@ export class Incremental implements Cache {
    */
   async initCacheFolder(): Promise<void> {
     if (!(await Helpers.checkFileExists(this._cacheFolder))) {
-      await Helpers.createFolders(this._cacheFolder)
+      await Helpers.createFolders(this._cacheFolder);
     }
   }
 
@@ -73,18 +77,18 @@ export class Incremental implements Cache {
     compressionType: string,
     compressOptions: IncrementalFileValue['revisions'][number]['options']
   ): {
-    isChanged: boolean
-    fileId: string
+    isChanged: boolean;
+    fileId: string;
   } {
-    const filePath = this._filePaths.get(target)
+    const filePath = this._filePaths.get(target);
     const selectedRevision = filePath?.revisions.find(
       (revision) =>
         compressionType === revision.compressionType &&
         deepEqual(revision.options, compressOptions)
-    )
+    );
 
     if (!filePath) {
-      const fileId = crypto.randomUUID()
+      const fileId = crypto.randomUUID();
       this._filePaths.set(target, {
         revisions: [
           {
@@ -95,16 +99,16 @@ export class Incremental implements Cache {
             options: compressOptions,
           },
         ],
-      })
+      });
 
       return {
         isChanged: true,
         fileId,
-      }
+      };
     }
 
     if (!selectedRevision) {
-      const fileId = crypto.randomUUID()
+      const fileId = crypto.randomUUID();
       this._filePaths.set(target, {
         revisions: filePath.revisions.concat({
           lastChecksum: checksum,
@@ -113,12 +117,12 @@ export class Incremental implements Cache {
           compressionType,
           options: compressOptions,
         }),
-      })
+      });
 
       return {
         isChanged: true,
         fileId,
-      }
+      };
     }
 
     if (selectedRevision.lastChecksum !== checksum) {
@@ -126,34 +130,34 @@ export class Incremental implements Cache {
         revisions: filePath.revisions.map((revision) => {
           return revision.fileId === selectedRevision.fileId
             ? { ...revision, date: new Date(), lastChecksum: checksum }
-            : revision
+            : revision;
         }),
-      })
+      });
 
       return {
         isChanged: true,
         fileId: selectedRevision.fileId,
-      }
+      };
     }
 
     return {
       isChanged: false,
       fileId: selectedRevision.fileId,
-    }
+    };
   }
 
   /**
    * Returns file checksum.
    */
   async getFileChecksum(target: string): Promise<string> {
-    const hash = crypto.createHash('md5')
-    const stream = createReadStream(target)
+    const hash = crypto.createHash('md5');
+    const stream = createReadStream(target);
 
     return new Promise((resolve, reject) => {
-      stream.on('data', (data: string) => hash.update(data, 'utf8'))
-      stream.on('end', () => resolve(hash.digest('hex')))
-      stream.on('error', (error: unknown) => reject(error))
-    })
+      stream.on('data', (data: string) => hash.update(data, 'utf8'));
+      stream.on('end', () => resolve(hash.digest('hex')));
+      stream.on('error', (error: unknown) => reject(error));
+    });
   }
 
   /**
@@ -161,31 +165,31 @@ export class Incremental implements Cache {
    */
   async cachePurge(): Promise<void> {
     if (!(await Helpers.checkFileExists(this._cacheFolder))) {
-      throw new Error('No cache found.')
+      throw new Error('No cache found.');
     }
 
     const recursiveRemove = async (
       folderPath = this._cacheFolder
     ): Promise<void> => {
-      const files = await readdir(folderPath)
+      const files = await readdir(folderPath);
 
       for (const file of files) {
-        const filePath = path.resolve(folderPath, file)
-        const isDirectory = (await lstat(filePath)).isDirectory()
+        const filePath = path.resolve(folderPath, file);
+        const isDirectory = (await lstat(filePath)).isDirectory();
 
         if (isDirectory) {
-          await recursiveRemove(filePath)
+          await recursiveRemove(filePath);
         } else {
-          await unlink(filePath)
+          await unlink(filePath);
         }
       }
 
-      await rmdir(folderPath)
-    }
+      await rmdir(folderPath);
+    };
 
-    await recursiveRemove()
-    this.config.deleteProperty('incremental')
-    await this.config.writeConfig()
+    await recursiveRemove();
+    this.config.deleteProperty('incremental');
+    await this.config.writeConfig();
   }
 
   /**
@@ -193,25 +197,25 @@ export class Incremental implements Cache {
    */
   async cacheSize(folderPath = this._cacheFolder, size = 0): Promise<number> {
     if (!(await Helpers.checkFileExists(this._cacheFolder))) {
-      throw new Error('No cache found.')
+      throw new Error('No cache found.');
     }
 
-    const files = await readdir(folderPath)
+    const files = await readdir(folderPath);
 
     if (!files.length) {
-      return 0
+      return 0;
     }
 
     for (const file of files) {
-      const filePath = path.resolve(folderPath, file)
-      const fileStat = await lstat(filePath)
+      const filePath = path.resolve(folderPath, file);
+      const fileStat = await lstat(filePath);
 
       if (fileStat.isDirectory()) {
-        size += await this.cacheSize(filePath, size)
+        size += await this.cacheSize(filePath, size);
       } else if (fileStat.isFile()) {
-        size += fileStat.size
+        size += fileStat.size;
       }
     }
-    return size
+    return size;
   }
 }

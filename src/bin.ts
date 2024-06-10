@@ -1,20 +1,20 @@
-import { Command } from 'commander'
+import { Command } from 'commander';
 
-import { Compress } from './Compress'
-import { Helpers } from './helpers'
-import { CompressOptions } from './interfaces'
-import { Incremental } from './Incremental'
-import { Config } from './Config'
-import { Logger } from './logger/Logger'
-import { LogLevel } from './logger/LogLevel.enum'
+import { Compress } from './Compress';
+import { Helpers } from './helpers';
+import { CompressOptions } from './interfaces';
+import { Incremental } from './Incremental';
+import { Config } from './Config';
+import { Logger } from './logger/Logger';
+import { LogLevel } from './logger/LogLevel.enum';
 
 export class Index {
-  private readonly argv: string[] = process.argv
-  private readonly env: NodeJS.ProcessEnv = process.env
-  private commander = new Command()
+  private readonly argv: string[] = process.argv;
+  private readonly env: NodeJS.ProcessEnv = process.env;
+  private commander = new Command();
 
   async exec(): Promise<void> {
-    this.commander.version(Helpers.getVersion()).name('gzipper')
+    this.commander.version(Helpers.getVersion()).name('gzipper');
 
     this.commander
       .command('compress <path> [outputPath]')
@@ -123,23 +123,23 @@ export class Index {
         (value) => parseInt(value)
       )
       .option('--no-color', 'disable logger colorful messages')
-      .action(this.compress.bind(this))
+      .action(this.compress.bind(this));
 
     const cache = this.commander
       .command('cache')
-      .description('manipulations with cache')
+      .description('manipulations with cache');
 
     cache
       .command('purge')
       .description('purge cache storage')
-      .action(this.cachePurge.bind(this))
+      .action(this.cachePurge.bind(this));
 
     cache
       .command('size')
       .description('size of cached resources')
-      .action(this.cacheSize.bind(this))
+      .action(this.cacheSize.bind(this));
 
-    await this.commander.parseAsync(this.argv)
+    await this.commander.parseAsync(this.argv);
   }
 
   private async compress(
@@ -225,45 +225,45 @@ export class Index {
         : options.skipCompressed,
       workers: parseInt(this.env.GZIPPER_WORKERS as string) || options.workers,
       color: Helpers.getLogColor(options.color, this.env),
-    }
+    };
 
-    await this.runCompress(target, outputPath, adjustedOptions)
+    await this.runCompress(target, outputPath, adjustedOptions);
   }
 
   private async cachePurge(): Promise<void> {
     Logger.setOptions({
       verbose: true,
-    })
-    const config = new Config()
-    const incremental = new Incremental(config)
+    });
+    const config = new Config();
+    const incremental = new Incremental(config);
 
     try {
-      await incremental.cachePurge()
+      await incremental.cachePurge();
       Logger.log(
         'Cache has been purged, you are free to initialize a new one.',
         LogLevel.SUCCESS
-      )
+      );
     } catch (err) {
-      Logger.log(err, LogLevel.ERROR)
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 
   private async cacheSize(): Promise<void> {
     Logger.setOptions({
       verbose: true,
-    })
-    const incremental = new Incremental()
+    });
+    const incremental = new Incremental();
 
     try {
-      const size = await incremental.cacheSize()
+      const size = await incremental.cacheSize();
       Logger.log(
         size
           ? `Cache size is ${Helpers.readableSize(size)}`
           : `Cache is empty, initialize a new one with --incremental option.`,
         LogLevel.INFO
-      )
+      );
     } catch (err) {
-      Logger.log(err, LogLevel.ERROR)
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -274,17 +274,17 @@ export class Index {
   ): Promise<void> {
     Logger.setOptions({
       verbose: true,
-    })
+    });
     const compress = new Compress(
       target,
       outputPath,
       this.filterOptions(options)
-    )
+    );
 
     try {
-      await compress.run()
+      await compress.run();
     } catch (err) {
-      Logger.log(err, LogLevel.ERROR)
+      Logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -299,7 +299,7 @@ export class Index {
             (options as Record<string, unknown>)[key] !==
               (options as Record<string, unknown>)[key]
           )
-        )
+        );
       })
       .reduce(
         (obj, key) => ({
@@ -307,18 +307,18 @@ export class Index {
           [key]: (options as Record<string, unknown>)[key],
         }),
         {} as T
-      )
+      );
   }
 
   private optionToArray<T>(value: T): string[] | T {
     if (typeof value === 'string' && value) {
-      return value.split(',').map((item) => item.trim())
+      return value.split(',').map((item) => item.trim());
     }
 
-    return value
+    return value;
   }
 }
 
 if (process.env.NODE_ENV !== 'test') {
-  new Index().exec()
+  new Index().exec();
 }
