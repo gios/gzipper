@@ -42,13 +42,13 @@ describe('CLI Cache -> Purge', () => {
       'writeConfig',
     );
     await incremental.cachePurge();
+    const cacheExist = await Helpers.checkFileExists(cachePath);
+
     expect(deleteWritableContentPropertySpy).toHaveBeenCalledTimes(1);
     expect(deleteWritableContentPropertySpy).toHaveBeenCalledWith(
       'incremental',
     );
     expect(writeConfigSpy).toHaveBeenCalledTimes(1);
-
-    const cacheExist = await Helpers.checkFileExists(cachePath);
     expect(cacheExist).toBeFalsy();
   });
 

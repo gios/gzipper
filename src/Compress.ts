@@ -24,11 +24,11 @@ import { CompressionExtensions } from './enums';
 export class Compress {
   private readonly incremental!: Incremental;
   private readonly config: Config;
-  private readonly options: CompressOptions;
   private readonly outputPath: string | undefined;
-  private readonly compressionInstances: CompressionType[];
   private readonly target: string;
   private readonly service: CompressService;
+  readonly options: CompressOptions;
+  readonly compressionInstances: CompressionType[];
 
   /**
    * Creates an instance of Compress.

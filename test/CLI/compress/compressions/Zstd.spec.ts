@@ -10,6 +10,7 @@ import {
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
+import { ZstdCompression } from '../../../../src/compressions/Zstd';
 
 describe('CLI Compress -> Zstd compression', () => {
   let testPath: string;
@@ -37,6 +38,7 @@ describe('CLI Compress -> Zstd compression', () => {
     const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.zst']);
+    const instance = compress.compressionInstances[0] as ZstdCompression;
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -54,14 +56,9 @@ describe('CLI Compress -> Zstd compression', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('zst');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(1);
-    expect(Object.keys((compress as any).options).length).toBe(2);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.level,
-    ).toBe(3);
+    expect(instance.ext).toBe('zst');
+    expect(Object.keys(instance.compressionOptions).length).toBe(1);
+    expect(Object.keys(compress.options).length).toBe(2);
+    expect(instance.compressionOptions.level).toBe(3);
   });
 });

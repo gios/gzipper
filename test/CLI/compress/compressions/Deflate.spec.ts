@@ -10,6 +10,7 @@ import {
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
+import { DeflateCompression } from '../../../../src/compressions/Deflate';
 
 describe('CLI Compress -> Deflate compression', () => {
   let testPath: string;
@@ -39,6 +40,7 @@ describe('CLI Compress -> Deflate compression', () => {
     const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.zz']);
+    const instance = compress.compressionInstances[0] as DeflateCompression;
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -56,20 +58,11 @@ describe('CLI Compress -> Deflate compression', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('zz');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(3);
-    expect(Object.keys((compress as any).options).length).toBe(4);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.level,
-    ).toBe(6);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.memLevel,
-    ).toBe(4);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.strategy,
-    ).toBe(2);
+    expect(instance.ext).toBe('zz');
+    expect(Object.keys(instance.compressionOptions).length).toBe(3);
+    expect(Object.keys(compress.options).length).toBe(4);
+    expect(instance.compressionOptions.level).toBe(6);
+    expect(instance.compressionOptions.memLevel).toBe(4);
+    expect(instance.compressionOptions.strategy).toBe(2);
   });
 });

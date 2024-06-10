@@ -9,6 +9,7 @@ import {
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
+import { ZopfliCompression } from '../../../../src/compressions/Zopfli';
 
 describe('CLI Compress -> Zopfli compression', () => {
   let testPath: string;
@@ -40,6 +41,7 @@ describe('CLI Compress -> Zopfli compression', () => {
     const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
+    const instance = compress.compressionInstances[0] as ZopfliCompression;
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -57,23 +59,11 @@ describe('CLI Compress -> Zopfli compression', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('gz');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(3);
-    expect(Object.keys((compress as any).options).length).toBe(4);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .numiterations,
-    ).toBe(15);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .blocksplitting,
-    ).toBeTruthy();
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .blocksplittingmax,
-    ).toBe(10);
+    expect(instance.ext).toBe('gz');
+    expect(Object.keys(instance.compressionOptions).length).toBe(3);
+    expect(Object.keys(compress.options).length).toBe(4);
+    expect(instance.compressionOptions.numiterations).toBe(15);
+    expect(instance.compressionOptions.blocksplitting).toBeTruthy();
+    expect(instance.compressionOptions.blocksplittingmax).toBe(10);
   });
 }, 10000);

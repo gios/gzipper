@@ -80,10 +80,10 @@ describe('CLI Compress -> Incremental', () => {
     const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
-
     const exists = await Helpers.checkFileExists(
       path.resolve(process.cwd(), './.gzipper'),
     );
+    const instance = compress.compressionInstances[0];
 
     expect(exists).toBeTruthy();
     expect(logSpy).toHaveBeenNthCalledWith(
@@ -107,12 +107,9 @@ describe('CLI Compress -> Incremental', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('gz');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(instance.ext).toBe('gz');
+    expect(Object.keys(instance.compressionOptions).length).toBe(0);
+    expect(Object.keys(compress.options).length).toBe(1);
   });
 
   it('should generate .gzipperconfig', async () => {
@@ -123,10 +120,10 @@ describe('CLI Compress -> Incremental', () => {
 
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const exists = await Helpers.checkFileExists(configPath);
-    expect(exists).toBeTruthy();
-
     const fileConfig = await readFile(configPath);
     const config = JSON.parse(fileConfig.toString());
+
+    expect(exists).toBeTruthy();
     expect(validateConfig(config, files)).toBeTruthy();
   });
 

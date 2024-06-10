@@ -10,6 +10,7 @@ import {
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
 import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
+import { GzipCompression } from '../../../../src/compressions/Gzip';
 
 describe('CLI Compress -> Gzip compression', () => {
   let testPath: string;
@@ -38,6 +39,7 @@ describe('CLI Compress -> Gzip compression', () => {
     const logSpy = vitest.spyOn(Logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
+    const instance = compress.compressionInstances[0] as GzipCompression;
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -55,20 +57,11 @@ describe('CLI Compress -> Gzip compression', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('gz');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(3);
-    expect(Object.keys((compress as any).options).length).toBe(3);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.level,
-    ).toBe(6);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.memLevel,
-    ).toBe(4);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.strategy,
-    ).toBe(2);
+    expect(instance.ext).toBe('gz');
+    expect(Object.keys(instance.compressionOptions).length).toBe(3);
+    expect(Object.keys(compress.options).length).toBe(3);
+    expect(instance.compressionOptions.level).toBe(6);
+    expect(instance.compressionOptions.memLevel).toBe(4);
+    expect(instance.compressionOptions.strategy).toBe(2);
   });
 });
