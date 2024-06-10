@@ -20,7 +20,7 @@ export const TEST_FOLDER_PATH = path.resolve(__dirname, './tmp-test-folder');
 export const GZIPPER_CONFIG_FOLDER = path.resolve(process.cwd(), './.gzipper');
 export const COMPRESS_PATH = path.resolve(
   RESOURCES_FOLDER_PATH,
-  './folder_to_compress'
+  './folder_to_compress',
 );
 const BIG_FILE_NAME = './big.js';
 
@@ -36,20 +36,20 @@ function filterByExtension(extensions: string[], ext: string): boolean {
 export async function generatePaths(
   options: GeneratePathsOptions = {
     excludeBig: false,
-  }
+  },
 ): Promise<string[]> {
   const tmpDir = path.resolve(TEST_FOLDER_PATH, `./tmp-${crypto.randomUUID()}`);
   const compressPath = path.resolve(
     tmpDir,
-    `./tmp-compress-${crypto.randomUUID()}`
+    `./tmp-compress-${crypto.randomUUID()}`,
   );
   const emptyFolderPath = path.resolve(
     tmpDir,
-    `./tmp-empty-folder-${crypto.randomUUID()}`
+    `./tmp-empty-folder-${crypto.randomUUID()}`,
   );
   const compressTargetPath = path.resolve(
     tmpDir,
-    `./tmp-compress-target-${crypto.randomUUID()}`
+    `./tmp-compress-target-${crypto.randomUUID()}`,
   );
   await copyFolder(COMPRESS_PATH, compressPath);
   options.excludeBig && unlink(path.resolve(compressPath, BIG_FILE_NAME));
@@ -60,7 +60,7 @@ export async function generatePaths(
 
 export async function clearDirectory(
   target = COMPRESS_PATH,
-  extensions: string[] | boolean
+  extensions: string[] | boolean,
 ): Promise<string[]> {
   const force = typeof extensions === 'boolean' && extensions;
   const files: string[] = [];
@@ -94,7 +94,7 @@ export async function clearDirectory(
  */
 export async function clear(
   directory: string,
-  extensions: string[] | boolean
+  extensions: string[] | boolean,
 ): Promise<void> {
   if (await Helpers.checkFileExists(directory)) {
     await clearDirectory(directory, extensions);
@@ -111,7 +111,7 @@ export async function createFolder(target: string): Promise<string> {
 
 export async function getFiles(
   target: string,
-  extensions: string[] = []
+  extensions: string[] = [],
 ): Promise<string[]> {
   const files: string[] = [];
   const filesList = await readdir(target);
@@ -137,7 +137,7 @@ export async function getFiles(
 
 export async function copyFolder(
   target: string,
-  destination: string
+  destination: string,
 ): Promise<void> {
   const filesList = await readdir(target);
 

@@ -42,33 +42,33 @@ describe('CLI Compress -> Gzip compression', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | level: 6, memLevel: 4, strategy: 2',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(3);
     expect(Object.keys((compress as any).options).length).toBe(3);
     expect(
-      (compress as any).compressionInstances[0].compressionOptions.level
+      (compress as any).compressionInstances[0].compressionOptions.level,
     ).toBe(6);
     expect(
-      (compress as any).compressionInstances[0].compressionOptions.memLevel
+      (compress as any).compressionInstances[0].compressionOptions.memLevel,
     ).toBe(4);
     expect(
-      (compress as any).compressionInstances[0].compressionOptions.strategy
+      (compress as any).compressionInstances[0].compressionOptions.strategy,
     ).toBe(2);
   });
 });

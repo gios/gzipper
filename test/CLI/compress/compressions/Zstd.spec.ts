@@ -41,27 +41,27 @@ describe('CLI Compress -> Zstd compression', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression ZSTD | level: 3',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('zst');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(1);
     expect(Object.keys((compress as any).options).length).toBe(2);
     expect(
-      (compress as any).compressionInstances[0].compressionOptions.level
+      (compress as any).compressionInstances[0].compressionOptions.level,
     ).toBe(3);
   });
 });

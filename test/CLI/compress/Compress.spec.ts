@@ -36,12 +36,12 @@ describe('CLI Compress', () => {
   });
 
   async function validateOutputFileFormat(
-    options: CompressOptions
+    options: CompressOptions,
   ): Promise<[Compress, string[], string[]]> {
     const compress = new Compress(
       compressTestPath,
       targetFolderTestPath,
-      options
+      options,
     );
     const logSpy = vitest.spyOn(Logger, 'log');
     const files = await getFiles(compressTestPath);
@@ -51,27 +51,29 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).not.toHaveBeenNthCalledWith(
       2,
       'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${compressedFiles.length} files have been compressed. (.+)`)
+        new RegExp(
+          `${compressedFiles.length} files have been compressed. (.+)`,
+        ),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
     expect((compress as any).options.outputFileFormat).toBe(
-      options.outputFileFormat
+      options.outputFileFormat,
     );
 
     return [compress, files, compressedFiles];
@@ -104,14 +106,14 @@ describe('CLI Compress', () => {
       expect(logSpy).toHaveBeenNthCalledWith(
         1,
         'Compression GZIP | ',
-        LogLevel.INFO
+        LogLevel.INFO,
       );
       expect(logSpy).toHaveBeenLastCalledWith(
         expect.objectContaining({
           name: 'Error',
           message: 'Compressing error.',
         }),
-        LogLevel.ERROR
+        LogLevel.ERROR,
       );
     }
   });
@@ -144,13 +146,13 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(NO_FILES_MESSAGE, LogLevel.WARNING);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -163,13 +165,13 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(NO_FILES_MESSAGE, LogLevel.WARNING);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(0);
   });
@@ -184,27 +186,27 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       3,
       expect.stringMatching(/\[\d+\] Worker has started./),
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(/1 file has been compressed\. \(.+\)/),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(compressedFiles.length).toBe(1);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(0);
   });
@@ -217,27 +219,27 @@ describe('CLI Compress', () => {
     const compressedFiles = await getFiles(targetFolderTestPath, ['.gz']);
 
     const filesRelative = files.map((file) =>
-      path.relative(compressTestPath, file)
+      path.relative(compressTestPath, file),
     );
     const compressedRelative = compressedFiles.map((file) =>
-      path.relative(targetFolderTestPath, file)
+      path.relative(targetFolderTestPath, file),
     );
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(files.length).toBe(compressedFiles.length);
     for (const file of filesRelative) {
@@ -245,16 +247,16 @@ describe('CLI Compress', () => {
         compressedRelative.some((compressedFile) => {
           const withoutExtFile = compressedFile.replace(
             path.basename(compressedFile),
-            path.parse(path.basename(compressedFile)).name
+            path.parse(path.basename(compressedFile)).name,
           );
           return withoutExtFile === file;
-        })
+        }),
       ).toBeTruthy();
     }
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(0);
   });
@@ -269,23 +271,23 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(0);
     expect((compress as any).options.outputFileFormat).toBeUndefined();
@@ -305,7 +307,7 @@ describe('CLI Compress', () => {
     const [compress, files, compressedFiles] =
       await validateOutputFileFormat(options);
     const compressedFilesNames = compressedFiles.map((file) =>
-      path.basename(file)
+      path.basename(file),
     );
 
     for (const file of files) {
@@ -325,7 +327,7 @@ describe('CLI Compress', () => {
 
     const [, files, compressedFiles] = await validateOutputFileFormat(options);
     const compressedFilesNames = compressedFiles.map((file) =>
-      path.basename(file)
+      path.basename(file),
     );
 
     for (const file of files) {
@@ -333,8 +335,8 @@ describe('CLI Compress', () => {
       const fileName = path.basename(file, fileExt);
       expect(
         compressedFilesNames.find((file) =>
-          new RegExp(`${fileName}-.*-55${fileExt}`, 'g').test(file)
-        )
+          new RegExp(`${fileName}-.*-55${fileExt}`, 'g').test(file),
+        ),
       ).toBeTruthy();
     }
   });
@@ -351,19 +353,19 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} file has been compressed. (.+)`)
+        new RegExp(`${files.length} file has been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(files.length).toBe(1);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -384,19 +386,19 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(beforeFiles.length).toBe(files.length);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -413,19 +415,19 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${filesAfter.length} files have been compressed. (.+)`)
+        new RegExp(`${filesAfter.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(filesBefore.length).toBe(filesAfter.length);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(0);
   });
@@ -452,19 +454,19 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${filesGzipped.length} files have been compressed. (.+)`)
+        new RegExp(`${filesGzipped.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(filesGzipped.length).toBe(includedFiles);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -481,19 +483,19 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(files.length).toBe(6);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -505,7 +507,7 @@ describe('CLI Compress', () => {
     const compress = new Compress(
       compressTestPath,
       targetFolderTestPath,
-      options
+      options,
     );
     await compress.run();
 
@@ -519,17 +521,17 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       'No files for compression.',
-      LogLevel.WARNING
+      LogLevel.WARNING,
     );
     expect(filesBefore.length).toBe(filesAfter.length);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -551,17 +553,17 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       'No files for compression.',
-      LogLevel.WARNING
+      LogLevel.WARNING,
     );
     expect(filesBefore.length).toBe(filesAfter.length);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -583,17 +585,17 @@ describe('CLI Compress', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       'No files for compression.',
-      LogLevel.WARNING
+      LogLevel.WARNING,
     );
     expect(filesBefore.length).toBe(filesAfter.length);
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -616,34 +618,34 @@ describe('CLI Compress', () => {
     const deflateFiles = await getFiles(compressTestPath, ['.zz']);
 
     const gzipInstance = (compress as any).compressionInstances.find(
-      (instance: any) => instance.compressionName === CompressionNames.GZIP
+      (instance: any) => instance.compressionName === CompressionNames.GZIP,
     );
 
     expect(logSpy).toHaveBeenCalledWith(
       'Compression GZIP | memLevel: 1',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(gzipFiles.length).toBe(21);
     expect(gzipInstance.ext).toBe('gz');
     expect(Object.keys(gzipInstance.compressionOptions).length).toBe(1);
 
     const brotliInstance = (compress as any).compressionInstances.find(
-      (instance: any) => instance.compressionName === CompressionNames.BROTLI
+      (instance: any) => instance.compressionName === CompressionNames.BROTLI,
     );
     expect(logSpy).toHaveBeenCalledWith(
       'Compression BROTLI | quality: 2',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(brotliFiles.length).toBe(21);
     expect(brotliInstance.ext).toBe('br');
     expect(Object.keys(brotliInstance.compressionOptions).length).toBe(1);
 
     const deflateInstance = (compress as any).compressionInstances.find(
-      (instance: any) => instance.compressionName === CompressionNames.DEFLATE
+      (instance: any) => instance.compressionName === CompressionNames.DEFLATE,
     );
     expect(logSpy).toHaveBeenCalledWith(
       'Compression DEFLATE | level: 3',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(deflateFiles.length).toBe(21);
     expect(deflateInstance.ext).toBe('zz');
@@ -654,10 +656,10 @@ describe('CLI Compress', () => {
         new RegExp(
           `${
             gzipFiles.length + brotliFiles.length + deflateFiles.length
-          } files have been compressed. (.+)`
-        )
+          } files have been compressed. (.+)`,
+        ),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(Object.keys((compress as any).options).length).toBe(6);
   });

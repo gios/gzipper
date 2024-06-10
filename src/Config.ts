@@ -40,7 +40,7 @@ export class Config {
    */
   setProperty<T extends keyof FileConfig, K extends FileConfig[T]>(
     field: T,
-    content: K
+    content: K,
   ): void {
     this._configContent[field] = content;
   }
@@ -58,7 +58,7 @@ export class Config {
   async writeConfig(): Promise<void> {
     await writeFile(
       path.resolve(this._configFile),
-      JSON.stringify(this._configContent, null, 2)
+      JSON.stringify(this._configContent, null, 2),
     );
   }
 }

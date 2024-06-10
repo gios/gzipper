@@ -127,7 +127,7 @@ describe('Index CLI', () => {
     expect(runCompressSpy).toHaveBeenCalledWith(
       'folder_to_compress',
       'folder_to_compress_out',
-      request
+      request,
     );
     expect(compressRunSpy).toHaveBeenCalledTimes(1);
     expect(filterOptionsSpy).toHaveBeenCalledTimes(1);
@@ -292,7 +292,7 @@ describe('Index CLI', () => {
     expect(runCompressSpy).toHaveBeenCalledWith(
       'folder_to_compress',
       'folder_to_compress_out',
-      request
+      request,
     );
     expect(compressRunSpy).toHaveBeenCalledTimes(1);
     expect(filterOptionsSpy).toHaveBeenCalledTimes(1);
@@ -313,7 +313,7 @@ describe('Index CLI', () => {
     expect(loggerLogSpy).toHaveBeenCalledTimes(1);
     expect(loggerLogSpy).toHaveBeenCalledWith(
       'Cache has been purged, you are free to initialize a new one.',
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect(cachePurgeSpy).toHaveBeenCalledTimes(1);
     expect(cacheSizeSpy).toHaveBeenCalledTimes(0);
@@ -332,7 +332,7 @@ describe('Index CLI', () => {
     expect(loggerLogSpy).toHaveBeenCalledTimes(1);
     expect(loggerLogSpy).toHaveBeenCalledWith(
       'Cache is empty, initialize a new one with --incremental option.',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
     expect(cacheSizeSpy).toHaveBeenCalledTimes(1);
@@ -352,7 +352,7 @@ describe('Index CLI', () => {
     expect(loggerLogSpy).toHaveBeenCalledTimes(1);
     expect(loggerLogSpy).toHaveBeenCalledWith(
       'Cache size is 12 B',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
     expect(cacheSizeSpy).toHaveBeenCalledTimes(1);

@@ -50,17 +50,17 @@ export type CompressionType =
   | ZopfliCompression
   | ZstdCompression;
 
-export type BrotliOptions = { [key: number]: number };
+export type BrotliOptions = Record<number, number>;
 
-export type ZstdOptions = {
+export interface ZstdOptions {
   level?: number;
-};
+}
 
-export type ZopfliOptions = {
+export interface ZopfliOptions {
   numiterations?: number;
   blocksplitting?: boolean;
   blocksplittingmax?: number;
-};
+}
 
 export interface CompressedFile {
   beforeSize: number;

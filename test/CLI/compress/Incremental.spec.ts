@@ -26,7 +26,7 @@ import { Helpers } from '../../../src/helpers';
 
 function getFileRevisions(
   config: FileConfig,
-  filePath: string
+  filePath: string,
 ): IncrementalFileValueRevision[] {
   return config.incremental?.files[filePath].revisions || [];
 }
@@ -38,7 +38,7 @@ function validateConfig(config: FileConfig, files: string[]): boolean {
   if (version && incremental) {
     const hasFiles = Object.keys(incremental.files).length === files.length;
     const hasRevisions = Object.values(incremental.files).every(
-      (file) => file.revisions.length
+      (file) => file.revisions.length,
     );
     const hasRevisionConfig = Object.values(incremental.files)
       .map((file) => file.revisions)
@@ -48,8 +48,8 @@ function validateConfig(config: FileConfig, files: string[]): boolean {
             revision.date &&
             revision.lastChecksum &&
             revision.fileId &&
-            revision.options
-        )
+            revision.options,
+        ),
       );
     return hasFiles && hasRevisions && hasRevisionConfig;
   }
@@ -82,35 +82,35 @@ describe('CLI Compress -> Incremental', () => {
     const files = await getFiles(compressTestPath, ['.gz']);
 
     const exists = await Helpers.checkFileExists(
-      path.resolve(process.cwd(), './.gzipper')
+      path.resolve(process.cwd(), './.gzipper'),
     );
 
     expect(exists).toBeTruthy();
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       INCREMENTAL_ENABLE_MESSAGE,
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       'Compression GZIP | ',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       3,
       'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('gz');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(0);
     expect(Object.keys((compress as any).options).length).toBe(1);
   });
@@ -153,7 +153,7 @@ describe('CLI Compress -> Incremental', () => {
     await compress.run();
     await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const configBefore: FileConfig = JSON.parse(
-      (await readFile(configPath)).toString()
+      (await readFile(configPath)).toString(),
     );
     const fileRevisionsBefore: Partial<IncrementalFileValueRevision>[] =
       getFileRevisions(configBefore, fileToEdit);
@@ -162,14 +162,14 @@ describe('CLI Compress -> Incremental', () => {
     await writeFile(fileToEdit, 'New content which breaks checksum.');
     await compress.run();
     const configAfter: FileConfig = JSON.parse(
-      (await readFile(configPath)).toString()
+      (await readFile(configPath)).toString(),
     );
     const fileRevisionsAfter: Partial<IncrementalFileValueRevision>[] =
       getFileRevisions(configAfter, fileToEdit);
     await writeFile(fileToEdit, beforeFileContent);
 
     expect(fileRevisionsBefore[0]?.lastChecksum).not.toBe(
-      fileRevisionsAfter[0]?.lastChecksum
+      fileRevisionsAfter[0]?.lastChecksum,
     );
     expect(fileRevisionsBefore[0]?.date).not.toBe(fileRevisionsAfter[0]?.date);
 
@@ -191,7 +191,7 @@ describe('CLI Compress -> Incremental', () => {
     await compress.run();
     await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const config: FileConfig = JSON.parse(
-      (await readFile(configPath)).toString()
+      (await readFile(configPath)).toString(),
     );
     const fileRevisions = getFileRevisions(config, fileToEdit);
     const hashPath = path.resolve(cachePath, fileRevisions[0].fileId);
@@ -223,14 +223,14 @@ describe('CLI Compress -> Incremental', () => {
     });
     await compress2.run();
     const configAfter: FileConfig = JSON.parse(
-      (await readFile(configPath)).toString()
+      (await readFile(configPath)).toString(),
     );
     const revisions = Object.values(
-      configAfter.incremental?.files as Record<string, IncrementalFileValue>
+      configAfter.incremental?.files as Record<string, IncrementalFileValue>,
     ).every(
       (file) =>
         file.revisions.length === 2 &&
-        deepEqual(file.revisions[1].options, { level: 8 })
+        deepEqual(file.revisions[1].options, { level: 8 }),
     );
     const cachedFiles = await getFiles(cachePath);
 
@@ -256,17 +256,17 @@ describe('CLI Compress -> Incremental', () => {
     await compress2.run();
     await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const configBefore: FileConfig = JSON.parse(
-      (await readFile(configPath)).toString()
+      (await readFile(configPath)).toString(),
     );
     const fileRevisionsBefore = getFileRevisions(configBefore, fileToEdit);
     expect(fileRevisionsBefore.length).toBe(2);
     const fileRevisionBefore: Partial<IncrementalFileValueRevision> =
       fileRevisionsBefore.find((revision) =>
-        deepEqual(revision.options, { level: 8 })
+        deepEqual(revision.options, { level: 8 }),
       ) as IncrementalFileValueRevision;
     const hashPath = path.resolve(
       cachePath,
-      fileRevisionBefore.fileId as string
+      fileRevisionBefore.fileId as string,
     );
     const hashContentBefore = await readFile(hashPath);
 
@@ -280,18 +280,18 @@ describe('CLI Compress -> Incremental', () => {
     await writeFile(fileToEdit, beforeFileContent);
     const hashContentAfter = await readFile(hashPath);
     const configAfter: FileConfig = JSON.parse(
-      (await readFile(configPath)).toString()
+      (await readFile(configPath)).toString(),
     );
     const fileRevisionsAfter = getFileRevisions(configAfter, fileToEdit);
     expect(fileRevisionsAfter.length).toBe(2);
     const fileRevisionAfter: Partial<IncrementalFileValueRevision> =
       fileRevisionsAfter.find((revision) =>
-        deepEqual(revision.options, { level: 8 })
+        deepEqual(revision.options, { level: 8 }),
       ) as IncrementalFileValueRevision;
 
     expect(!hashContentBefore.equals(hashContentAfter)).toBeTruthy();
     expect(fileRevisionBefore.lastChecksum).not.toBe(
-      fileRevisionAfter.lastChecksum
+      fileRevisionAfter.lastChecksum,
     );
     expect(fileRevisionBefore.date).not.toBe(fileRevisionAfter.date);
 

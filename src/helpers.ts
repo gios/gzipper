@@ -21,7 +21,7 @@ export class Helpers {
         obj[key] = value;
         return obj;
       },
-      {} as Record<K, V>
+      {} as Record<K, V>,
     );
   }
 
@@ -88,7 +88,7 @@ export class Helpers {
    */
   static filterObject<T>(
     obj: T,
-    predicate: (key: string, item: T[Extract<keyof T, string>]) => boolean
+    predicate: (key: string, item: T[Extract<keyof T, string>]) => boolean,
   ): T {
     const result = {} as T;
 
@@ -109,7 +109,7 @@ export class Helpers {
    */
   static getLogColor(
     defaultValue = true,
-    env: NodeJS.ProcessEnv = process.env
+    env: NodeJS.ProcessEnv = process.env,
   ): boolean {
     return !(env.GZIPPER_NO_COLOR
       ? !!parseInt(env.GZIPPER_NO_COLOR as string)

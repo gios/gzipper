@@ -16,7 +16,7 @@ export class ZopfliStream extends Transform {
   _transform(
     chunk: Buffer,
     _: BufferEncoding,
-    callback: TransformCallback
+    callback: TransformCallback,
   ): void {
     this.buffer = Buffer.concat([this.buffer, chunk]);
     callback();

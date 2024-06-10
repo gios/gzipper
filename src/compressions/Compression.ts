@@ -31,8 +31,8 @@ export abstract class Compression<T> {
    */
   readableOptions(
     keyWrapper: (key: string) => string | undefined = (
-      key: string
-    ): string | undefined => key
+      key: string,
+    ): string | undefined => key,
   ): string {
     let options = '';
 

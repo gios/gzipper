@@ -49,7 +49,7 @@ describe('CLI Cache -> Size', () => {
     const incremental = new Incremental(config);
 
     await expect(incremental.cacheSize()).rejects.toThrowError(
-      'No cache found.'
+      'No cache found.',
     );
   });
 

@@ -25,17 +25,17 @@ export class Index {
       .option(
         '-e, --exclude <extensions>',
         'exclude file extensions from compression, example: jpeg,jpg...',
-        this.optionToArray.bind(this)
+        this.optionToArray.bind(this),
       )
       .option(
         '-i, --include <extensions>',
         'include file extensions for compression, example: js,css,html...',
-        this.optionToArray.bind(this)
+        this.optionToArray.bind(this),
       )
       .option(
         '-t, --threshold <number>',
         'exclude assets smaller than this byte size. 0 (default)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option('--deflate', 'enable deflate compression')
       .option('--brotli', 'enable brotli compression')
@@ -45,82 +45,82 @@ export class Index {
       .option(
         '--gzip-level <number>',
         'gzip compression level 6 (default), 0 (no compression) - 9 (best compression)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--gzip-memory-level <number>',
         'amount of memory which will be allocated for gzip compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--gzip-strategy <number>',
         'gzip compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--deflate-level <number>',
         'deflate compression level 6 (default), 0 (no compression) - 9 (best compression)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--deflate-memory-level <number>',
         'amount of memory which will be allocated for deflate compression 8 (default), 1 (minimum memory) - 9 (maximum memory)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--deflate-strategy <number>',
         'deflate compression strategy 0 (default), 1 (filtered), 2 (huffman only), 3 (RLE), 4 (fixed)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--brotli-param-mode <value>',
-        'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)'
+        'default, text (for UTF-8 text), font (for WOFF 2.0 fonts)',
       )
       .option(
         '--brotli-quality <number>',
         'brotli compression quality 11 (default), 0 - 11',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--brotli-size-hint <number>',
         'expected input size 0 (default)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--zopfli-num-iterations <number>',
         'maximum amount of times to rerun forward and backward pass to optimize LZ77 compression cost',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--zopfli-block-splitting',
-        'splits the data in multiple deflate blocks with optimal choice for the block boundaries'
+        'splits the data in multiple deflate blocks with optimal choice for the block boundaries',
       )
       .option(
         '--zopfli-block-splitting-max <number>',
         'maximum amount of blocks to split into (0 for unlimited, but this can give extreme results that hurt compression on some files)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--zstd-level <number>',
         'zstd compression level 1 (default), 5 (best compression)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option(
         '--output-file-format <value>',
-        'output file format with default artifacts [filename].[ext].[compressExt]'
+        'output file format with default artifacts [filename].[ext].[compressExt]',
       )
       .option(
         '--remove-larger',
-        'remove compressed files if they larger than uncompressed originals'
+        'remove compressed files if they larger than uncompressed originals',
       )
       .option(
         '--skip-compressed',
-        'skip compressed files if they already exist'
+        'skip compressed files if they already exist',
       )
       .option(
         '--workers <number>',
         'numbers of workers which will be spawned, system CPU cores count (default)',
-        (value) => parseInt(value)
+        (value) => parseInt(value),
       )
       .option('--no-color', 'disable logger colorful messages')
       .action(this.compress.bind(this));
@@ -145,7 +145,7 @@ export class Index {
   private async compress(
     target: string,
     outputPath: string,
-    options: CompressOptions
+    options: CompressOptions,
   ): Promise<void> {
     const adjustedOptions: CompressOptions = {
       verbose: this.env.GZIPPER_VERBOSE
@@ -241,7 +241,7 @@ export class Index {
       await incremental.cachePurge();
       Logger.log(
         'Cache has been purged, you are free to initialize a new one.',
-        LogLevel.SUCCESS
+        LogLevel.SUCCESS,
       );
     } catch (err) {
       Logger.log(err, LogLevel.ERROR);
@@ -260,7 +260,7 @@ export class Index {
         size
           ? `Cache size is ${Helpers.readableSize(size)}`
           : `Cache is empty, initialize a new one with --incremental option.`,
-        LogLevel.INFO
+        LogLevel.INFO,
       );
     } catch (err) {
       Logger.log(err, LogLevel.ERROR);
@@ -270,7 +270,7 @@ export class Index {
   private async runCompress(
     target: string,
     outputPath: string,
-    options: CompressOptions
+    options: CompressOptions,
   ): Promise<void> {
     Logger.setOptions({
       verbose: true,
@@ -278,7 +278,7 @@ export class Index {
     const compress = new Compress(
       target,
       outputPath,
-      this.filterOptions(options)
+      this.filterOptions(options),
     );
 
     try {
@@ -306,7 +306,7 @@ export class Index {
           ...obj,
           [key]: (options as Record<string, unknown>)[key],
         }),
-        {} as T
+        {} as T,
       );
   }
 

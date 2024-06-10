@@ -35,16 +35,16 @@ describe('CLI Cache -> Purge', () => {
 
     const deleteWritableContentPropertySpy = vitest.spyOn(
       (incremental as any).config,
-      'deleteProperty'
+      'deleteProperty',
     );
     const writeConfigSpy = vitest.spyOn(
       (incremental as any).config,
-      'writeConfig'
+      'writeConfig',
     );
     await incremental.cachePurge();
     expect(deleteWritableContentPropertySpy).toHaveBeenCalledTimes(1);
     expect(deleteWritableContentPropertySpy).toHaveBeenCalledWith(
-      'incremental'
+      'incremental',
     );
     expect(writeConfigSpy).toHaveBeenCalledTimes(1);
 
@@ -58,11 +58,11 @@ describe('CLI Cache -> Purge', () => {
 
     const deleteWritableContentPropertySpy = vitest.spyOn(
       (incremental as any).config,
-      'deleteProperty'
+      'deleteProperty',
     );
     const writeConfigSpy = vitest.spyOn(
       (incremental as any).config,
-      'writeConfig'
+      'writeConfig',
     );
 
     await expect(incremental.cachePurge()).rejects.toThrow('No cache found.');

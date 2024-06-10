@@ -7,7 +7,7 @@ import { LogLevel } from './LogLevel.enum';
 export function filter(): (
   target: unknown,
   propertyKey: string,
-  descriptor: PropertyDescriptor
+  descriptor: PropertyDescriptor,
 ) => void {
   return function (_target, _propertyKey, descriptor): PropertyDescriptor {
     const valueDescriptor = descriptor.value;

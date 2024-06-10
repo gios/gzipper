@@ -54,7 +54,7 @@ class CompressWorker {
         const fileInfo = await this.compressFile(
           path.basename(filePath),
           path.dirname(filePath),
-          compressionInstance
+          compressionInstance,
         );
 
         if (!fileInfo.removeCompressed && !fileInfo.isSkipped) {
@@ -68,8 +68,8 @@ class CompressWorker {
               compressionInstance,
               filePath,
               fileInfo as CompressedFile,
-              hrTimeEnd
-            )
+              hrTimeEnd,
+            ),
           );
         }
       }
@@ -87,7 +87,7 @@ class CompressWorker {
   private async compressFile(
     filename: string,
     target: string,
-    compressionInstance: CompressionType
+    compressionInstance: CompressionType,
   ): Promise<Partial<CompressedFile>> {
     const createCompression = await compressionInstance.getCompression();
     let isCached = false;
@@ -103,7 +103,7 @@ class CompressWorker {
     const outputPath = this.getOutputPath(
       target,
       filename,
-      compressionInstance.ext
+      compressionInstance.ext,
     );
 
     if (this.options.skipCompressed) {
@@ -119,29 +119,29 @@ class CompressWorker {
         inputPath,
         checksum,
         compressionInstance.compressionName,
-        compressionInstance.compressionOptions
+        compressionInstance.compressionOptions,
       );
 
       const cachedFile = path.resolve(
         this.incremental.cacheFolder,
-        fileId as string
+        fileId as string,
       );
 
       if (isChanged) {
         await pipeline(
           createReadStream(inputPath),
           createCompression,
-          createWriteStream(outputPath)
+          createWriteStream(outputPath),
         );
 
         await pipeline(
           createReadStream(outputPath),
-          createWriteStream(cachedFile)
+          createWriteStream(cachedFile),
         );
       } else {
         await pipeline(
           createReadStream(cachedFile),
-          createWriteStream(outputPath)
+          createWriteStream(outputPath),
         );
         isCached = true;
       }
@@ -149,7 +149,7 @@ class CompressWorker {
       await pipeline(
         createReadStream(inputPath),
         createCompression,
-        createWriteStream(outputPath)
+        createWriteStream(outputPath),
       );
     }
 
@@ -184,7 +184,7 @@ class CompressWorker {
       ['[compressExt]', ext],
     ]);
     let filename = `${artifactsMap.get('[filename]')}.${artifactsMap.get(
-      '[ext]'
+      '[ext]',
     )}.${artifactsMap.get('[compressExt]')}`;
 
     if (this.options.outputFileFormat) {
@@ -202,7 +202,7 @@ class CompressWorker {
           } else {
             return artifact;
           }
-        }
+        },
       );
     }
 
@@ -216,7 +216,7 @@ class CompressWorker {
     compressionInstance: CompressionType,
     file: string,
     fileInfo: CompressedFile,
-    hrtime: [number, number]
+    hrtime: [number, number],
   ): string {
     const fileRelative = path.relative(this.target, file);
     const compressionName = compressionInstance.compressionName;
@@ -225,7 +225,7 @@ class CompressWorker {
     }
 
     const getSize = `${Helpers.readableSize(
-      fileInfo.beforeSize
+      fileInfo.beforeSize,
     )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
     const getTime = Helpers.readableHrtime(hrtime);
     const fileMessage = fileInfo.isCached

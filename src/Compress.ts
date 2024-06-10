@@ -36,7 +36,7 @@ export class Compress {
   constructor(
     target: string,
     outputPath?: string | null,
-    options: CompressOptions = {}
+    options: CompressOptions = {},
   ) {
     Logger.setOptions({
       verbose: options.verbose,
@@ -97,7 +97,7 @@ export class Compress {
         `${filesCount} ${
           filesCount > 1 ? 'files have' : 'file has'
         } been compressed. (${Helpers.readableHrtime(hrtime)})`,
-        LogLevel.SUCCESS
+        LogLevel.SUCCESS,
       );
     } else {
       Logger.log(NO_FILES_MESSAGE, LogLevel.WARNING);
@@ -131,7 +131,7 @@ export class Compress {
       } else if (
         fileStat.isFile() &&
         this.service.isValidFileExtensions(
-          path.extname(filePath).slice(1) as CompressionExtensions
+          path.extname(filePath).slice(1) as CompressionExtensions,
         )
       ) {
         if (fileStat.size < (this.options.threshold ?? 0)) {
@@ -166,7 +166,7 @@ export class Compress {
       {
         files: [],
         filePaths: {},
-      } as WorkerMessage
+      } as WorkerMessage,
     );
   }
 
@@ -180,7 +180,7 @@ export class Compress {
           __dirname,
           process.env.NODE_ENV !== 'test'
             ? './Compress.worker.js'
-            : '../test/__mocks__/Compress.worker.import.js'
+            : '../test/__mocks__/Compress.worker.import.js',
         ),
         {
           workerData: {
@@ -192,11 +192,11 @@ export class Compress {
             incrementalFilePaths:
               this.options.incremental &&
               Helpers.filterObject(this.incremental.filePaths, (key) =>
-                chunk.includes(key)
+                chunk.includes(key),
               ),
           },
           execArgv: [...process.execArgv, '--unhandled-rejections=strict'],
-        }
+        },
       );
 
       worker.on('online', () => {

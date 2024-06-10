@@ -36,7 +36,7 @@ export class Incremental implements Cache {
     this._cacheFolder = path.resolve(
       process.cwd(),
       CONFIG_FOLDER,
-      CACHE_FOLDER
+      CACHE_FOLDER,
     );
   }
 
@@ -75,7 +75,7 @@ export class Incremental implements Cache {
     target: string,
     checksum: string,
     compressionType: string,
-    compressOptions: IncrementalFileValue['revisions'][number]['options']
+    compressOptions: IncrementalFileValue['revisions'][number]['options'],
   ): {
     isChanged: boolean;
     fileId: string;
@@ -84,7 +84,7 @@ export class Incremental implements Cache {
     const selectedRevision = filePath?.revisions.find(
       (revision) =>
         compressionType === revision.compressionType &&
-        deepEqual(revision.options, compressOptions)
+        deepEqual(revision.options, compressOptions),
     );
 
     if (!filePath) {
@@ -169,7 +169,7 @@ export class Incremental implements Cache {
     }
 
     const recursiveRemove = async (
-      folderPath = this._cacheFolder
+      folderPath = this._cacheFolder,
     ): Promise<void> => {
       const files = await readdir(folderPath);
 

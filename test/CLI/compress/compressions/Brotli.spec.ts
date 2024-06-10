@@ -44,44 +44,44 @@ describe('CLI Compress -> Brotli compression', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression BROTLI | paramMode: 1, quality: 10, sizeHint: 5',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       2,
       'Default output file format: [filename].[ext].[compressExt]',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenNthCalledWith(
       3,
       expect.stringMatching(/\[\d+\] Worker has started./),
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('br');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(3);
     expect(Object.keys((compress as any).options).length).toBe(4);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
-      ]
+      ],
     ).toBe(zlib.constants.BROTLI_MODE_TEXT);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_QUALITY
-      ]
+      ],
     ).toBe(10);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_SIZE_HINT
-      ]
+      ],
     ).toBe(5);
   });
 
@@ -101,24 +101,24 @@ describe('CLI Compress -> Brotli compression', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression BROTLI | paramMode: 0',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('br');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(1);
     expect(Object.keys((compress as any).options).length).toBe(2);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
-      ]
+      ],
     ).toBe(zlib.constants.BROTLI_MODE_GENERIC);
   });
 
@@ -138,24 +138,24 @@ describe('CLI Compress -> Brotli compression', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression BROTLI | paramMode: 0',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('br');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(1);
     expect(Object.keys((compress as any).options).length).toBe(2);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
-      ]
+      ],
     ).toBe(zlib.constants.BROTLI_MODE_GENERIC);
   });
 
@@ -174,24 +174,24 @@ describe('CLI Compress -> Brotli compression', () => {
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
       'Compression BROTLI | paramMode: 2',
-      LogLevel.INFO
+      LogLevel.INFO,
     );
     expect(logSpy).toHaveBeenLastCalledWith(
       expect.stringMatching(
-        new RegExp(`${files.length} files have been compressed. (.+)`)
+        new RegExp(`${files.length} files have been compressed. (.+)`),
       ),
-      LogLevel.SUCCESS
+      LogLevel.SUCCESS,
     );
     expect((compress as any).compressionInstances[0].ext).toBe('br');
     expect(
       Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length
+        .length,
     ).toBe(1);
     expect(Object.keys((compress as any).options).length).toBe(2);
     expect(
       (compress as any).compressionInstances[0].compressionOptions[
         zlib.constants.BROTLI_PARAM_MODE
-      ]
+      ],
     ).toBe(zlib.constants.BROTLI_MODE_FONT);
   });
 });
