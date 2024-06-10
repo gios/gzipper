@@ -11,4 +11,7 @@ export default tseslint.config(
   ...tseslint.configs.stylistic,
   eslintConfigPrettier,
   eslintPluginVitest.configs.recommended,
+  {
+    ignores: ['dist/'],
+  },
 );

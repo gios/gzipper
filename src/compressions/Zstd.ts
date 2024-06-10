@@ -1,7 +1,7 @@
 import stream from 'node:stream';
 
 import { Compression } from './Compression';
-import { CompressOptions, ZstdOptions } from '../interfaces';
+import { ZstdOptions } from '../interfaces';
 import { CompressionExtensions, CompressionNames } from '../enums';
 
 /**
@@ -10,12 +10,6 @@ import { CompressionExtensions, CompressionNames } from '../enums';
 export class ZstdCompression extends Compression<ZstdOptions> {
   readonly compressionName = CompressionNames.ZSTD;
   readonly ext = CompressionExtensions.ZSTD;
-  /**
-   * Creates an instance of ZstdCompression.
-   */
-  constructor(options: CompressOptions) {
-    super(options);
-  }
 
   /**
    * Returns zstd compression instance in closure.

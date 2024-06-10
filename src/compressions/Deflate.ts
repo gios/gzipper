@@ -1,7 +1,7 @@
 import zlib from 'node:zlib';
 
 import { Compression } from './Compression';
-import { CompressOptions, CompressionOptions } from '../interfaces';
+import { CompressionOptions } from '../interfaces';
 import { CompressionExtensions, CompressionNames } from '../enums';
 
 /**
@@ -10,12 +10,6 @@ import { CompressionExtensions, CompressionNames } from '../enums';
 export class DeflateCompression extends Compression<CompressionOptions> {
   readonly compressionName = CompressionNames.DEFLATE;
   readonly ext = CompressionExtensions.DEFLATE;
-  /**
-   * Creates an instance of DeflateCompression.
-   */
-  constructor(options: CompressOptions) {
-    super(options);
-  }
 
   /**
    * Returns deflate compression instance in closure.

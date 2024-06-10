@@ -7,14 +7,14 @@ import { Helpers } from './helpers';
 
 export class Config {
   private readonly _configFile: string;
-  private _configContent: FileConfig = {} as FileConfig;
+  private _configContent = new Map<string, FileConfig[keyof FileConfig]>();
 
   get configContent(): Readonly<FileConfig> {
-    return this._configContent;
+    return Object.fromEntries(this._configContent);
   }
 
   set configContent(value: Readonly<FileConfig>) {
-    this._configContent = value;
+    this._configContent = new Map(Object.entries(value));
   }
 
   /**
@@ -31,7 +31,9 @@ export class Config {
   async readConfig(): Promise<void> {
     if (await Helpers.checkFileExists(this._configFile)) {
       const response = await Helpers.readFile(this._configFile);
-      this._configContent = JSON.parse(response.toString());
+      this._configContent = new Map(
+        Object.entries(JSON.parse(response.toString())),
+      );
     }
   }
 
@@ -42,14 +44,14 @@ export class Config {
     field: T,
     content: K,
   ): void {
-    this._configContent[field] = content;
+    this._configContent.set(field, content);
   }
 
   /**
    * delete property from config file (.gzipperconfig).
    */
   deleteProperty<T extends keyof FileConfig>(field: T): void {
-    delete this._configContent[field];
+    this._configContent.delete(field);
   }
 
   /**
@@ -58,7 +60,7 @@ export class Config {
   async writeConfig(): Promise<void> {
     await writeFile(
       path.resolve(this._configFile),
-      JSON.stringify(this._configContent, null, 2),
+      JSON.stringify(Object.fromEntries(this._configContent), null, 2),
     );
   }
 }

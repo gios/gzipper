@@ -1,5 +1,5 @@
 import { Compression } from './Compression';
-import { CompressOptions, ZopfliOptions } from '../interfaces';
+import { ZopfliOptions } from '../interfaces';
 import { CompressionExtensions, CompressionNames } from '../enums';
 import { ZopfliStream } from './ZopfliStream';
 
@@ -9,12 +9,6 @@ import { ZopfliStream } from './ZopfliStream';
 export class ZopfliCompression extends Compression<ZopfliOptions> {
   readonly compressionName = CompressionNames.ZOPFLI;
   readonly ext = CompressionExtensions.GZIP;
-  /**
-   * Creates an instance of ZopfliCompression
-   */
-  constructor(options: CompressOptions) {
-    super(options);
-  }
 
   /**
    * Returns zopfli compression instance in closure.

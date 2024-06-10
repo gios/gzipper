@@ -1,7 +1,7 @@
 import zlib from 'node:zlib';
 
 import { Compression } from './Compression';
-import { CompressOptions, CompressionOptions } from '../interfaces';
+import { CompressionOptions } from '../interfaces';
 import { CompressionExtensions, CompressionNames } from '../enums';
 
 /**
@@ -10,12 +10,6 @@ import { CompressionExtensions, CompressionNames } from '../enums';
 export class GzipCompression extends Compression<CompressionOptions> {
   readonly compressionName = CompressionNames.GZIP;
   readonly ext = CompressionExtensions.GZIP;
-  /**
-   * Creates an instance of GzipCompression.
-   */
-  constructor(options: CompressOptions) {
-    super(options);
-  }
 
   /**
    * Returns gzip compression instance in closure.
