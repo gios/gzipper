@@ -47,7 +47,7 @@ describe('CLI Cache -> Purge', () => {
     expect(writeConfigSpy).toHaveBeenCalledTimes(1)
 
     const cacheExist = await Helpers.checkFileExists(cachePath)
-    expect(cacheExist)
+    expect(cacheExist).toBeFalsy()
   })
 
   it("should throw error if cache doesn't exists", async () => {

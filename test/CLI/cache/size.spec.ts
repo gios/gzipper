@@ -30,15 +30,15 @@ describe('CLI Cache -> Size', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true)
   })
 
-  it('should returns cache size if exists', async () => {
+  it('should return cache size if exists', async () => {
     const options: CompressOptions = { incremental: true }
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache')
     const compress = new Compress(compressTestPath, null, options)
     await compress.run()
     const config = new Config()
     const incremental = new Incremental(config)
-    const size = await incremental.cacheSize()
 
+    const size = await incremental.cacheSize()
     expect(size).toBeGreaterThan(0)
     const cacheExist = await Helpers.checkFileExists(cachePath)
     expect(cacheExist).toBeTruthy()
