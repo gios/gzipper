@@ -1,14 +1,8 @@
-name: 'Setup pnpm'
-description: 'Setup pnpm'
+name: 'Install pnpm dependencies'
+description: 'Install pnpm dependencies'
 runs:
   using: 'composite'
   steps:
-    - uses: pnpm/action-setup@v4
-      name: Install pnpm
-      with:
-        version: 8
-        run_install: false
-
     - name: Get pnpm store directory
       shell: bash
       run: |

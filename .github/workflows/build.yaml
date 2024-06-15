@@ -18,14 +18,20 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
+
       - name: Use Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
-      - name: Setup pnpm
-        uses: ./.github/actions/pnpm-setup
+      - name: Install pnpm dependencies
+        uses: ./.github/actions/install-pnpm-dependencies
 
       - name: Install and Validate
         run: |
