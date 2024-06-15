@@ -23,7 +23,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Setup pnpm
-        uses: actions/pnpm-setup
+        uses: ../actions/pnpm-setup
 
       - name: Validate
         run: |
@@ -46,7 +46,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Setup pnpm
-        uses: actions/pnpm-setup
+        uses: ../actions/pnpm-setup
 
       - name: Build
         run: pnpm run build
