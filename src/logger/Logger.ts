@@ -1,4 +1,3 @@
-import { filter } from './filter.decorator';
 import { LogLevel } from './LogLevel.enum';
 import { getLogColor } from '../helpers';
 import { CompressOptions } from '../interfaces';
@@ -52,8 +51,12 @@ export class Logger {
   /**
    * Log message.
    */
-  @filter()
   log<T>(message: T, level: LogLevel = LogLevel.DEBUG): void {
-    return this.logger(message, level);
+    const shouldLog =
+      this.verbose || level === LogLevel.SUCCESS || level === LogLevel.ERROR;
+
+    if (shouldLog) {
+      this.logger(message, level);
+    }
   }
 }
