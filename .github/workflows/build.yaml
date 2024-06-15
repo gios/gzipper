@@ -28,6 +28,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Install pnpm dependencies
         uses: ./.github/actions/install-pnpm-dependencies
