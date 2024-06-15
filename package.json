@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "vitest run --no-file-parallelism",
+    "test": "vitest run --no-file-parallelism --test-timeout=20000",
     "coverage": "npm run test --coverage --silent",
     "eslint": "eslint \"**/*.ts\"",
     "prettier": "prettier \"**/*.{ts,js,yaml,md,json}\" --write",

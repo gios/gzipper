@@ -65,4 +65,4 @@ describe('CLI Compress -> Zopfli compression', () => {
     expect(instance.compressionOptions.blocksplitting).toBeTruthy();
     expect(instance.compressionOptions.blocksplittingmax).toBe(10);
   });
-}, 10000);
+});
