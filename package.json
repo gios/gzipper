@@ -8,7 +8,7 @@
     "test": "vitest run --no-file-parallelism",
     "coverage": "npm run test --coverage --silent",
     "eslint": "eslint \"**/*.ts\"",
-    "prettier": "prettier \"**/*.ts\" --write",
+    "prettier": "prettier \"**/*.{ts,js,yaml}\" --write",
     "build": "rimraf dist && tsc && copyfiles -f package.json package-lock.json README.md LICENSE CHANGELOG.md dist/"
   },
   "repository": {
