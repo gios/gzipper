@@ -23,9 +23,9 @@ jobs:
 
       - name: Install and Validate
         run: |
-          npm install
-          npm run eslint
-          npm run test
+          pnpm install
+          pnpm run eslint
+          pnpm run test
 
   publish:
     needs: test
@@ -42,12 +42,12 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install
-        run: npm install
+        run: pnpm install
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Publish
-        run: cd dist && npm publish
+        run: cd dist && pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
