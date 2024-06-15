@@ -52,8 +52,7 @@ export class Logger {
    * Log message.
    */
   log<T>(message: T, level: LogLevel = LogLevel.DEBUG): void {
-    const shouldLog =
-      this.verbose || level === LogLevel.SUCCESS || level === LogLevel.ERROR;
+    const shouldLog = this.verbose || level === LogLevel.ERROR;
 
     if (shouldLog) {
       this.logger(message, level);
