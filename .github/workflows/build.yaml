@@ -36,5 +36,6 @@ jobs:
       - name: Install and Validate
         run: |
           pnpm run eslint
+          pnpm run tsc
           pnpm run test
           pnpm run build

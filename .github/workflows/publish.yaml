@@ -34,6 +34,7 @@ jobs:
       - name: Validate
         run: |
           pnpm run eslint
+          pnpm run tsc
           pnpm run test
 
   publish:
