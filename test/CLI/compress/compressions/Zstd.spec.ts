@@ -8,7 +8,6 @@ import {
   GZIPPER_CONFIG_FOLDER,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
-import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 import { ZstdCompression } from '../../../../src/compressions/Zstd';
 
@@ -35,7 +34,7 @@ describe('CLI Compress -> Zstd compression', () => {
       zstdLevel: 3,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.zst']);
     const instance = compress.compressionInstances[0] as ZstdCompression;

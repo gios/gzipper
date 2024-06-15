@@ -12,7 +12,6 @@ import {
 import { CompressOptions } from '../../../src/interfaces';
 import { NO_FILES_MESSAGE } from '../../../src/constants';
 import { LogLevel } from '../../../src/logger/LogLevel.enum';
-import { Logger } from '../../../src/logger/Logger';
 import { CompressionNames } from '../../../src/enums';
 import { GzipCompression } from '../../../src/compressions/Gzip';
 import { DeflateCompression } from '../../../src/compressions/Deflate';
@@ -46,7 +45,7 @@ describe('CLI Compress', () => {
       targetFolderTestPath,
       options,
     );
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     const files = await getFiles(compressTestPath);
     await compress.run();
     const compressedFiles = await getFiles(targetFolderTestPath);
@@ -90,7 +89,7 @@ describe('CLI Compress', () => {
   it('should throw on compress error', async () => {
     const compress = new Compress(compressTestPath, null);
     const createWorkersSpy = vitest.spyOn(compress, 'createWorkers' as never);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     const runCompressWorkerSpy = vitest
       .spyOn(compress as never, 'runCompressWorker')
       .mockRejectedValueOnce(new Error('Compressing error.'));
@@ -139,7 +138,7 @@ describe('CLI Compress', () => {
       ],
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const instance = compress.compressionInstances[0];
 
@@ -156,7 +155,7 @@ describe('CLI Compress', () => {
 
   it('should print message about empty folder', async () => {
     const compress = new Compress(emptyFolderTestPath, null);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const instance = compress.compressionInstances[0];
 
@@ -174,7 +173,7 @@ describe('CLI Compress', () => {
   it('should compress a single file to a certain folder', async () => {
     const file = `${compressTestPath}${path.sep}index.txt`;
     const compress = new Compress(file, targetFolderTestPath);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const compressedFiles = await getFiles(targetFolderTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -206,7 +205,7 @@ describe('CLI Compress', () => {
 
   it('should compress files to a certain folder with existing folder structure', async () => {
     const compress = new Compress(compressTestPath, targetFolderTestPath);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath);
     const compressedFiles = await getFiles(targetFolderTestPath, ['.gz']);
@@ -254,7 +253,7 @@ describe('CLI Compress', () => {
 
   it('should use default file format artifacts via --output-file-format', async () => {
     const compress = new Compress(compressTestPath, null);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     const files = await getFiles(compressTestPath);
     await compress.run();
     const compressedFiles = await getFiles(compressTestPath, ['.gz']);
@@ -334,7 +333,7 @@ describe('CLI Compress', () => {
       include: ['sunny'],
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -365,7 +364,7 @@ describe('CLI Compress', () => {
       return !(ext === '.jpeg' || ext === '.jpg');
     });
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -391,7 +390,7 @@ describe('CLI Compress', () => {
     const compress = new Compress(compressTestPath, null);
     await compress.run();
     const filesBefore = await getFiles(compressTestPath, ['.gz']);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const filesAfter = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -428,7 +427,7 @@ describe('CLI Compress', () => {
       ++includedFiles;
     }
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const filesGzipped = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -455,7 +454,7 @@ describe('CLI Compress', () => {
       removeLarger: true,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -489,7 +488,7 @@ describe('CLI Compress', () => {
     await compress.run();
 
     const filesBefore = await getFiles(targetFolderTestPath, ['.gz']);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const filesAfter = await getFiles(targetFolderTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -517,7 +516,7 @@ describe('CLI Compress', () => {
     await compress.run();
 
     const filesBefore = await getFiles(compressTestPath, ['.gz']);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const filesAfter = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -545,7 +544,7 @@ describe('CLI Compress', () => {
     await compress.run();
 
     const filesBefore = await getFiles(compressTestPath, ['.gz']);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const filesAfter = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0];
@@ -575,7 +574,7 @@ describe('CLI Compress', () => {
       brotliQuality: 2,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
 
     const gzipFiles = await getFiles(compressTestPath, ['.gz']);

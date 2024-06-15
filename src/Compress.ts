@@ -2,7 +2,13 @@ import { lstat, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { Worker } from 'node:worker_threads';
 
-import { Helpers } from './helpers';
+import {
+  createFolders,
+  readableHrtime,
+  getCPUs,
+  chunkArray,
+  filterObject,
+} from './helpers';
 import { Logger } from './logger/Logger';
 import {
   NO_FILES_MESSAGE,
@@ -27,6 +33,7 @@ export class Compress {
   private readonly outputPath: string | undefined;
   private readonly target: string;
   private readonly service: CompressService;
+  readonly logger: Logger;
   readonly options: CompressOptions;
   readonly compressionInstances: CompressionType[];
 
@@ -38,14 +45,15 @@ export class Compress {
     outputPath?: string | null,
     options: CompressOptions = {},
   ) {
-    Logger.setOptions({
+    this.logger = new Logger();
+    this.logger.initialize({
       verbose: options.verbose,
       color: options.color,
     });
     this.config = new Config();
     if (!target) {
       const message = NO_PATH_MESSAGE;
-      Logger.log(message, LogLevel.ERROR);
+      this.logger.log(message, LogLevel.ERROR);
       throw new Error(message);
     }
     if (outputPath) {
@@ -68,11 +76,11 @@ export class Compress {
     let hrtime: [number, number];
     try {
       if (this.outputPath) {
-        await Helpers.createFolders(this.outputPath);
+        await createFolders(this.outputPath);
       }
       if (this.options.incremental) {
         await this.config.readConfig();
-        Logger.log(INCREMENTAL_ENABLE_MESSAGE, LogLevel.INFO);
+        this.logger.log(INCREMENTAL_ENABLE_MESSAGE, LogLevel.INFO);
         await this.incremental.initCacheFolder();
         await this.incremental.readConfig();
       }
@@ -87,20 +95,20 @@ export class Compress {
         await this.config.writeConfig();
       }
     } catch (error) {
-      Logger.log(error as Error, LogLevel.ERROR);
+      this.logger.log(error as Error, LogLevel.ERROR);
       throw new Error((error as Error).message);
     }
 
     const filesCount = files.length;
     if (filesCount) {
-      Logger.log(
+      this.logger.log(
         `${filesCount} ${
           filesCount > 1 ? 'files have' : 'file has'
-        } been compressed. (${Helpers.readableHrtime(hrtime)})`,
+        } been compressed. (${readableHrtime(hrtime)})`,
         LogLevel.SUCCESS,
       );
     } else {
-      Logger.log(NO_FILES_MESSAGE, LogLevel.WARNING);
+      this.logger.log(NO_FILES_MESSAGE, LogLevel.WARNING);
     }
 
     return files;
@@ -149,11 +157,9 @@ export class Compress {
   private async createWorkers(): Promise<WorkerMessage> {
     const files = await this.getFilesToCompress();
     const cpus =
-      process.env.NODE_ENV !== 'test'
-        ? this.options.workers || Helpers.getCPUs()
-        : 1;
+      process.env.NODE_ENV !== 'test' ? this.options.workers || getCPUs() : 1;
     const size = Math.ceil(files.length / cpus);
-    const chunks = Helpers.chunkArray(files, size);
+    const chunks = chunkArray(files, size);
     const workers = chunks.map((chunk) => this.runCompressWorker(chunk));
     const results = await Promise.all(workers);
     return results.reduce(
@@ -191,7 +197,7 @@ export class Compress {
             options: this.options,
             incrementalFilePaths:
               this.options.incremental &&
-              Helpers.filterObject(this.incremental.filePaths, (key) =>
+              filterObject(this.incremental.filePaths, (key) =>
                 chunk.includes(key),
               ),
           },
@@ -200,7 +206,10 @@ export class Compress {
       );
 
       worker.on('online', () => {
-        Logger.log(`[${worker.threadId}] ${WORKER_STARTED}`, LogLevel.INFO);
+        this.logger.log(
+          `[${worker.threadId}] ${WORKER_STARTED}`,
+          LogLevel.INFO,
+        );
       });
 
       worker.once('message', (result) => {
@@ -220,11 +229,14 @@ export class Compress {
    */
   private compressionLog(): void {
     for (const instance of this.compressionInstances) {
-      Logger.log(`Compression ${instance.readableOptions()}`, LogLevel.INFO);
+      this.logger.log(
+        `Compression ${instance.readableOptions()}`,
+        LogLevel.INFO,
+      );
     }
 
     if (!this.options.outputFileFormat) {
-      Logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
+      this.logger.log(DEFAULT_OUTPUT_FORMAT_MESSAGE, LogLevel.INFO);
     }
   }
 }

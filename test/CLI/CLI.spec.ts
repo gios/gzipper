@@ -3,10 +3,8 @@ import { describe, beforeEach, it, vitest, expect } from 'vitest';
 import { Index } from '../../src/bin';
 import { Compress } from '../../src/Compress';
 import { CompressOptions } from '../../src/interfaces';
-import { Logger } from '../../src/logger/Logger';
 import { Incremental } from '../../src/Incremental';
 import { LogLevel } from '../../src/logger/LogLevel.enum';
-import { Helpers } from '../../src/helpers';
 
 describe('Index CLI', () => {
   beforeEach(() => {
@@ -60,9 +58,9 @@ describe('Index CLI', () => {
       '--no-color',
     ];
     const index = new Index();
-    (index as any).argv = cliArguments;
-    const runCompressSpy = vitest.spyOn(index as any, 'runCompress');
-    const filterOptionsSpy = vitest.spyOn(index as any, 'filterOptions');
+    index.argv = cliArguments;
+    const runCompressSpy = vitest.spyOn(index as never, 'runCompress');
+    const filterOptionsSpy = vitest.spyOn(index as never, 'filterOptions');
     const compressRunSpy = vitest
       .spyOn(Compress.prototype, 'run')
       .mockResolvedValueOnce([]);
@@ -220,10 +218,10 @@ describe('Index CLI', () => {
       '--no-color',
     ];
     const index = new Index();
-    (index as any).argv = cliArguments;
-    (index as any).env = envArguments;
-    const runCompressSpy = vitest.spyOn(index as any, 'runCompress');
-    const filterOptionsSpy = vitest.spyOn(index as any, 'filterOptions');
+    index.argv = cliArguments;
+    index.env = envArguments;
+    const runCompressSpy = vitest.spyOn(index as never, 'runCompress');
+    const filterOptionsSpy = vitest.spyOn(index as never, 'filterOptions');
     const compressRunSpy = vitest
       .spyOn(Compress.prototype, 'run')
       .mockResolvedValueOnce([]);
@@ -303,8 +301,8 @@ describe('Index CLI', () => {
   it("cache purge should exec 'cachePurge' and throw the SUCCESS message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
-    (index as any).argv = cliArguments;
-    const loggerLogSpy = vitest.spyOn(Logger, 'log');
+    index.argv = cliArguments;
+    const loggerLogSpy = vitest.spyOn(index.logger, 'log');
     const cachePurgeSpy = vitest
       .spyOn(Incremental.prototype, 'cachePurge')
       .mockResolvedValueOnce();
@@ -322,8 +320,8 @@ describe('Index CLI', () => {
   it("cache size should exec 'cacheSize' and throw the info message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
-    (index as any).argv = cliArguments;
-    const loggerLogSpy = vitest.spyOn(Logger, 'log');
+    index.argv = cliArguments;
+    const loggerLogSpy = vitest.spyOn(index.logger, 'log');
     const cachePurgeSpy = vitest.spyOn(Incremental.prototype, 'cachePurge');
     const cacheSizeSpy = vitest
       .spyOn(Incremental.prototype, 'cacheSize')
@@ -341,9 +339,8 @@ describe('Index CLI', () => {
   it("cache size should exec 'cacheSize', 'readableSize' and throw the info message", async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
-    (index as any).argv = cliArguments;
-    const loggerLogSpy = vitest.spyOn(Logger, 'log');
-    const readableSizeSpy = vitest.spyOn(Helpers, 'readableSize');
+    index.argv = cliArguments;
+    const loggerLogSpy = vitest.spyOn(index.logger, 'log');
     const cachePurgeSpy = vitest.spyOn(Incremental.prototype, 'cachePurge');
     const cacheSizeSpy = vitest
       .spyOn(Incremental.prototype, 'cacheSize')
@@ -356,14 +353,13 @@ describe('Index CLI', () => {
     );
     expect(cachePurgeSpy).toHaveBeenCalledTimes(0);
     expect(cacheSizeSpy).toHaveBeenCalledTimes(1);
-    expect(readableSizeSpy).toHaveBeenCalledTimes(1);
   });
 
   it('cache size should throw the error message', async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'size'];
     const index = new Index();
-    (index as any).argv = cliArguments;
-    const loggerLogSpy = vitest.spyOn(Logger, 'log');
+    index.argv = cliArguments;
+    const loggerLogSpy = vitest.spyOn(index.logger, 'log');
     const cachePurgeSpy = vitest.spyOn(Incremental.prototype, 'cachePurge');
     const cacheSizeSpy = vitest
       .spyOn(Incremental.prototype, 'cacheSize')
@@ -378,8 +374,8 @@ describe('Index CLI', () => {
   it('cache purge should throw the error message', async () => {
     const cliArguments = ['node.exe', 'index.js', 'cache', 'purge'];
     const index = new Index();
-    (index as any).argv = cliArguments;
-    const loggerLogSpy = vitest.spyOn(Logger, 'log');
+    index.argv = cliArguments;
+    const loggerLogSpy = vitest.spyOn(index.logger, 'log');
     const cachePurgeSpy = vitest
       .spyOn(Incremental.prototype, 'cachePurge')
       .mockRejectedValueOnce('Error');

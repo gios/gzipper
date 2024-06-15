@@ -6,7 +6,7 @@ import { Compress } from '../../../src/Compress';
 import { Config } from '../../../src/Config';
 import { Incremental } from '../../../src/Incremental';
 import { CompressOptions } from '../../../src/interfaces';
-import { Helpers } from '../../../src/helpers';
+import { checkFileExists } from '../../../src/helpers';
 
 describe('CLI Cache -> Purge', () => {
   let testPath: string;
@@ -34,15 +34,12 @@ describe('CLI Cache -> Purge', () => {
     const incremental = new Incremental(config);
 
     const deleteWritableContentPropertySpy = vitest.spyOn(
-      (incremental as any).config,
+      incremental.config,
       'deleteProperty',
     );
-    const writeConfigSpy = vitest.spyOn(
-      (incremental as any).config,
-      'writeConfig',
-    );
+    const writeConfigSpy = vitest.spyOn(incremental.config, 'writeConfig');
     await incremental.cachePurge();
-    const cacheExist = await Helpers.checkFileExists(cachePath);
+    const cacheExist = await checkFileExists(cachePath);
 
     expect(deleteWritableContentPropertySpy).toHaveBeenCalledTimes(1);
     expect(deleteWritableContentPropertySpy).toHaveBeenCalledWith(
@@ -57,13 +54,10 @@ describe('CLI Cache -> Purge', () => {
     const incremental = new Incremental(config);
 
     const deleteWritableContentPropertySpy = vitest.spyOn(
-      (incremental as any).config,
+      incremental.config,
       'deleteProperty',
     );
-    const writeConfigSpy = vitest.spyOn(
-      (incremental as any).config,
-      'writeConfig',
-    );
+    const writeConfigSpy = vitest.spyOn(incremental.config, 'writeConfig');
 
     await expect(incremental.cachePurge()).rejects.toThrow('No cache found.');
     expect(deleteWritableContentPropertySpy).toHaveBeenCalledTimes(0);

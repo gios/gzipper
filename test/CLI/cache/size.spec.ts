@@ -11,7 +11,7 @@ import { Compress } from '../../../src/Compress';
 import { Config } from '../../../src/Config';
 import { Incremental } from '../../../src/Incremental';
 import { CompressOptions } from '../../../src/interfaces';
-import { Helpers } from '../../../src/helpers';
+import { checkFileExists } from '../../../src/helpers';
 
 describe('CLI Cache -> Size', () => {
   let testPath: string;
@@ -40,7 +40,7 @@ describe('CLI Cache -> Size', () => {
 
     const size = await incremental.cacheSize();
     expect(size).toBeGreaterThan(0);
-    const cacheExist = await Helpers.checkFileExists(cachePath);
+    const cacheExist = await checkFileExists(cachePath);
     expect(cacheExist).toBeTruthy();
   });
 

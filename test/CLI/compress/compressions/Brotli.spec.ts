@@ -9,7 +9,6 @@ import {
   generatePaths,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
-import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 import { BrotliCompression } from '../../../../src/compressions/Brotli';
 
@@ -38,7 +37,7 @@ describe('CLI Compress -> Brotli compression', () => {
       brotliSizeHint: 5,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.br']);
     const instance = compress.compressionInstances[0] as BrotliCompression;
@@ -87,7 +86,7 @@ describe('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.br']);
     const instance = compress.compressionInstances[0] as BrotliCompression;
@@ -120,7 +119,7 @@ describe('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.br']);
     const instance = compress.compressionInstances[0] as BrotliCompression;
@@ -153,7 +152,7 @@ describe('CLI Compress -> Brotli compression', () => {
       return;
     }
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.br']);
     const instance = compress.compressionInstances[0] as BrotliCompression;

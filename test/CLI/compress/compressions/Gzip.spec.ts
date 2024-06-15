@@ -8,7 +8,6 @@ import {
   generatePaths,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
-import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 import { GzipCompression } from '../../../../src/compressions/Gzip';
 
@@ -36,7 +35,7 @@ describe('CLI Compress -> Gzip compression', () => {
       gzipStrategy: 2,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0] as GzipCompression;

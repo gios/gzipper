@@ -9,7 +9,7 @@ import {
 } from 'node:fs/promises';
 import crypto from 'node:crypto';
 
-import { Helpers } from '../src/helpers';
+import { checkFileExists } from '../src/helpers';
 
 interface GeneratePathsOptions {
   excludeBig: boolean;
@@ -96,14 +96,14 @@ export async function clear(
   directory: string,
   extensions: string[] | boolean,
 ): Promise<void> {
-  if (await Helpers.checkFileExists(directory)) {
+  if (await checkFileExists(directory)) {
     await clearDirectory(directory, extensions);
   }
 }
 
 export async function createFolder(target: string): Promise<string> {
   const folderPath = path.resolve(__dirname, target);
-  if (!(await Helpers.checkFileExists(folderPath))) {
+  if (!(await checkFileExists(folderPath))) {
     await mkdir(folderPath, { recursive: true });
   }
   return folderPath;

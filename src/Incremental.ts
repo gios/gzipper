@@ -5,14 +5,14 @@ import path from 'node:path';
 import deepEqual from 'deep-equal';
 
 import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
-import { Helpers } from './helpers';
+import { mapToJSON, checkFileExists, createFolders } from './helpers';
 import { Cache, IncrementalFileValue } from './interfaces';
 import { Config } from './Config';
 
 export class Incremental implements Cache {
-  private readonly config!: Config;
   private readonly _cacheFolder: string;
   private _filePaths = new Map<string, IncrementalFileValue>();
+  readonly config!: Config;
 
   get cacheFolder(): string {
     return this._cacheFolder;
@@ -55,7 +55,7 @@ export class Incremental implements Cache {
    */
   async updateConfig(): Promise<void> {
     this.config.setProperty('incremental', {
-      files: Helpers.mapToJSON(this._filePaths),
+      files: mapToJSON(this._filePaths),
     });
   }
 
@@ -63,8 +63,8 @@ export class Incremental implements Cache {
    * Create cache folder (.gzipper).
    */
   async initCacheFolder(): Promise<void> {
-    if (!(await Helpers.checkFileExists(this._cacheFolder))) {
-      await Helpers.createFolders(this._cacheFolder);
+    if (!(await checkFileExists(this._cacheFolder))) {
+      await createFolders(this._cacheFolder);
     }
   }
 
@@ -164,7 +164,7 @@ export class Incremental implements Cache {
    * Purge cache folder.
    */
   async cachePurge(): Promise<void> {
-    if (!(await Helpers.checkFileExists(this._cacheFolder))) {
+    if (!(await checkFileExists(this._cacheFolder))) {
       throw new Error('No cache found.');
     }
 
@@ -196,7 +196,7 @@ export class Incremental implements Cache {
    * Returns cache size.
    */
   async cacheSize(folderPath = this._cacheFolder, size = 0): Promise<number> {
-    if (!(await Helpers.checkFileExists(this._cacheFolder))) {
+    if (!(await checkFileExists(this._cacheFolder))) {
       throw new Error('No cache found.');
     }
 

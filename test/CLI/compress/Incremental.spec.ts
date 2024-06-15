@@ -21,8 +21,7 @@ import {
   IncrementalFileValue,
   CompressOptions,
 } from '../../../src/interfaces';
-import { Logger } from '../../../src/logger/Logger';
-import { Helpers } from '../../../src/helpers';
+import { checkFileExists } from '../../../src/helpers';
 
 function getFileRevisions(
   config: FileConfig,
@@ -77,10 +76,10 @@ describe('CLI Compress -> Incremental', () => {
   it('should compress files and create .gzipper folder', async () => {
     const options: CompressOptions = { incremental: true };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
-    const exists = await Helpers.checkFileExists(
+    const exists = await checkFileExists(
       path.resolve(process.cwd(), './.gzipper'),
     );
     const instance = compress.compressionInstances[0];
@@ -119,7 +118,7 @@ describe('CLI Compress -> Incremental', () => {
     await compress.run();
 
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
-    const exists = await Helpers.checkFileExists(configPath);
+    const exists = await checkFileExists(configPath);
     const fileConfig = await readFile(configPath);
     const config = JSON.parse(fileConfig.toString());
 

@@ -7,7 +7,6 @@ import {
   GZIPPER_CONFIG_FOLDER,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
-import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
 import { ZopfliCompression } from '../../../../src/compressions/Zopfli';
 
@@ -38,7 +37,7 @@ describe('CLI Compress -> Zopfli compression', () => {
       zopfliBlockSplittingMax: 10,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = vitest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
     const instance = compress.compressionInstances[0] as ZopfliCompression;

@@ -13,7 +13,12 @@ import {
   WorkerMessage,
 } from './interfaces';
 import { OUTPUT_FILE_FORMAT_REGEXP } from './constants';
-import { Helpers } from './helpers';
+import {
+  createFolders,
+  checkFileExists,
+  readableSize,
+  readableHrtime,
+} from './helpers';
 import { Logger } from './logger/Logger';
 import { CompressService } from './Compress.service';
 import { Incremental } from './Incremental';
@@ -28,13 +33,15 @@ class CompressWorker {
   private readonly incremental!: Incremental;
   private readonly service: CompressService;
   private readonly compressionInstances: CompressionType[];
+  private readonly logger: Logger;
 
   constructor() {
     if (this.options.incremental) {
       this.incremental = new Incremental();
       this.incremental.filePaths = this.incrementalFilePaths;
     }
-    Logger.setOptions({
+    this.logger = new Logger();
+    this.logger.initialize({
       verbose: this.options.verbose,
       color: this.options.color,
     });
@@ -63,7 +70,7 @@ class CompressWorker {
 
         if (this.options.verbose) {
           const hrTimeEnd = process.hrtime(hrtimeStart);
-          Logger.log(
+          this.logger.log(
             this.getCompressedFileMsg(
               compressionInstance,
               filePath,
@@ -98,7 +105,7 @@ class CompressWorker {
       target = isFileTarget
         ? this.outputPath
         : path.join(this.outputPath, path.relative(this.target, target));
-      await Helpers.createFolders(target);
+      await createFolders(target);
     }
     const outputPath = this.getOutputPath(
       target,
@@ -107,7 +114,7 @@ class CompressWorker {
     );
 
     if (this.options.skipCompressed) {
-      if (await Helpers.checkFileExists(outputPath)) {
+      if (await checkFileExists(outputPath)) {
         isSkipped = true;
         return { isCached, isSkipped };
       }
@@ -224,10 +231,10 @@ class CompressWorker {
       return `File ${fileRelative} has been skipped.`;
     }
 
-    const getSize = `${Helpers.readableSize(
+    const getSize = `${readableSize(
       fileInfo.beforeSize,
-    )} -> ${Helpers.readableSize(fileInfo.afterSize)}`;
-    const getTime = Helpers.readableHrtime(hrtime);
+    )} -> ${readableSize(fileInfo.afterSize)}`;
+    const getTime = readableHrtime(hrtime);
     const fileMessage = fileInfo.isCached
       ? `File ${fileRelative} has been retrieved from the cache.`
       : `File ${fileRelative} has been compressed.`;

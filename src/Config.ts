@@ -3,7 +3,7 @@ import { writeFile } from 'node:fs/promises';
 
 import { FileConfig } from './interfaces';
 import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
-import { Helpers } from './helpers';
+import { getVersion, checkFileExists, readFile } from './helpers';
 
 export class Config {
   private readonly _configFile: string;
@@ -22,15 +22,15 @@ export class Config {
    */
   constructor() {
     this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
-    this.setProperty('version', Helpers.getVersion());
+    this.setProperty('version', getVersion());
   }
 
   /**
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    if (await Helpers.checkFileExists(this._configFile)) {
-      const response = await Helpers.readFile(this._configFile);
+    if (await checkFileExists(this._configFile)) {
+      const response = await readFile(this._configFile);
       this._configContent = new Map(
         Object.entries(JSON.parse(response.toString())),
       );
