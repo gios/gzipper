@@ -2,7 +2,7 @@ import { createReadStream } from 'node:fs';
 import { mkdir, access } from 'node:fs/promises';
 import os from 'node:os';
 
-import * as pack from '../package.json';
+import pack from '../package.json';
 
 /**
  * Create folders by path.

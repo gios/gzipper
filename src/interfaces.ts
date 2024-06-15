@@ -37,18 +37,11 @@ export interface CompressOptions {
   color?: boolean;
 }
 
-export type CompressionOptions = {
+export type GenericCompressionOptions = {
   level?: number;
   memoryLevel?: number;
   strategy?: number;
 } & zlib.ZlibOptions;
-
-export type CompressionType =
-  | BrotliCompression
-  | DeflateCompression
-  | GzipCompression
-  | ZopfliCompression
-  | ZstdCompression;
 
 export type BrotliOptions = Record<number, number>;
 
@@ -61,6 +54,19 @@ export interface ZopfliOptions {
   blocksplitting?: boolean;
   blocksplittingmax?: number;
 }
+
+export type CompressionOptions =
+  | GenericCompressionOptions
+  | BrotliOptions
+  | ZstdOptions
+  | ZopfliOptions;
+
+export type CompressionType =
+  | BrotliCompression
+  | DeflateCompression
+  | GzipCompression
+  | ZopfliCompression
+  | ZstdCompression;
 
 export interface CompressedFile {
   beforeSize: number;
@@ -77,7 +83,7 @@ export interface Cache {
 
 export interface FileConfig {
   incremental?: IncrementalConfig;
-  version: string;
+  version?: string;
 }
 
 export interface IncrementalFileValue {
@@ -89,7 +95,7 @@ export interface IncrementalFileValueRevision {
   fileId: string;
   date: Date;
   compressionType: string;
-  options: CompressionOptions | BrotliOptions;
+  options: CompressionOptions;
 }
 
 export interface IncrementalConfig {

@@ -20,7 +20,7 @@ export class CompressService {
   /**
    * Return compression instances.
    */
-  public getCompressionInstances(): CompressionType[] {
+  getCompressionInstances(): CompressionType[] {
     const instances: CompressionType[] = [];
     if (this.options.brotli) {
       instances.push(new BrotliCompression(this.options));
@@ -47,7 +47,7 @@ export class CompressService {
   /**
    * Returns if the file extension is valid.
    */
-  public isValidFileExtensions(ext: CompressionExtensions): boolean {
+  isValidFileExtensions(ext: CompressionExtensions): boolean {
     if (COMPRESSION_EXTENSIONS.includes(ext)) {
       return false;
     }

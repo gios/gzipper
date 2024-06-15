@@ -1,13 +1,13 @@
 import zlib from 'node:zlib';
 
 import { Compression } from './Compression';
-import { CompressionOptions } from '../interfaces';
+import { GenericCompressionOptions } from '../interfaces';
 import { CompressionExtensions, CompressionNames } from '../enums';
 
 /**
  * Deflate compression
  */
-export class DeflateCompression extends Compression<CompressionOptions> {
+export class DeflateCompression extends Compression<GenericCompressionOptions> {
   readonly compressionName = CompressionNames.DEFLATE;
   readonly ext = CompressionExtensions.DEFLATE;
 
@@ -22,7 +22,7 @@ export class DeflateCompression extends Compression<CompressionOptions> {
    * Build deflate compression options object.
    */
   protected selectCompression(): void {
-    const options: CompressionOptions = {};
+    const options: GenericCompressionOptions = {};
 
     if (this.options.deflateLevel !== undefined) {
       options.level = this.options.deflateLevel;

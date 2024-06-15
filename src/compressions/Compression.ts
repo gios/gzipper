@@ -1,8 +1,8 @@
 import stream from 'stream';
 
-import { CompressOptions } from '../interfaces';
+import { CompressOptions, CompressionOptions } from '../interfaces';
 
-export abstract class Compression<T> {
+export abstract class Compression<T extends CompressionOptions> {
   compressionOptions: T = {} as T;
   abstract ext: string;
   abstract compressionName: string;
