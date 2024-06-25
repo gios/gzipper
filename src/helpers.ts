@@ -1,8 +1,7 @@
-import { createReadStream } from 'node:fs';
+import { createReadStream, readFileSync } from 'node:fs';
 import { mkdir, access } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import os from 'node:os';
-
-import pack from '../package.json';
 
 /**
  * Create folders by path.
@@ -28,7 +27,11 @@ export function mapToJSON<K extends string, V>(map: Map<K, V>): Record<K, V> {
  * Returns package version.
  */
 export function getVersion(): string {
-  return pack.version;
+  const file = readFileSync(
+    resolve(import.meta.dirname, '../package.json'),
+    'utf-8',
+  );
+  return JSON.parse(file).version;
 }
 
 /**

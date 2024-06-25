@@ -4,10 +4,10 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import deepEqual from 'deep-equal';
 
-import { CACHE_FOLDER, CONFIG_FOLDER } from './constants';
-import { mapToJSON, checkFileExists, createFolders } from './helpers';
-import { Cache, IncrementalFileValue } from './interfaces';
-import { Config } from './Config';
+import { CACHE_FOLDER, CONFIG_FOLDER } from './constants.js';
+import { mapToJSON, checkFileExists, createFolders } from './helpers.js';
+import { Cache, IncrementalFileValue } from './interfaces.js';
+import { Config } from './Config.js';
 
 export class Incremental implements Cache {
   private readonly _cacheFolder: string;

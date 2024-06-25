@@ -1,8 +1,8 @@
 import stream from 'node:stream';
 
-import { Compression } from './Compression';
-import { ZstdOptions } from '../interfaces';
-import { CompressionExtensions, CompressionNames } from '../enums';
+import { Compression } from './Compression.js';
+import { ZstdOptions } from '../interfaces.js';
+import { CompressionExtensions, CompressionNames } from '../enums.js';
 
 /**
  * Zstd compression

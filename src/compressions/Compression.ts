@@ -1,6 +1,6 @@
 import stream from 'stream';
 
-import { CompressOptions, CompressionOptions } from '../interfaces';
+import { CompressOptions, CompressionOptions } from '../interfaces.js';
 
 export abstract class Compression<T extends CompressionOptions> {
   compressionOptions: T = {} as T;

@@ -1,6 +1,6 @@
-import { LogLevel } from './LogLevel.enum';
-import { getLogColor } from '../helpers';
-import { CompressOptions } from '../interfaces';
+import { LogLevel } from './LogLevel.enum.js';
+import { getLogColor } from '../helpers.js';
+import { CompressOptions } from '../interfaces.js';
 
 export class Logger {
   private verbose = false;

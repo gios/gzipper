@@ -15,8 +15,14 @@ interface GeneratePathsOptions {
   excludeBig: boolean;
 }
 
-export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, './resources');
-export const TEST_FOLDER_PATH = path.resolve(__dirname, './tmp-test-folder');
+export const RESOURCES_FOLDER_PATH = path.resolve(
+  import.meta.dirname,
+  './resources',
+);
+export const TEST_FOLDER_PATH = path.resolve(
+  import.meta.dirname,
+  './tmp-test-folder',
+);
 export const GZIPPER_CONFIG_FOLDER = path.resolve(process.cwd(), './.gzipper');
 export const COMPRESS_PATH = path.resolve(
   RESOURCES_FOLDER_PATH,
@@ -102,7 +108,7 @@ export async function clear(
 }
 
 export async function createFolder(target: string): Promise<string> {
-  const folderPath = path.resolve(__dirname, target);
+  const folderPath = path.resolve(import.meta.dirname, target);
   if (!(await checkFileExists(folderPath))) {
     await mkdir(folderPath, { recursive: true });
   }

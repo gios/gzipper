@@ -1,4 +1,4 @@
-import { CompressionExtensions } from './enums';
+import { CompressionExtensions } from './enums.js';
 
 export const OUTPUT_FILE_FORMAT_REGEXP =
   /(\[filename\]*)|(\[hash\]*)|(\[compressExt\]*)|(\[ext\]*)/g;

@@ -1,9 +1,9 @@
 import path from 'node:path';
 import { writeFile } from 'node:fs/promises';
 
-import { FileConfig } from './interfaces';
-import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
-import { getVersion, checkFileExists, readFile } from './helpers';
+import { FileConfig } from './interfaces.js';
+import { CONFIG_FILE, CONFIG_FOLDER } from './constants.js';
+import { getVersion, checkFileExists, readFile } from './helpers.js';
 
 export class Config {
   private readonly _configFile: string;

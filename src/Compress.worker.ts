@@ -11,17 +11,17 @@ import {
   CompressOptions,
   IncrementalFileValue,
   WorkerMessage,
-} from './interfaces';
-import { OUTPUT_FILE_FORMAT_REGEXP } from './constants';
+} from './interfaces.js';
+import { OUTPUT_FILE_FORMAT_REGEXP } from './constants.js';
 import {
   createFolders,
   checkFileExists,
   readableSize,
   readableHrtime,
-} from './helpers';
-import { Logger } from './logger/Logger';
-import { CompressService } from './Compress.service';
-import { Incremental } from './Incremental';
+} from './helpers.js';
+import { Logger } from './logger/Logger.js';
+import { CompressService } from './Compress.service.js';
+import { Incremental } from './Incremental.js';
 
 class CompressWorker {
   private readonly options: CompressOptions = workerData.options;

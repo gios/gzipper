@@ -1,12 +1,12 @@
 import { Command } from 'commander';
 
-import { Compress } from './Compress';
-import { getVersion, getLogColor, readableSize } from './helpers';
-import { CompressOptions } from './interfaces';
-import { Incremental } from './Incremental';
-import { Config } from './Config';
-import { Logger } from './logger/Logger';
-import { LogLevel } from './logger/LogLevel.enum';
+import { Compress } from './Compress.js';
+import { getVersion, getLogColor, readableSize } from './helpers.js';
+import { CompressOptions } from './interfaces.js';
+import { Incremental } from './Incremental.js';
+import { Config } from './Config.js';
+import { Logger } from './logger/Logger.js';
+import { LogLevel } from './logger/LogLevel.enum.js';
 
 export class Index {
   private commander = new Command();

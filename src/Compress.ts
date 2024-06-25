@@ -8,21 +8,25 @@ import {
   getCPUs,
   chunkArray,
   filterObject,
-} from './helpers';
-import { Logger } from './logger/Logger';
+} from './helpers.js';
+import { Logger } from './logger/Logger.js';
 import {
   NO_FILES_MESSAGE,
   NO_PATH_MESSAGE,
   DEFAULT_OUTPUT_FORMAT_MESSAGE,
   INCREMENTAL_ENABLE_MESSAGE,
   WORKER_STARTED,
-} from './constants';
-import { CompressionType, CompressOptions, WorkerMessage } from './interfaces';
-import { Incremental } from './Incremental';
-import { Config } from './Config';
-import { LogLevel } from './logger/LogLevel.enum';
-import { CompressService } from './Compress.service';
-import { CompressionExtensions } from './enums';
+} from './constants.js';
+import {
+  CompressionType,
+  CompressOptions,
+  WorkerMessage,
+} from './interfaces.js';
+import { Incremental } from './Incremental.js';
+import { Config } from './Config.js';
+import { LogLevel } from './logger/LogLevel.enum.js';
+import { CompressService } from './Compress.service.js';
+import { CompressionExtensions } from './enums.js';
 
 /**
  * Compressing files.
@@ -183,7 +187,7 @@ export class Compress {
     return new Promise((resolve, reject) => {
       const worker = new Worker(
         path.resolve(
-          __dirname,
+          import.meta.dirname,
           process.env.NODE_ENV !== 'test'
             ? './Compress.worker.js'
             : '../test/__mocks__/Compress.worker.import.js',

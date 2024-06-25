@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "preserve",
+    "module": "node16",
     "lib": ["es2023"],
-    "moduleResolution": "bundler",
+    "moduleResolution": "node16",
     "outDir": "dist",
     "declaration": true,
     "strict": true,
     "noImplicitAny": false,
+    "skipLibCheck": true,
     "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

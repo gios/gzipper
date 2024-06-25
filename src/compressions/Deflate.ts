@@ -1,8 +1,8 @@
 import zlib from 'node:zlib';
 
-import { Compression } from './Compression';
-import { GenericCompressionOptions } from '../interfaces';
-import { CompressionExtensions, CompressionNames } from '../enums';
+import { Compression } from './Compression.js';
+import { GenericCompressionOptions } from '../interfaces.js';
+import { CompressionExtensions, CompressionNames } from '../enums.js';
 
 /**
  * Deflate compression
