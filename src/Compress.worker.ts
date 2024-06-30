@@ -213,7 +213,11 @@ class CompressWorker {
       );
     }
 
-    return `${path.join(target, filename)}`;
+    filename = filename.replaceAll(/\.+/g, (match, offset, value) =>
+      match.length + offset === value.length ? '' : '.',
+    );
+
+    return path.join(target, filename);
   }
 
   /**
