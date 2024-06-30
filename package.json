@@ -10,7 +10,7 @@
     "eslint": "eslint \"**/*.ts\"",
     "prettier": "prettier \"**/*.{ts,js,yaml,md,json}\" --write",
     "tsc": "tsc --noEmit",
-    "build": "rimraf dist && tsc && copyfiles -f package.json package-lock.json README.md LICENSE CHANGELOG.md dist/"
+    "build": "rimraf dist && tsc && copyfiles -f package.json README.md LICENSE CHANGELOG.md dist/"
   },
   "repository": {
     "type": "git",
