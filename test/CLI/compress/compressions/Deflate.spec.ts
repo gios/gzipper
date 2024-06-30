@@ -1,3 +1,5 @@
+import { describe, beforeEach, afterEach, it, expect, vitest } from 'vitest';
+
 import { Compress } from '../../../../src/Compress';
 import {
   getFiles,
@@ -6,18 +8,18 @@ import {
   GZIPPER_CONFIG_FOLDER,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
-import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
+import { DeflateCompression } from '../../../../src/compressions/Deflate';
 
 describe('CLI Compress -> Deflate compression', () => {
   let testPath: string;
   let compressTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -26,7 +28,7 @@ describe('CLI Compress -> Deflate compression', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('--level, --memory-level, --strategy should change deflate configuration', async () => {
+  it('--level, --memory-level, --strategy should change deflate configuration', async () => {
     const options: CompressOptions = {
       deflate: true,
       deflateLevel: 6,
@@ -34,9 +36,10 @@ describe('CLI Compress -> Deflate compression', () => {
       deflateStrategy: 2,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.zz']);
+    const instance = compress.compressionInstances[0] as DeflateCompression;
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -54,20 +57,11 @@ describe('CLI Compress -> Deflate compression', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('zz');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(3);
-    expect(Object.keys((compress as any).options).length).toBe(4);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.level,
-    ).toBe(6);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.memLevel,
-    ).toBe(4);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions.strategy,
-    ).toBe(2);
+    expect(instance.ext).toBe('zz');
+    expect(Object.keys(instance.compressionOptions).length).toBe(3);
+    expect(Object.keys(compress.options).length).toBe(4);
+    expect(instance.compressionOptions.level).toBe(6);
+    expect(instance.compressionOptions.memLevel).toBe(4);
+    expect(instance.compressionOptions.strategy).toBe(2);
   });
 });

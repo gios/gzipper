@@ -1,8 +1,8 @@
-import zlib from 'zlib';
+import zlib from 'node:zlib';
 
-import { Compression } from './Compression';
-import { CompressOptions, BrotliOptions } from '../interfaces';
-import { CompressionExtensions, CompressionNames } from '../enums';
+import { Compression } from './Compression.js';
+import { BrotliOptions } from '../interfaces.js';
+import { CompressionExtensions, CompressionNames } from '../enums.js';
 
 /**
  * Brotli compression
@@ -10,12 +10,6 @@ import { CompressionExtensions, CompressionNames } from '../enums';
 export class BrotliCompression extends Compression<BrotliOptions> {
   readonly compressionName = CompressionNames.BROTLI;
   readonly ext = CompressionExtensions.BROTLI;
-  /**
-   * Creates an instance of BrotliCompression
-   */
-  constructor(options: CompressOptions) {
-    super(options);
-  }
 
   /**
    * Returns brotli compression instance in closure.

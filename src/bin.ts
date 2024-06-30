@@ -1,20 +1,21 @@
 import { Command } from 'commander';
 
-import { Compress } from './Compress';
-import { Helpers } from './helpers';
-import { CompressOptions } from './interfaces';
-import { Incremental } from './Incremental';
-import { Config } from './Config';
-import { Logger } from './logger/Logger';
-import { LogLevel } from './logger/LogLevel.enum';
+import { Compress } from './Compress.js';
+import { getVersion, getLogColor, readableSize } from './helpers.js';
+import { CompressOptions } from './interfaces.js';
+import { Incremental } from './Incremental.js';
+import { Config } from './Config.js';
+import { Logger } from './logger/Logger.js';
+import { LogLevel } from './logger/LogLevel.enum.js';
 
 export class Index {
-  private readonly argv: string[] = process.argv;
-  private readonly env: NodeJS.ProcessEnv = process.env;
   private commander = new Command();
+  logger = new Logger();
+  argv: string[] = process.argv;
+  env: NodeJS.ProcessEnv = process.env;
 
   async exec(): Promise<void> {
-    this.commander.version(Helpers.getVersion()).name('gzipper');
+    this.commander.version(getVersion()).name('gzipper');
 
     this.commander
       .command('compress <path> [outputPath]')
@@ -224,14 +225,14 @@ export class Index {
         ? !!parseInt(this.env.GZIPPER_SKIP_COMPRESSED as string)
         : options.skipCompressed,
       workers: parseInt(this.env.GZIPPER_WORKERS as string) || options.workers,
-      color: Helpers.getLogColor(options.color, this.env),
+      color: getLogColor(options.color, this.env),
     };
 
     await this.runCompress(target, outputPath, adjustedOptions);
   }
 
   private async cachePurge(): Promise<void> {
-    Logger.setOptions({
+    this.logger.initialize({
       verbose: true,
     });
     const config = new Config();
@@ -239,31 +240,31 @@ export class Index {
 
     try {
       await incremental.cachePurge();
-      Logger.log(
+      this.logger.log(
         'Cache has been purged, you are free to initialize a new one.',
         LogLevel.SUCCESS,
       );
     } catch (err) {
-      Logger.log(err, LogLevel.ERROR);
+      this.logger.log(err, LogLevel.ERROR);
     }
   }
 
   private async cacheSize(): Promise<void> {
-    Logger.setOptions({
+    this.logger.initialize({
       verbose: true,
     });
     const incremental = new Incremental();
 
     try {
       const size = await incremental.cacheSize();
-      Logger.log(
+      this.logger.log(
         size
-          ? `Cache size is ${Helpers.readableSize(size)}`
+          ? `Cache size is ${readableSize(size)}`
           : `Cache is empty, initialize a new one with --incremental option.`,
         LogLevel.INFO,
       );
     } catch (err) {
-      Logger.log(err, LogLevel.ERROR);
+      this.logger.log(err, LogLevel.ERROR);
     }
   }
 
@@ -272,8 +273,8 @@ export class Index {
     outputPath: string,
     options: CompressOptions,
   ): Promise<void> {
-    Logger.setOptions({
-      verbose: true,
+    this.logger.initialize({
+      verbose: options.verbose,
     });
     const compress = new Compress(
       target,
@@ -284,7 +285,7 @@ export class Index {
     try {
       await compress.run();
     } catch (err) {
-      Logger.log(err, LogLevel.ERROR);
+      this.logger.log(err, LogLevel.ERROR);
     }
   }
 

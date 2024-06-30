@@ -1,25 +1,20 @@
-import path from 'path';
-import util from 'util';
-import fs from 'fs';
+import path from 'node:path';
+import { writeFile } from 'node:fs/promises';
 
-import { FileConfig } from './interfaces';
-import { CONFIG_FILE, CONFIG_FOLDER } from './constants';
-import { Helpers } from './helpers';
+import { FileConfig } from './interfaces.js';
+import { CONFIG_FILE, CONFIG_FOLDER } from './constants.js';
+import { getVersion, checkFileExists, readFile } from './helpers.js';
 
 export class Config {
-  private readonly nativeFs = {
-    writeFile: util.promisify(fs.writeFile),
-    exists: util.promisify(fs.exists),
-  };
   private readonly _configFile: string;
-  private _configContent: FileConfig = {} as FileConfig;
+  private _configContent = new Map<string, FileConfig[keyof FileConfig]>();
 
   get configContent(): Readonly<FileConfig> {
-    return this._configContent;
+    return Object.fromEntries(this._configContent);
   }
 
   set configContent(value: Readonly<FileConfig>) {
-    this._configContent = value;
+    this._configContent = new Map(Object.entries(value));
   }
 
   /**
@@ -27,16 +22,18 @@ export class Config {
    */
   constructor() {
     this._configFile = path.resolve(process.cwd(), CONFIG_FOLDER, CONFIG_FILE);
-    this.setProperty('version', Helpers.getVersion());
+    this.setProperty('version', getVersion());
   }
 
   /**
    * Read config (.gzipperconfig).
    */
   async readConfig(): Promise<void> {
-    if (await this.nativeFs.exists(this._configFile)) {
-      const response = await Helpers.readFile(this._configFile);
-      this._configContent = JSON.parse(response.toString());
+    if (await checkFileExists(this._configFile)) {
+      const response = await readFile(this._configFile);
+      this._configContent = new Map(
+        Object.entries(JSON.parse(response.toString())),
+      );
     }
   }
 
@@ -47,23 +44,23 @@ export class Config {
     field: T,
     content: K,
   ): void {
-    this._configContent[field] = content;
+    this._configContent.set(field, content);
   }
 
   /**
    * delete property from config file (.gzipperconfig).
    */
   deleteProperty<T extends keyof FileConfig>(field: T): void {
-    delete this._configContent[field];
+    this._configContent.delete(field);
   }
 
   /**
    * Init or update config (.gzipperconfig).
    */
   async writeConfig(): Promise<void> {
-    await this.nativeFs.writeFile(
+    await writeFile(
       path.resolve(this._configFile),
-      JSON.stringify(this._configContent, null, 2),
+      JSON.stringify(Object.fromEntries(this._configContent), null, 2),
     );
   }
 }

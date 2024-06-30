@@ -1,38 +1,26 @@
-import { filter } from './filter.decorator';
-import { LogLevel } from './LogLevel.enum';
-import { Helpers } from '../helpers';
-import { CompressOptions } from '../interfaces';
+import { LogLevel } from './LogLevel.enum.js';
+import { getLogColor } from '../helpers.js';
+import { CompressOptions } from '../interfaces.js';
 
-/**
- * Custom logger.
- */
 export class Logger {
-  static verbose: boolean;
-  static color: boolean;
+  private verbose = false;
+  private color = false;
 
   /**
-   * Set verbose mode.
+   * Initialize the logger.
    */
-  static setOptions(options: Pick<CompressOptions, 'verbose' | 'color'>): void {
-    Logger.verbose = !!options.verbose;
-    Logger.color = Helpers.getLogColor(options.color);
-  }
-
-  /**
-   * Log message.
-   */
-  @filter()
-  static log<T>(message: T, level: LogLevel = LogLevel.DEBUG): void {
-    return Logger.logger(message, level);
+  initialize(options: Pick<CompressOptions, 'verbose' | 'color'>) {
+    this.verbose = !!options.verbose;
+    this.color = getLogColor(options.color);
   }
 
   /**
    * Colorize messages depends on the level and return a wrapper.
    */
-  private static logger<T>(message: T, level: LogLevel): void {
+  private logger<T>(message: T, level: LogLevel): void {
     let colorfulMessage: string;
     const prefix = 'gzipper';
-    level = !Logger.color ? LogLevel.DEBUG : level;
+    level = !this.color ? LogLevel.DEBUG : level;
 
     switch (level) {
       case LogLevel.INFO:
@@ -58,5 +46,16 @@ export class Logger {
     }
 
     console.log(colorfulMessage, message);
+  }
+
+  /**
+   * Log message.
+   */
+  log<T>(message: T, level: LogLevel = LogLevel.DEBUG): void {
+    const shouldLog = this.verbose || level === LogLevel.ERROR;
+
+    if (shouldLog) {
+      this.logger(message, level);
+    }
   }
 }

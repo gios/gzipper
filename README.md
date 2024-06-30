@@ -170,20 +170,20 @@ Commands:
 
   1. Add module to scripts in your package.json and run `compress` command `npm run compress`
 
-      ```json
-        "scripts": {
-          "gzipper": "gzipper",
-          "compress": "gzipper compress ./src"
-        }
-      ```
+     ```json
+       "scripts": {
+         "gzipper": "gzipper",
+         "compress": "gzipper compress ./src"
+       }
+     ```
 
   2. Use `npx` command
 
-      ```json
-        "scripts": {
-          "compress": "npx gzipper compress ./src"
-        }
-      ```
+     ```json
+       "scripts": {
+         "compress": "npx gzipper compress ./src"
+       }
+     ```
 
 - UI build tools (e.g. Angular CLI)
 
@@ -582,14 +582,14 @@ command -v zstd  # MacOS/Linux
 
 If you didn't find executable `zstd` you have to install this manually:
 
-* MacOS using Brew
+- MacOS using Brew
 
   ```sh
   brew install zstd   # zstd only
   brew install zlib   # whole library
   ```
 
-* Windows Subsystem for Linux (WSL), Ubuntu, Debian... using APT
+- Windows Subsystem for Linux (WSL), Ubuntu, Debian... using APT
 
   ```sh
   sudo apt install zstd

@@ -1,0 +1,8 @@
+name: 'Install pnpm dependencies'
+description: 'Install pnpm dependencies'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install

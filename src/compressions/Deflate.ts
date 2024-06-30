@@ -1,21 +1,15 @@
-import zlib from 'zlib';
+import zlib from 'node:zlib';
 
-import { Compression } from './Compression';
-import { CompressOptions, CompressionOptions } from '../interfaces';
-import { CompressionExtensions, CompressionNames } from '../enums';
+import { Compression } from './Compression.js';
+import { GenericCompressionOptions } from '../interfaces.js';
+import { CompressionExtensions, CompressionNames } from '../enums.js';
 
 /**
  * Deflate compression
  */
-export class DeflateCompression extends Compression<CompressionOptions> {
+export class DeflateCompression extends Compression<GenericCompressionOptions> {
   readonly compressionName = CompressionNames.DEFLATE;
   readonly ext = CompressionExtensions.DEFLATE;
-  /**
-   * Creates an instance of DeflateCompression.
-   */
-  constructor(options: CompressOptions) {
-    super(options);
-  }
 
   /**
    * Returns deflate compression instance in closure.
@@ -28,7 +22,7 @@ export class DeflateCompression extends Compression<CompressionOptions> {
    * Build deflate compression options object.
    */
   protected selectCompression(): void {
-    const options: CompressionOptions = {};
+    const options: GenericCompressionOptions = {};
 
     if (this.options.deflateLevel !== undefined) {
       options.level = this.options.deflateLevel;

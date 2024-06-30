@@ -1,7 +1,7 @@
-import path from 'path';
-import fs from 'fs';
-import util from 'util';
+import path from 'node:path';
+import { readFile, writeFile } from 'node:fs/promises';
 import deepEqual from 'deep-equal';
+import { describe, beforeEach, afterEach, it, expect, vitest } from 'vitest';
 
 import {
   clear,
@@ -21,11 +21,7 @@ import {
   IncrementalFileValue,
   CompressOptions,
 } from '../../../src/interfaces';
-import { Logger } from '../../../src/logger/Logger';
-
-const fsExists = util.promisify(fs.exists);
-const fsReadFile = util.promisify(fs.readFile);
-const fsWriteFile = util.promisify(fs.writeFile);
+import { checkFileExists } from '../../../src/helpers';
 
 function getFileRevisions(
   config: FileConfig,
@@ -65,10 +61,10 @@ describe('CLI Compress -> Incremental', () => {
   let compressTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -77,14 +73,17 @@ describe('CLI Compress -> Incremental', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('should compress files and create .gzipper folder', async () => {
+  it('should compress files and create .gzipper folder', async () => {
     const options: CompressOptions = { incremental: true };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
+    const exists = await checkFileExists(
+      path.resolve(process.cwd(), './.gzipper'),
+    );
+    const instance = compress.compressionInstances[0];
 
-    const exists = await fsExists(path.resolve(process.cwd(), './.gzipper'));
     expect(exists).toBeTruthy();
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -107,43 +106,41 @@ describe('CLI Compress -> Incremental', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('gz');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(0);
-    expect(Object.keys((compress as any).options).length).toBe(1);
+    expect(instance.ext).toBe('gz');
+    expect(Object.keys(instance.compressionOptions).length).toBe(0);
+    expect(Object.keys(compress.options).length).toBe(1);
   });
 
-  test('should generate .gzipperconfig', async () => {
+  it('should generate .gzipperconfig', async () => {
     const options: CompressOptions = { incremental: true };
     const compress = new Compress(compressTestPath, null, options);
     const files = await getFiles(compressTestPath);
     await compress.run();
 
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
-    const exists = await fsExists(configPath);
-    expect(exists).toBeTruthy();
-    const fileConfig = await fsReadFile(configPath);
+    const exists = await checkFileExists(configPath);
+    const fileConfig = await readFile(configPath);
     const config = JSON.parse(fileConfig.toString());
+
+    expect(exists).toBeTruthy();
     expect(validateConfig(config, files)).toBeTruthy();
   });
 
-  test('should retrieve all files from cache', async () => {
+  it('should retrieve all files from cache', async () => {
     const options: CompressOptions = { incremental: true };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const compress = new Compress(compressTestPath, null, options);
 
     await compress.run();
-    const configBefore = JSON.parse((await fsReadFile(configPath)).toString());
+    const configBefore = JSON.parse((await readFile(configPath)).toString());
     await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     await compress.run();
-    const configAfter = JSON.parse((await fsReadFile(configPath)).toString());
+    const configAfter = JSON.parse((await readFile(configPath)).toString());
 
     expect(configBefore).toEqual(configAfter);
   });
 
-  test('should update "lastChecksum" and "date" revision if file was changed', async () => {
+  it('should update "lastChecksum" and "date" revision if file was changed', async () => {
     const options: CompressOptions = { incremental: true };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const compress = new Compress(compressTestPath, null, options);
@@ -152,20 +149,20 @@ describe('CLI Compress -> Incremental', () => {
     await compress.run();
     await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const configBefore: FileConfig = JSON.parse(
-      (await fsReadFile(configPath)).toString(),
+      (await readFile(configPath)).toString(),
     );
     const fileRevisionsBefore: Partial<IncrementalFileValueRevision>[] =
       getFileRevisions(configBefore, fileToEdit);
 
-    const beforeFileContent = await fsReadFile(fileToEdit);
-    await fsWriteFile(fileToEdit, 'New content which breaks checksum.');
+    const beforeFileContent = await readFile(fileToEdit);
+    await writeFile(fileToEdit, 'New content which breaks checksum.');
     await compress.run();
     const configAfter: FileConfig = JSON.parse(
-      (await fsReadFile(configPath)).toString(),
+      (await readFile(configPath)).toString(),
     );
     const fileRevisionsAfter: Partial<IncrementalFileValueRevision>[] =
       getFileRevisions(configAfter, fileToEdit);
-    await fsWriteFile(fileToEdit, beforeFileContent);
+    await writeFile(fileToEdit, beforeFileContent);
 
     expect(fileRevisionsBefore[0]?.lastChecksum).not.toBe(
       fileRevisionsAfter[0]?.lastChecksum,
@@ -180,7 +177,7 @@ describe('CLI Compress -> Incremental', () => {
     expect(configBefore).toEqual(configAfter);
   });
 
-  test('should update hash inside cache folder if file was changed', async () => {
+  it('should update hash inside cache folder if file was changed', async () => {
     const options: CompressOptions = { incremental: true };
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
@@ -190,22 +187,22 @@ describe('CLI Compress -> Incremental', () => {
     await compress.run();
     await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const config: FileConfig = JSON.parse(
-      (await fsReadFile(configPath)).toString(),
+      (await readFile(configPath)).toString(),
     );
     const fileRevisions = getFileRevisions(config, fileToEdit);
     const hashPath = path.resolve(cachePath, fileRevisions[0].fileId);
-    const hashContentBefore = await fsReadFile(hashPath);
+    const hashContentBefore = await readFile(hashPath);
 
-    const beforeFileContent = await fsReadFile(fileToEdit);
-    await fsWriteFile(fileToEdit, 'New content which breaks checksum.');
+    const beforeFileContent = await readFile(fileToEdit);
+    await writeFile(fileToEdit, 'New content which breaks checksum.');
     await compress.run();
-    await fsWriteFile(fileToEdit, beforeFileContent);
-    const hashContentAfter = await fsReadFile(hashPath);
+    await writeFile(fileToEdit, beforeFileContent);
+    const hashContentAfter = await readFile(hashPath);
 
     expect(!hashContentBefore.equals(hashContentAfter)).toBeTruthy();
   });
 
-  test('should add new revision if compress options were changed', async () => {
+  it('should add new revision if compress options were changed', async () => {
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const files = await getFiles(compressTestPath);
@@ -222,7 +219,7 @@ describe('CLI Compress -> Incremental', () => {
     });
     await compress2.run();
     const configAfter: FileConfig = JSON.parse(
-      (await fsReadFile(configPath)).toString(),
+      (await readFile(configPath)).toString(),
     );
     const revisions = Object.values(
       configAfter.incremental?.files as Record<string, IncrementalFileValue>,
@@ -237,7 +234,7 @@ describe('CLI Compress -> Incremental', () => {
     expect(files.length * 2).toBe(cachedFiles.length);
   });
 
-  test('should update certain revision if file was changed', async () => {
+  it('should update certain revision if file was changed', async () => {
     const configPath = path.resolve(process.cwd(), './.gzipper/.gzipperconfig');
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const fileToEdit = path.resolve(compressTestPath, './index.txt');
@@ -255,7 +252,7 @@ describe('CLI Compress -> Incremental', () => {
     await compress2.run();
     await clear(compressTestPath, COMPRESSION_EXTENSIONS);
     const configBefore: FileConfig = JSON.parse(
-      (await fsReadFile(configPath)).toString(),
+      (await readFile(configPath)).toString(),
     );
     const fileRevisionsBefore = getFileRevisions(configBefore, fileToEdit);
     expect(fileRevisionsBefore.length).toBe(2);
@@ -267,19 +264,19 @@ describe('CLI Compress -> Incremental', () => {
       cachePath,
       fileRevisionBefore.fileId as string,
     );
-    const hashContentBefore = await fsReadFile(hashPath);
+    const hashContentBefore = await readFile(hashPath);
 
     const compress3 = new Compress(compressTestPath, null, {
       incremental: true,
       gzipLevel: 8,
     });
-    const beforeFileContent = await fsReadFile(fileToEdit);
-    await fsWriteFile(fileToEdit, 'New content which breaks checksum.');
+    const beforeFileContent = await readFile(fileToEdit);
+    await writeFile(fileToEdit, 'New content which breaks checksum.');
     await compress3.run();
-    await fsWriteFile(fileToEdit, beforeFileContent);
-    const hashContentAfter = await fsReadFile(hashPath);
+    await writeFile(fileToEdit, beforeFileContent);
+    const hashContentAfter = await readFile(hashPath);
     const configAfter: FileConfig = JSON.parse(
-      (await fsReadFile(configPath)).toString(),
+      (await readFile(configPath)).toString(),
     );
     const fileRevisionsAfter = getFileRevisions(configAfter, fileToEdit);
     expect(fileRevisionsAfter.length).toBe(2);

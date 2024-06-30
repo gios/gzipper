@@ -1,6 +1,5 @@
-import fs from 'fs';
-import util from 'util';
-import path from 'path';
+import path from 'node:path';
+import { describe, beforeEach, afterEach, it, expect, vitest } from 'vitest';
 
 import {
   clear,
@@ -12,18 +11,17 @@ import { Compress } from '../../../src/Compress';
 import { Config } from '../../../src/Config';
 import { Incremental } from '../../../src/Incremental';
 import { CompressOptions } from '../../../src/interfaces';
-
-const fsExists = util.promisify(fs.exists);
+import { checkFileExists } from '../../../src/helpers';
 
 describe('CLI Cache -> Size', () => {
   let testPath: string;
   let compressTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath] = await generatePaths();
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -32,7 +30,7 @@ describe('CLI Cache -> Size', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('should returns cache size if exists', async () => {
+  it('should return cache size if exists', async () => {
     const options: CompressOptions = { incremental: true };
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');
     const compress = new Compress(compressTestPath, null, options);
@@ -42,21 +40,20 @@ describe('CLI Cache -> Size', () => {
 
     const size = await incremental.cacheSize();
     expect(size).toBeGreaterThan(0);
-    const cacheExists = await fsExists(cachePath);
-    expect(cacheExists).toBeTruthy();
+    const cacheExist = await checkFileExists(cachePath);
+    expect(cacheExist).toBeTruthy();
   });
 
-  test("should throw error if cache doesn't exists", async () => {
+  it("should throw error if cache doesn't exists", async () => {
     const config = new Config();
     const incremental = new Incremental(config);
 
-    await expect(incremental.cacheSize()).rejects.toThrowError({
-      name: 'Error',
-      message: 'No cache found.',
-    });
+    await expect(incremental.cacheSize()).rejects.toThrowError(
+      'No cache found.',
+    );
   });
 
-  test('should return 0 if cache is empty', async () => {
+  it('should return 0 if cache is empty', async () => {
     const config = new Config();
     const incremental = new Incremental(config);
     const cachePath = path.resolve(process.cwd(), './.gzipper/cache');

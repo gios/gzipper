@@ -1,22 +1,28 @@
-import path from 'path';
-import fs from 'fs';
-import util from 'util';
-import { v4 } from 'uuid';
+import path from 'node:path';
+import {
+  unlink,
+  readdir,
+  lstat,
+  rmdir,
+  mkdir,
+  copyFile,
+} from 'node:fs/promises';
+import crypto from 'node:crypto';
 
-const unlink = util.promisify(fs.unlink);
-const copyFile = util.promisify(fs.copyFile);
-const mkdir = util.promisify(fs.mkdir);
-const lstat = util.promisify(fs.lstat);
-const exists = util.promisify(fs.exists);
-const readdir = util.promisify(fs.readdir);
-const rmdir = util.promisify(fs.rmdir);
+import { checkFileExists } from '../src/helpers';
 
 interface GeneratePathsOptions {
   excludeBig: boolean;
 }
 
-export const RESOURCES_FOLDER_PATH = path.resolve(__dirname, './resources');
-export const TEST_FOLDER_PATH = path.resolve(__dirname, './tmp-test-folder');
+export const RESOURCES_FOLDER_PATH = path.resolve(
+  import.meta.dirname,
+  './resources',
+);
+export const TEST_FOLDER_PATH = path.resolve(
+  import.meta.dirname,
+  './tmp-test-folder',
+);
 export const GZIPPER_CONFIG_FOLDER = path.resolve(process.cwd(), './.gzipper');
 export const COMPRESS_PATH = path.resolve(
   RESOURCES_FOLDER_PATH,
@@ -38,12 +44,18 @@ export async function generatePaths(
     excludeBig: false,
   },
 ): Promise<string[]> {
-  const tmpDir = path.resolve(TEST_FOLDER_PATH, `./tmp-${v4()}`);
-  const compressPath = path.resolve(tmpDir, `./tmp-compress-${v4()}`);
-  const emptyFolderPath = path.resolve(tmpDir, `./tmp-empty-folder-${v4()}`);
+  const tmpDir = path.resolve(TEST_FOLDER_PATH, `./tmp-${crypto.randomUUID()}`);
+  const compressPath = path.resolve(
+    tmpDir,
+    `./tmp-compress-${crypto.randomUUID()}`,
+  );
+  const emptyFolderPath = path.resolve(
+    tmpDir,
+    `./tmp-empty-folder-${crypto.randomUUID()}`,
+  );
   const compressTargetPath = path.resolve(
     tmpDir,
-    `./tmp-compress-target-${v4()}`,
+    `./tmp-compress-target-${crypto.randomUUID()}`,
   );
   await copyFolder(COMPRESS_PATH, compressPath);
   options.excludeBig && unlink(path.resolve(compressPath, BIG_FILE_NAME));
@@ -90,15 +102,14 @@ export async function clear(
   directory: string,
   extensions: string[] | boolean,
 ): Promise<void> {
-  if (await exists(directory)) {
+  if (await checkFileExists(directory)) {
     await clearDirectory(directory, extensions);
   }
 }
 
 export async function createFolder(target: string): Promise<string> {
-  const folderPath = path.resolve(__dirname, target);
-  const isExists = await exists(folderPath);
-  if (!isExists) {
+  const folderPath = path.resolve(import.meta.dirname, target);
+  if (!(await checkFileExists(folderPath))) {
     await mkdir(folderPath, { recursive: true });
   }
   return folderPath;

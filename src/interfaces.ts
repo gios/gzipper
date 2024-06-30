@@ -1,10 +1,10 @@
-import zlib from 'zlib';
+import zlib from 'node:zlib';
 
-import { BrotliCompression } from './compressions/Brotli';
-import { DeflateCompression } from './compressions/Deflate';
-import { GzipCompression } from './compressions/Gzip';
-import { ZopfliCompression } from './compressions/Zopfli';
-import { ZstdCompression } from './compressions/Zstd';
+import { BrotliCompression } from './compressions/Brotli.js';
+import { DeflateCompression } from './compressions/Deflate.js';
+import { GzipCompression } from './compressions/Gzip.js';
+import { ZopfliCompression } from './compressions/Zopfli.js';
+import { ZstdCompression } from './compressions/Zstd.js';
 
 export interface CompressOptions {
   verbose?: boolean;
@@ -37,11 +37,29 @@ export interface CompressOptions {
   color?: boolean;
 }
 
-export type CompressionOptions = {
+export type GenericCompressionOptions = {
   level?: number;
   memoryLevel?: number;
   strategy?: number;
 } & zlib.ZlibOptions;
+
+export type BrotliOptions = Record<number, number>;
+
+export interface ZstdOptions {
+  level?: number;
+}
+
+export interface ZopfliOptions {
+  numiterations?: number;
+  blocksplitting?: boolean;
+  blocksplittingmax?: number;
+}
+
+export type CompressionOptions =
+  | GenericCompressionOptions
+  | BrotliOptions
+  | ZstdOptions
+  | ZopfliOptions;
 
 export type CompressionType =
   | BrotliCompression
@@ -49,18 +67,6 @@ export type CompressionType =
   | GzipCompression
   | ZopfliCompression
   | ZstdCompression;
-
-export type BrotliOptions = { [key: number]: number };
-
-export type ZstdOptions = {
-  level?: number;
-};
-
-export type ZopfliOptions = {
-  numiterations?: number;
-  blocksplitting?: boolean;
-  blocksplittingmax?: number;
-};
 
 export interface CompressedFile {
   beforeSize: number;
@@ -77,7 +83,7 @@ export interface Cache {
 
 export interface FileConfig {
   incremental?: IncrementalConfig;
-  version: string;
+  version?: string;
 }
 
 export interface IncrementalFileValue {
@@ -89,7 +95,7 @@ export interface IncrementalFileValueRevision {
   fileId: string;
   date: Date;
   compressionType: string;
-  options: CompressionOptions | BrotliOptions;
+  options: CompressionOptions;
 }
 
 export interface IncrementalConfig {

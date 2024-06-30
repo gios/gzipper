@@ -1,11 +1,11 @@
-import { BrotliCompression } from './compressions/Brotli';
-import { DeflateCompression } from './compressions/Deflate';
-import { GzipCompression } from './compressions/Gzip';
-import { ZopfliCompression } from './compressions/Zopfli';
-import { ZstdCompression } from './compressions/Zstd';
-import { COMPRESSION_EXTENSIONS } from './constants';
-import { CompressionExtensions } from './enums';
-import { CompressionType, CompressOptions } from './interfaces';
+import { BrotliCompression } from './compressions/Brotli.js';
+import { DeflateCompression } from './compressions/Deflate.js';
+import { GzipCompression } from './compressions/Gzip.js';
+import { ZopfliCompression } from './compressions/Zopfli.js';
+import { ZstdCompression } from './compressions/Zstd.js';
+import { COMPRESSION_EXTENSIONS } from './constants.js';
+import { CompressionExtensions } from './enums.js';
+import { CompressionType, CompressOptions } from './interfaces.js';
 
 export class CompressService {
   private readonly options: CompressOptions;
@@ -20,7 +20,7 @@ export class CompressService {
   /**
    * Return compression instances.
    */
-  public getCompressionInstances(): CompressionType[] {
+  getCompressionInstances(): CompressionType[] {
     const instances: CompressionType[] = [];
     if (this.options.brotli) {
       instances.push(new BrotliCompression(this.options));
@@ -47,7 +47,7 @@ export class CompressService {
   /**
    * Returns if the file extension is valid.
    */
-  public isValidFileExtensions(ext: CompressionExtensions): boolean {
+  isValidFileExtensions(ext: CompressionExtensions): boolean {
     if (COMPRESSION_EXTENSIONS.includes(ext)) {
       return false;
     }

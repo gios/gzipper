@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, it, expect, vitest } from 'vitest';
 import { Compress } from '../../../../src/Compress';
 import {
   getFiles,
@@ -6,22 +7,20 @@ import {
   GZIPPER_CONFIG_FOLDER,
 } from '../../../utils';
 import { LogLevel } from '../../../../src/logger/LogLevel.enum';
-import { Logger } from '../../../../src/logger/Logger';
 import { CompressOptions } from '../../../../src/interfaces';
-
-jest.setTimeout(60000);
+import { ZopfliCompression } from '../../../../src/compressions/Zopfli';
 
 describe('CLI Compress -> Zopfli compression', () => {
   let testPath: string;
   let compressTestPath: string;
 
   beforeEach(async () => {
-    jest.restoreAllMocks();
-    jest.resetModules();
+    vitest.restoreAllMocks();
+    vitest.resetModules();
     [testPath, compressTestPath] = await generatePaths({
       excludeBig: true,
     });
-    const processSpy = jest.spyOn(global.process, 'cwd');
+    const processSpy = vitest.spyOn(global.process, 'cwd');
     processSpy.mockImplementation(() => testPath);
   });
 
@@ -30,7 +29,7 @@ describe('CLI Compress -> Zopfli compression', () => {
     await clear(GZIPPER_CONFIG_FOLDER, true);
   });
 
-  test('--zopfli-num-iterations, --zopfli-block-splitting, --zopfli-block-splitting-max <number> should change zopfli configuration', async () => {
+  it('--zopfli-num-iterations, --zopfli-block-splitting, --zopfli-block-splitting-max <number> should change zopfli configuration', async () => {
     const options: CompressOptions = {
       zopfli: true,
       zopfliNumIterations: 15,
@@ -38,9 +37,10 @@ describe('CLI Compress -> Zopfli compression', () => {
       zopfliBlockSplittingMax: 10,
     };
     const compress = new Compress(compressTestPath, null, options);
-    const logSpy = jest.spyOn(Logger, 'log');
+    const logSpy = vitest.spyOn(compress.logger, 'log');
     await compress.run();
     const files = await getFiles(compressTestPath, ['.gz']);
+    const instance = compress.compressionInstances[0] as ZopfliCompression;
 
     expect(logSpy).toHaveBeenNthCalledWith(
       1,
@@ -58,23 +58,11 @@ describe('CLI Compress -> Zopfli compression', () => {
       ),
       LogLevel.SUCCESS,
     );
-    expect((compress as any).compressionInstances[0].ext).toBe('gz');
-    expect(
-      Object.keys((compress as any).compressionInstances[0].compressionOptions)
-        .length,
-    ).toBe(3);
-    expect(Object.keys((compress as any).options).length).toBe(4);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .numiterations,
-    ).toBe(15);
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .blocksplitting,
-    ).toBeTruthy();
-    expect(
-      (compress as any).compressionInstances[0].compressionOptions
-        .blocksplittingmax,
-    ).toBe(10);
+    expect(instance.ext).toBe('gz');
+    expect(Object.keys(instance.compressionOptions).length).toBe(3);
+    expect(Object.keys(compress.options).length).toBe(4);
+    expect(instance.compressionOptions.numiterations).toBe(15);
+    expect(instance.compressionOptions.blocksplitting).toBeTruthy();
+    expect(instance.compressionOptions.blocksplittingmax).toBe(10);
   });
 });
