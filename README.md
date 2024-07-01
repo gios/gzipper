@@ -3,7 +3,6 @@
 [![Support Ukraine Badge](https://bit.ly/support-ukraine-now)](https://github.com/support-ukraine/support-ukraine)
 [![Build Status](https://github.com/gios/gzipper/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/gios/gzipper/actions)
 [![npm version](https://badge.fury.io/js/gzipper.svg)](https://badge.fury.io/js/gzipper)
-[![codecov](https://codecov.io/gh/gios/gzipper/branch/master/graph/badge.svg)](https://codecov.io/gh/gios/gzipper)
 
 A tool for compressing files by means of
 [Deflate](https://wikiless.org/wiki/DEFLATE),
