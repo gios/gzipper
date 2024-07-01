@@ -220,11 +220,10 @@ Commands:
 ### Node.js Module
 
 ```javascript
-const { Compress } = require('gzipper');
+import { Compress } from "gzipper";
 const gzip = new Compress('./src', './dist', {
   verbose: true,
   brotli: true,
-  deflate: true,
 });
 
 try {
@@ -567,7 +566,7 @@ I appreciate every contribution, just fork the repository and send the pull requ
 
 ## Support
 
-- Node.js >= 14
+- Node.js >= 20.11.0
 
 ## Prerequisites
 
