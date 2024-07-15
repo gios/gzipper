@@ -2,7 +2,7 @@ import { createReadStream } from 'node:fs';
 import { lstat, readdir, unlink, rmdir } from 'node:fs/promises';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import deepEqual from 'deep-equal';
+import {isDeepStrictEqual as deepEqual} from 'node:util';
 
 import { CACHE_FOLDER, CONFIG_FOLDER } from './constants.js';
 import { mapToJSON, checkFileExists, createFolders } from './helpers.js';

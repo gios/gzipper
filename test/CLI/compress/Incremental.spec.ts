@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { readFile, writeFile } from 'node:fs/promises';
-import deepEqual from 'deep-equal';
+import {isDeepStrictEqual as deepEqual} from 'node:util';
 import { describe, beforeEach, afterEach, it, expect, vitest } from 'vitest';
 
 import {
