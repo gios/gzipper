@@ -58,7 +58,9 @@ export async function generatePaths(
     `./tmp-compress-target-${crypto.randomUUID()}`,
   );
   await copyFolder(COMPRESS_PATH, compressPath);
-  options.excludeBig && unlink(path.resolve(compressPath, BIG_FILE_NAME));
+  if (options.excludeBig) {
+    unlink(path.resolve(compressPath, BIG_FILE_NAME));
+  }
   await createFolder(compressTargetPath);
   await createFolder(emptyFolderPath);
   return [tmpDir, compressPath, compressTargetPath, emptyFolderPath];
@@ -91,7 +93,9 @@ export async function clearDirectory(
       }
     }
   }
-  force && (await rmdir(target));
+  if (force) {
+    await rmdir(target);
+  }
   return files;
 }
 
@@ -131,8 +135,9 @@ export async function getFiles(
       files.push(...(await getFiles(filePath, extensions)));
     } else if (isFile) {
       if (extensions.length) {
-        filterByExtension(extensions, path.extname(filePath)) &&
+        if (filterByExtension(extensions, path.extname(filePath))) {
           files.push(filePath);
+        }
       } else {
         files.push(filePath);
       }
