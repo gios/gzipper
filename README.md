@@ -1,7 +1,7 @@
 # Gzipper
 
 [![Support Ukraine Badge](https://bit.ly/support-ukraine-now)](https://github.com/support-ukraine/support-ukraine)
-[![Build Status](https://github.com/gios/gzipper/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/gios/gzipper/actions)
+[![Build Status](https://github.com/gios/gzipper/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/gios/gzipper/actions)
 [![npm version](https://badge.fury.io/js/gzipper.svg)](https://badge.fury.io/js/gzipper)
 
 A tool for compressing files by means of
@@ -292,7 +292,7 @@ _(Could increase time of compression because of gathering additional metrics)_
 
 Exclude file extensions from compression.
 Compression extensions `br`, `gz`, `zz` and `zst` are
-[excluded by default](https://github.com/gios/gzipper/blob/master/src/enums.ts#L9).
+[excluded by default](https://github.com/gios/gzipper/blob/main/src/enums.ts#L9).
 
 #### `-i`, `--include <extensions>`
 
