@@ -2,9 +2,9 @@ name: Build Package
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20, 21]
+        node-version: [20, 21, 22]
 
     steps:
       - name: Checkout Repository
