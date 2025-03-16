@@ -136,7 +136,7 @@ Options:
   --output-file-format <value>           output file format with default artifacts [filename].[ext].[compressExt]
   --remove-larger                        remove compressed files if they larger than uncompressed originals
   --skip-compressed                      skip compressed files if they already exist
-  --workers <number>                     numbers of workers which will be spawned, system CPU cores count (default)
+  --workers <number>                     numbers of workers which will be spawned, system CPU cores count - 1 (default)
   --no-color                             disable logger colorful messages
   -h, --help                             display help for command
 ```

@@ -161,7 +161,9 @@ export class Compress {
   private async createWorkers(): Promise<WorkerMessage> {
     const files = await this.getFilesToCompress();
     const cpus =
-      process.env.NODE_ENV !== 'test' ? this.options.workers || getCPUs() : 1;
+      process.env.NODE_ENV !== 'test'
+        ? this.options.workers || getCPUs() - 1
+        : 1;
     const size = Math.ceil(files.length / cpus);
     const chunks = chunkArray(files, size);
     const workers = chunks.map((chunk) => this.runCompressWorker(chunk));
