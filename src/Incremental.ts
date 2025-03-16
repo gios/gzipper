@@ -2,7 +2,7 @@ import { createReadStream } from 'node:fs';
 import { lstat, readdir, unlink, rmdir } from 'node:fs/promises';
 import crypto from 'node:crypto';
 import path from 'node:path';
-import {isDeepStrictEqual as deepEqual} from 'node:util';
+import { isDeepStrictEqual as deepEqual } from 'node:util';
 
 import { CACHE_FOLDER, CONFIG_FOLDER } from './constants.js';
 import { mapToJSON, checkFileExists, createFolders } from './helpers.js';
@@ -154,7 +154,9 @@ export class Incremental implements Cache {
     const stream = createReadStream(target);
 
     return new Promise((resolve, reject) => {
-      stream.on('data', (data: string) => hash.update(data, 'utf8'));
+      stream.on('data', (data: string | Buffer) =>
+        hash.update(data.toString(), 'utf8'),
+      );
       stream.on('end', () => resolve(hash.digest('hex')));
       stream.on('error', (error: unknown) => reject(error));
     });
