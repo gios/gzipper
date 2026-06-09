@@ -100,7 +100,9 @@ export class Compress {
       }
     } catch (error) {
       this.logger.log(error as Error, LogLevel.ERROR);
-      throw new Error((error as Error).message);
+      throw new Error((error as Error).message, {
+        cause: error,
+      });
     }
 
     const filesCount = files.length;

@@ -78,12 +78,9 @@ describe('CLI Compress', () => {
   }
 
   it('should throw an error if no path found', () => {
-    try {
+    expect(() => {
       new Compress(null as never, null);
-    } catch (err) {
-      expect(err).toBeInstanceOf(Error);
-      expect(err.message).toBe(`Can't find a path.`);
-    }
+    }).toThrow(`Can't find a path.`);
   });
 
   it('should throw on compress error', async () => {
@@ -94,26 +91,24 @@ describe('CLI Compress', () => {
       .spyOn(compress as never, 'runCompressWorker')
       .mockRejectedValueOnce(new Error('Compressing error.'));
 
-    try {
-      await compress.run();
-    } catch (err) {
-      expect(err).toBeInstanceOf(Error);
-      expect(err.message).toBe('Compressing error.');
-      expect(createWorkersSpy).toHaveBeenCalledTimes(1);
-      expect(runCompressWorkerSpy).toHaveBeenCalledTimes(1);
-      expect(logSpy).toHaveBeenNthCalledWith(
-        1,
-        'Compression GZIP | ',
-        LogLevel.INFO,
-      );
-      expect(logSpy).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          name: 'Error',
-          message: 'Compressing error.',
-        }),
-        LogLevel.ERROR,
-      );
-    }
+    await expect(compress.run()).rejects.toThrow('Compressing error.');
+
+    expect(createWorkersSpy).toHaveBeenCalledTimes(1);
+    expect(runCompressWorkerSpy).toHaveBeenCalledTimes(1);
+
+    expect(logSpy).toHaveBeenNthCalledWith(
+      1,
+      'Compression GZIP | ',
+      LogLevel.INFO,
+    );
+
+    expect(logSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        name: 'Error',
+        message: 'Compressing error.',
+      }),
+      LogLevel.ERROR,
+    );
   });
 
   it('should print message about appropriate files', async () => {
