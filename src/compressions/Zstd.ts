@@ -14,9 +14,9 @@ export class ZstdCompression extends Compression<ZstdOptions> {
   /**
    * Returns zstd compression instance in closure.
    */
-  async getCompression(): Promise<stream.Transform> {
+  async getCompression(): Promise<stream.Duplex> {
     const zstd = await import('simple-zstd');
-    return zstd.ZSTDCompress(this.compressionOptions.level);
+    return zstd.compress(this.compressionOptions.level ?? 3);
   }
 
   /**

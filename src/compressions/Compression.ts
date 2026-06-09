@@ -19,7 +19,10 @@ export abstract class Compression<T extends CompressionOptions> {
   /**
    * Returns a compression instance in closure.
    */
-  abstract getCompression(): stream.Transform | Promise<stream.Transform>;
+  abstract getCompression():
+    | stream.Transform
+    | Promise<stream.Transform>
+    | Promise<stream.Duplex>;
 
   /**
    * Build compression options object [compressionOptions].
