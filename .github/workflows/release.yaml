@@ -21,6 +21,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -58,3 +63,9 @@ jobs:
         run: |
           git push origin HEAD:${{ github.ref_name }}
           git push origin "refs/tags/${{ github.event.inputs.version }}"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          generate_release_notes: true
