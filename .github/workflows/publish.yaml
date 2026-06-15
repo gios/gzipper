@@ -63,11 +63,11 @@ jobs:
           echo "Head SHA: $HEAD_SHA"
 
           if [ "$TAG_SHA" != "$HEAD_SHA" ]; then
-            echo "❌ Tag does not match commit. Exiting."
+            echo "Tag does not match commit. Exiting."
             exit 1
           fi
 
-          echo "✅ Tag matches commit. Proceeding..."
+          echo "Tag matches commit. Proceeding..."
 
       - uses: pnpm/action-setup@v6
         name: Install pnpm
