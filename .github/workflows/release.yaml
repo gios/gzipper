@@ -70,6 +70,6 @@ jobs:
           generate_release_notes: true
 
   publish:
-    uses: ./.github/workflows/publish.yml
+    uses: ./.github/workflows/publish.yaml
     with:
       version: ${{ github.event.inputs.version }}
