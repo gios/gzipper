@@ -68,3 +68,8 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.version }}
           generate_release_notes: true
+
+  publish:
+    uses: ./.github/workflows/publish.yml
+    with:
+      version: ${{ github.event.inputs.version }}

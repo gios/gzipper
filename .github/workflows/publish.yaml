@@ -1,18 +1,18 @@
 name: Publish Package
 
-# on:
-#   release:
-#     types: [published]
 on:
-  release:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: string
 
 jobs:
-  debug:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "EVENT: ${{ github.event.action }}"
-          echo "TAG: ${{ github.event.release.tag_name }}"
+          echo "Publishing tag: ${{ github.event.inputs.version }}"
 
 # jobs:
 #   test:
