@@ -3,8 +3,8 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Version in format v1.2.3'
+      tag:
+        description: 'Tag in format v1.2.3'
         required: true
         type: string
 
@@ -31,19 +31,19 @@ jobs:
         with:
           node-version: 24
 
-      - name: Validate version
+      - name: Validate tag
         run: |
-          VERSION="${{ github.event.inputs.version }}"
+          TAG="${{ github.event.inputs.tag }}"
 
-          if ! echo "$VERSION" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "Version must be in format v1.2.3"
+          if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Tag must be in format v1.2.3"
             exit 1
           fi
 
       - name: Update package.json
         run: |
-          VERSION="${{ github.event.inputs.version }}"
-          PACKAGE_VERSION="${VERSION#v}"
+          TAG="${{ github.event.inputs.tag }}"
+          PACKAGE_VERSION="${TAG#v}"
 
           pnpm version "$PACKAGE_VERSION" --no-git-tag-version
 
@@ -53,11 +53,11 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add package.json pnpm-lock.yaml
-          git commit -m "chore: release ${{ github.event.inputs.version }}"
+          git commit -m "chore: release ${{ github.event.inputs.tag }}"
 
       - name: Create tag
         run: |
-          git tag "${{ github.event.inputs.version }}"
+          git tag "${{ github.event.inputs.tag }}"
 
       - name: Push commit and tag
         run: |
@@ -66,11 +66,11 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ github.event.inputs.version }}
+          tag_name: ${{ github.event.inputs.tag }}
           generate_release_notes: true
 
   publish:
     uses: ./.github/workflows/publish.yaml
     needs: release
     with:
-      version: ${{ github.event.inputs.version }}
+      tag: ${{ github.event.inputs.tag }}
