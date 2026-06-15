@@ -53,6 +53,32 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.workflow_run.head_sha }}
 
+      - name: Debug tag resolution
+        run: |
+          echo "=== GIT CONTEXT ==="
+          echo "HEAD commit:"
+          git rev-parse HEAD
+
+          echo ""
+          echo "=== LAST COMMIT INFO ==="
+          git log -1 --oneline
+
+          echo ""
+          echo "=== ALL TAGS (LOCAL) ==="
+          git tag -l
+
+          echo ""
+          echo "=== TAGS POINTING TO HEAD ==="
+          git tag --points-at HEAD
+
+          echo ""
+          echo "=== DESCRIBE (best guess tag) ==="
+          git describe --tags --always || true
+
+          echo ""
+          echo "=== REFS ==="
+          git show-ref --tags || true
+
       - name: Get tag
         run: |
           TAG=$(git tag --points-at HEAD)
