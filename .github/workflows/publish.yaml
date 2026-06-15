@@ -8,97 +8,104 @@ on:
         type: string
 
 jobs:
-  publish:
+  info:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "Publishing tag: ${{ github.event.inputs.version }}"
+          VERSION="${{ github.event.inputs.version }}"
 
-# jobs:
-#   test:
-#     runs-on: ubuntu-latest
+          if [ -z "$VERSION" ]; then
+            echo "No version found, exiting"
+            exit 1
+          fi
 
-#     strategy:
-#       matrix:
-#         node-version: [24, 26]
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v6
-#         with:
-#           fetch-depth: 0
-#           ref: ${{ github.event.release.tag_name }}
+          echo "Publishing version: $VERSION"
 
-#       - uses: pnpm/action-setup@v6
-#         name: Install pnpm
-#         with:
-#           run_install: false
+  test:
+    needs: info
+    runs-on: ubuntu-latest
 
-#       - name: Use Node ${{ matrix.node-version }}
-#         uses: actions/setup-node@v6
-#         with:
-#           node-version: ${{ matrix.node-version }}
-#           cache: 'pnpm'
-#           cache-dependency-path: '**/pnpm-lock.yaml'
+    strategy:
+      matrix:
+        node-version: [24, 26]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.version }}
 
-#       - name: Install pnpm dependencies
-#         uses: ./.github/actions/install-pnpm-dependencies
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          run_install: false
 
-#       - name: Validate
-#         run: |
-#           pnpm run eslint
-#           pnpm run tsc
-#           pnpm run test
+      - name: Use Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
-#   publish:
-#     needs: test
-#     runs-on: ubuntu-latest
+      - name: Install pnpm dependencies
+        uses: ./.github/actions/install-pnpm-dependencies
 
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v6
-#         with:
-#           fetch-depth: 0
-#           ref: ${{ github.event.release.tag_name }}
+      - name: Validate
+        run: |
+          pnpm run eslint
+          pnpm run tsc
+          pnpm run test
 
-#       - name: Validate tag matches commit
-#         run: |
-#           TAG="${{ github.event.release.tag_name }}"
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
 
-#           echo "Tag: $TAG"
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.version }}
 
-#           TAG_SHA=$(git rev-list -n 1 "$TAG")
-#           HEAD_SHA=$(git rev-parse HEAD)
+      - name: Validate tag matches commit
+        run: |
+          TAG="${{ github.event.inputs.version }}"
 
-#           echo "Tag SHA:  $TAG_SHA"
-#           echo "Head SHA: $HEAD_SHA"
+          echo "Tag: $TAG"
 
-#           if [ "$TAG_SHA" != "$HEAD_SHA" ]; then
-#             echo "Tag does not match commit. Exiting."
-#             exit 1
-#           fi
+          TAG_SHA=$(git rev-list -n 1 "$TAG")
+          HEAD_SHA=$(git rev-parse HEAD)
 
-#           echo "Tag matches commit. Proceeding..."
+          echo "Tag SHA:  $TAG_SHA"
+          echo "Head SHA: $HEAD_SHA"
 
-#       - uses: pnpm/action-setup@v6
-#         name: Install pnpm
-#         with:
-#           run_install: false
+          if [ "$TAG_SHA" != "$HEAD_SHA" ]; then
+            echo "Tag does not match commit. Exiting."
+            exit 1
+          fi
 
-#       - name: Use Node ${{ matrix.node-version }}
-#         uses: actions/setup-node@v6
-#         with:
-#           node-version: 24
-#           cache: 'pnpm'
-#           cache-dependency-path: '**/pnpm-lock.yaml'
-#           registry-url: https://registry.npmjs.org/
+          echo "Tag matches commit. Proceeding..."
 
-#       - name: Install pnpm dependencies
-#         uses: ./.github/actions/install-pnpm-dependencies
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          run_install: false
 
-#       - name: Build
-#         run: pnpm run build
+      - name: Use Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
+          registry-url: https://registry.npmjs.org/
 
-#       - name: Publish
-#         run: cd dist && pnpm publish --no-git-checks
-#         env:
-#           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Install pnpm dependencies
+        uses: ./.github/actions/install-pnpm-dependencies
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Publish
+        run: cd dist && pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

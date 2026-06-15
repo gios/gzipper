@@ -71,5 +71,6 @@ jobs:
 
   publish:
     uses: ./.github/workflows/publish.yaml
+    needs: release
     with:
       version: ${{ github.event.inputs.version }}
