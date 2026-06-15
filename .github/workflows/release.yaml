@@ -61,7 +61,7 @@ jobs:
 
       - name: Push commit and tag
         run: |
-          git push origin HEAD:${{ github.ref_name }}
+          git push origin ${{ github.ref_name }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v3
