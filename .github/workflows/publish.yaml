@@ -105,7 +105,31 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Publish
-        run: cd dist && pnpm publish --no-git-checks
+      - name: Debug
+        run: |
+          test -n "$NODE_AUTH_TOKEN" && echo "Token present" || echo "Token missing"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish
+        run: cd dist && pnpm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Cleanup on failure
+        if: failure()
+        run: |
+          TAG="${{ github.event.inputs.tag }}"
+
+          gh release delete "$TAG" --yes
+
+          git push --delete origin "$TAG"
+
+          git tag -d "$TAG"
+
+          COMMIT_SHA=$(git log --grep="^chore: release ${{ github.event.inputs.tag }}$" --format="%H" -n 1)
+
+          if [ -n "$COMMIT_SHA" ]; then
+            git revert --no-edit "$COMMIT_SHA"
+            git push origin HEAD
+          fi
