@@ -6,9 +6,10 @@ on:
       tag:
         required: true
         type: string
-    secrets:
-      NPM_TOKEN:
-        required: true
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
   info:
@@ -108,16 +109,8 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Debug
-        run: |
-          test -n "$NODE_AUTH_TOKEN" && echo "Token present" || echo "Token missing"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Publish
-        run: cd dist && pnpm publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: cd dist && pnpm publish --provenance --no-git-checks
 
       - name: Cleanup on failure
         if: failure()
