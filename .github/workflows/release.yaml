@@ -74,3 +74,5 @@ jobs:
     needs: release
     with:
       tag: ${{ github.event.inputs.tag }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
